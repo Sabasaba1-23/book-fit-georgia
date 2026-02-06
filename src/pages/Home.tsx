@@ -22,7 +22,9 @@ interface ListingWithPartner {
   equipment_notes_en: string | null;
   equipment_notes_ka: string | null;
   status: string;
+  partner_id: string;
   partner_profiles: {
+    id: string;
     display_name: string;
     logo_url: string | null;
     partner_type: string;
@@ -41,7 +43,7 @@ export default function Home() {
     async function fetchListings() {
       const { data, error } = await supabase
         .from("training_listings")
-        .select("*, partner_profiles(display_name, logo_url, partner_type, bio)")
+        .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio)")
         .eq("status", "approved")
         .gte("scheduled_at", new Date().toISOString())
         .order("scheduled_at", { ascending: true });
@@ -137,6 +139,7 @@ export default function Home() {
               listing={{
                 ...listing,
                 price_gel: Number(listing.price_gel),
+                partner_id: listing.partner_id,
                 partner: listing.partner_profiles as any,
               }}
             />

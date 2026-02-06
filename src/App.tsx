@@ -11,6 +11,7 @@ import Profile from "./pages/Profile";
 import Bookings from "./pages/Bookings";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
+import PartnerProfile from "./pages/PartnerProfile";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminListings from "./pages/admin/AdminListings";
@@ -36,6 +37,7 @@ const App = () => (
             <Routes>
               <Route path="/auth" element={<Auth />} />
               <Route path="/" element={<Home />} />
+              <Route path="/partner/:id" element={<PartnerProfile />} />
               <Route path="/bookings" element={<ProtectedRoute><Bookings /></ProtectedRoute>} />
               <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
