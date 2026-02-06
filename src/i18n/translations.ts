@@ -62,6 +62,9 @@ export const translations = {
     logOut: "Log Out",
     settings: "Settings",
     languageLabel: "Language",
+    loginRequired: "Please log in to continue",
+    loginToBook: "Log in to book this training",
+    loginToChat: "Log in to send a message",
   },
   ka: {
     // Nav
@@ -126,6 +129,9 @@ export const translations = {
     logOut: "გასვლა",
     settings: "პარამეტრები",
     languageLabel: "ენა",
+    loginRequired: "გთხოვთ შეხვიდეთ გასაგრძელებლად",
+    loginToBook: "შეხვიდეთ ვარჯიშის დასაჯავშნად",
+    loginToChat: "შეხვიდეთ შეტყობინების გასაგზავნად",
   },
 } as const;
 
