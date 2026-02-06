@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
-  { key: "home" as const, icon: Home, path: "/", requiresAuth: false },
-  { key: "bookings" as const, icon: CalendarCheck, path: "/bookings", requiresAuth: true },
-  { key: "messages" as const, icon: MessageCircle, path: "/messages", requiresAuth: true },
-  { key: "profile" as const, icon: User, path: "/profile", requiresAuth: true },
+  { key: "home" as const, label: "EXPLORE", icon: Home, path: "/", requiresAuth: false },
+  { key: "bookings" as const, label: "BOOKINGS", icon: CalendarCheck, path: "/bookings", requiresAuth: true },
+  { key: "messages" as const, label: "CHAT", icon: MessageCircle, path: "/messages", requiresAuth: true },
+  { key: "profile" as const, label: "PROFILE", icon: User, path: "/profile", requiresAuth: true },
 ];
 
 export default function BottomNav() {
@@ -30,28 +30,33 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50">
-      <div className="glass-card mx-auto max-w-lg border-t-0 rounded-t-3xl">
-        <div className="flex h-16 items-center justify-around px-2">
-          {navItems.map(({ key, icon: Icon, path, requiresAuth }) => {
+      <div className="glass-card mx-auto max-w-lg rounded-t-3xl">
+        <div className="flex h-[72px] items-center justify-around px-2">
+          {navItems.map(({ key, label, icon: Icon, path, requiresAuth }) => {
             const active = location.pathname === path;
             return (
               <button
                 key={key}
                 onClick={() => handleNav(path, requiresAuth)}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 rounded-2xl px-4 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95",
-                  active
-                    ? "text-primary"
-                    : "text-muted-foreground"
+                  "flex flex-col items-center gap-1 px-3 py-1 transition-all duration-200 active:scale-95",
                 )}
               >
-                <div className={cn(
-                  "flex h-8 w-8 items-center justify-center rounded-full transition-all",
-                  active && "bg-primary/10"
-                )}>
-                  <Icon className={cn("h-5 w-5", active && "text-primary")} />
-                </div>
-                <span>{t(key)}</span>
+                <Icon
+                  className={cn(
+                    "h-5 w-5 transition-colors",
+                    active ? "text-primary" : "text-muted-foreground"
+                  )}
+                  strokeWidth={active ? 2.5 : 1.5}
+                />
+                <span
+                  className={cn(
+                    "text-[9px] font-bold tracking-[0.1em]",
+                    active ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  {label}
+                </span>
               </button>
             );
           })}

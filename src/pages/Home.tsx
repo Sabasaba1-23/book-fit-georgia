@@ -34,7 +34,6 @@ export default function Home() {
   const { t } = useLanguage();
   const [listings, setListings] = useState<ListingWithPartner[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchOpen, setSearchOpen] = useState(false);
   const [activeSport, setActiveSport] = useState("All");
   const [loading, setLoading] = useState(true);
 
@@ -55,7 +54,7 @@ export default function Home() {
     fetchListings();
   }, []);
 
-  // Get unique sports for filter chips
+  // Unique sports for filter chips
   const sports = ["All", ...Array.from(new Set(listings.map((l) => l.sport)))];
 
   const filtered = listings.filter((l) => {
@@ -75,42 +74,38 @@ export default function Home() {
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 pt-4 pb-2">
+      <header className="relative z-40 px-5 pt-5 pb-1">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-muted-foreground tracking-wider uppercase">Community</p>
-            <h1 className="text-2xl font-bold text-foreground">Discovery</h1>
+            <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-primary">Community</p>
+            <h1 className="text-3xl font-extrabold text-foreground -mt-0.5">Discovery</h1>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-card ios-shadow transition-transform active:scale-95"
-            >
-              <Search className="h-5 w-5 text-foreground" />
+            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground transition-transform active:scale-95">
+              <Bell className="h-5 w-5 text-background" />
             </button>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-card ios-shadow transition-transform active:scale-95">
-              <Bell className="h-5 w-5 text-foreground" />
-            </button>
-          </div>
-        </div>
-
-        {/* Search bar (expandable) */}
-        {searchOpen && (
-          <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="glass-card flex items-center gap-2 rounded-2xl px-4 py-2.5">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder={t("search")}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                autoFocus
-              />
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary p-[2px]">
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-background">
+                <span className="text-sm font-bold text-primary">K</span>
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </header>
+
+      {/* Search bar - always visible */}
+      <div className="relative z-30 px-5 py-3">
+        <div className="glass-card flex items-center gap-3 rounded-2xl px-4 py-3 ios-shadow">
+          <Search className="h-5 w-5 text-muted-foreground" />
+          <input
+            type="text"
+            placeholder="Search trainers, gyms or yoga..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60"
+          />
+        </div>
+      </div>
 
       {/* Filter chips */}
       <FilterChips
@@ -120,7 +115,7 @@ export default function Home() {
       />
 
       {/* Listings feed */}
-      <main className="relative z-10 mx-auto max-w-lg space-y-4 px-5 py-3">
+      <main className="relative z-10 mx-auto max-w-lg space-y-5 px-5 py-2">
         {loading ? (
           <div className="flex justify-center py-16">
             <div className="flex flex-col items-center gap-2">
