@@ -74,7 +74,9 @@ interface ListingCardProps {
     equipment_notes_ka: string | null;
     status: string;
     booked_spots?: number;
+    partner_id?: string;
     partner: {
+      id?: string;
       display_name: string;
       logo_url: string | null;
       partner_type: string;
@@ -143,7 +145,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
         {/* Top: Partner pill + Verified badge */}
         <div className="absolute left-3 right-3 top-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 rounded-full bg-foreground/70 py-1.5 pl-1.5 pr-3.5 backdrop-blur-sm">
+          <div
+            className="flex items-center gap-2 rounded-full bg-foreground/70 py-1.5 pl-1.5 pr-3.5 backdrop-blur-sm cursor-pointer transition-transform hover:scale-105 active:scale-95"
+            onClick={(e) => {
+              e.stopPropagation();
+              const pid = listing.partner_id || listing.partner?.id;
+              if (pid) navigate(`/partner/${pid}`);
+            }}
+          >
             <Avatar className="h-7 w-7 border border-white/20">
               {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
               <AvatarFallback className="bg-white/20 text-[10px] font-semibold text-white">
