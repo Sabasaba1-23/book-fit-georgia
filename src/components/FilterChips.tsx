@@ -20,7 +20,7 @@ export default function FilterChips({ options, active, onChange }: FilterChipsPr
               : "border border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground"
           )}
         >
-          {option}
+          {option.toUpperCase()}
         </button>
       ))}
     </div>
