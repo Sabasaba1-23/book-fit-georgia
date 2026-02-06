@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -97,14 +98,35 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const date = new Date(listing.scheduled_at);
   const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
 
-  const handleBook = (e?: React.MouseEvent) => {
+  const [booking, setBooking] = useState(false);
+
+  const handleBook = async (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!user) {
       toast({ title: t("loginToBook"), variant: "destructive" });
       navigate("/auth");
       return;
     }
-    // TODO: booking flow
+    if (booking) return;
+    setBooking(true);
+    try {
+      const { error } = await supabase.from("bookings").insert({
+        user_id: user.id,
+        listing_id: listing.id,
+        spots: 1,
+        total_price: listing.price_gel,
+      });
+      if (error) {
+        toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Booked successfully! 🎉" });
+        navigate("/bookings");
+      }
+    } catch {
+      toast({ title: "Something went wrong", variant: "destructive" });
+    } finally {
+      setBooking(false);
+    }
   };
 
   const handleAsk = (e: React.MouseEvent) => {
@@ -306,7 +328,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
               className="relative flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-primary/90 active:scale-95"
             >
               <Calendar className="h-4 w-4" />
-              {t("book")} Now
+              {booking ? "Booking..." : `${t("book")} Now`}
               <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl" />
             </button>
           </div>
