@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Calendar, Clock, Users, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface ListingCardProps {
   listing: {
@@ -36,7 +39,19 @@ interface ListingCardProps {
 
 export default function ListingCard({ listing }: ListingCardProps) {
   const { lang, t } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
+
+  const requireAuth = (messageKey: "loginToBook" | "loginToChat") => {
+    if (!user) {
+      toast({ title: t(messageKey), variant: "destructive" });
+      navigate("/auth");
+      return true;
+    }
+    return false;
+  };
 
   const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
   const description = lang === "ka" && listing.description_ka ? listing.description_ka : listing.description_en;
@@ -142,10 +157,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
             <p className="text-xs text-muted-foreground italic">{equipNotes}</p>
           )}
           <div className="flex gap-2 pt-1">
-            <Button size="sm" variant="outline" className="flex-1">
+            <Button size="sm" variant="outline" className="flex-1" onClick={() => !requireAuth("loginToChat")}>
               {t("askQuestion")}
             </Button>
-            <Button size="sm" className="flex-1">
+            <Button size="sm" className="flex-1" onClick={() => !requireAuth("loginToBook")}>
               {t("book")}
             </Button>
           </div>
