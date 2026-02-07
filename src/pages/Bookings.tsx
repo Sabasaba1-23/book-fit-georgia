@@ -8,7 +8,8 @@ import BookingTicket from "@/components/BookingTicket";
 import SessionConfirmationCard from "@/components/SessionConfirmationCard";
 import ReviewForm from "@/components/ReviewForm";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
 import { format, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
@@ -220,9 +221,17 @@ export default function Bookings() {
     <div className="relative min-h-screen bg-background pb-24">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      <header className="relative z-40 px-5 pt-5 pb-1">
+      <header className="relative z-40 px-5 pb-1" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top, 1.25rem))' }}>
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-extrabold text-foreground">My Bookings</h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/")}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95"
+            >
+              <ArrowLeft className="h-5 w-5 text-foreground" />
+            </button>
+            <h1 className="text-2xl font-extrabold text-foreground">My Bookings</h1>
+          </div>
           <button className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95">
             <Bell className="h-5 w-5 text-foreground" />
           </button>
@@ -257,11 +266,22 @@ export default function Bookings() {
 
       <main className="relative z-10 mx-auto max-w-lg space-y-4 px-5 py-2">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="flex flex-col items-center gap-2">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-sm text-muted-foreground">{t("loading")}</p>
-            </div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-[1.5rem] bg-card ios-shadow p-5">
+                <div className="flex items-start gap-3 mb-3">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-28" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : displayBookings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import BottomNav from "@/components/BottomNav";
 import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
@@ -214,8 +215,23 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="relative min-h-screen bg-background pb-24">
+        <div className="flex flex-col items-center pt-10 pb-4">
+          <Skeleton className="h-28 w-28 rounded-full" />
+          <Skeleton className="mt-3 h-6 w-32" />
+          <Skeleton className="mt-2 h-4 w-24" />
+        </div>
+        <div className="mx-5 mb-6">
+          <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex-1 py-4 flex flex-col items-center gap-2">
+                <Skeleton className="h-6 w-10" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <BottomNav />
       </div>
     );
   }

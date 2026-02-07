@@ -6,6 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import BottomNav from "@/components/BottomNav";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft,
   Send,
@@ -17,7 +18,6 @@ interface Thread {
   id: string;
   listing_id: string | null;
   created_at: string;
-  // joined data
   otherUser?: { display_name: string; avatar_url: string | null };
   lastMessage?: string;
   lastMessageAt?: string;
@@ -45,7 +45,6 @@ export default function Messages() {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch threads
   useEffect(() => {
     if (!user) return;
     fetchThreads();
@@ -69,89 +68,117 @@ export default function Messages() {
 
     const threadIds = participations.map((p) => p.thread_id);
 
-    // Get threads
-    const { data: threadsData } = await supabase
-      .from("conversation_threads")
-      .select("*")
-      .in("id", threadIds)
-      .order("created_at", { ascending: false });
+    // Batch all queries in parallel instead of N+1
+    const [threadsRes, allParticipantsRes, allMessagesRes] = await Promise.all([
+      supabase
+        .from("conversation_threads")
+        .select("*")
+        .in("id", threadIds)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("conversation_participants")
+        .select("thread_id, user_id")
+        .in("thread_id", threadIds)
+        .neq("user_id", user.id),
+      supabase
+        .from("messages")
+        .select("thread_id, content, sent_at")
+        .in("thread_id", threadIds)
+        .order("sent_at", { ascending: false }),
+    ]);
 
-    if (!threadsData) {
+    if (!threadsRes.data) {
       setLoading(false);
       return;
     }
 
-    // Enrich threads with other participant info and last message
-    const enriched: Thread[] = [];
+    // Collect unique other user IDs
+    const otherUserIds = new Set(
+      (allParticipantsRes.data || []).map((p) => p.user_id)
+    );
 
-    for (const thread of threadsData) {
-      // Get other participants
-      const { data: participants } = await supabase
-        .from("conversation_participants")
-        .select("user_id")
-        .eq("thread_id", thread.id)
-        .neq("user_id", user.id);
+    // Batch fetch partner and user profiles
+    const otherUserIdsArr = Array.from(otherUserIds);
+    const [partnerProfilesRes, userProfilesRes] = await Promise.all([
+      otherUserIdsArr.length > 0
+        ? supabase
+            .from("partner_profiles")
+            .select("user_id, display_name, logo_url")
+            .in("user_id", otherUserIdsArr)
+        : { data: [] },
+      otherUserIdsArr.length > 0
+        ? supabase
+            .from("profiles")
+            .select("user_id, full_name, avatar_url")
+            .in("user_id", otherUserIdsArr)
+        : { data: [] },
+    ]);
 
+    // Build lookup maps
+    const partnerMap = new Map(
+      (partnerProfilesRes.data || []).map((p) => [p.user_id, p])
+    );
+    const profileMap = new Map(
+      (userProfilesRes.data || []).map((p) => [p.user_id, p])
+    );
+
+    // Build participant map: thread_id -> other user_id
+    const participantMap = new Map<string, string>();
+    for (const p of allParticipantsRes.data || []) {
+      participantMap.set(p.thread_id, p.user_id);
+    }
+
+    // Build last message map (first occurrence per thread since ordered desc)
+    const lastMsgMap = new Map<string, { content: string; sent_at: string }>();
+    for (const msg of allMessagesRes.data || []) {
+      if (!lastMsgMap.has(msg.thread_id)) {
+        lastMsgMap.set(msg.thread_id, { content: msg.content, sent_at: msg.sent_at });
+      }
+    }
+
+    // Batch fetch listing titles
+    const listingIds = threadsRes.data
+      .filter((t) => t.listing_id)
+      .map((t) => t.listing_id!);
+    
+    let listingMap = new Map<string, string>();
+    if (listingIds.length > 0) {
+      const { data: listings } = await supabase
+        .from("training_listings")
+        .select("id, title_en")
+        .in("id", listingIds);
+      listingMap = new Map(
+        (listings || []).map((l) => [l.id, l.title_en])
+      );
+    }
+
+    // Assemble enriched threads
+    const enriched: Thread[] = threadsRes.data.map((thread) => {
+      const otherUserId = participantMap.get(thread.id);
       let otherUser: Thread["otherUser"] = undefined;
 
-      if (participants && participants.length > 0) {
-        // Try partner_profiles first (trainer/gym name)
-        const { data: partnerProfile } = await supabase
-          .from("partner_profiles")
-          .select("display_name, logo_url")
-          .eq("user_id", participants[0].user_id)
-          .maybeSingle();
-
-        if (partnerProfile) {
-          otherUser = {
-            display_name: partnerProfile.display_name,
-            avatar_url: partnerProfile.logo_url,
-          };
+      if (otherUserId) {
+        const partner = partnerMap.get(otherUserId);
+        if (partner) {
+          otherUser = { display_name: partner.display_name, avatar_url: partner.logo_url };
         } else {
-          // Fall back to profiles
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("full_name, avatar_url")
-            .eq("user_id", participants[0].user_id)
-            .maybeSingle();
-
+          const profile = profileMap.get(otherUserId);
           if (profile) {
-            otherUser = {
-              display_name: profile.full_name || "User",
-              avatar_url: profile.avatar_url,
-            };
+            otherUser = { display_name: profile.full_name || "User", avatar_url: profile.avatar_url };
           }
         }
       }
 
-      // Get last message
-      const { data: lastMsg } = await supabase
-        .from("messages")
-        .select("content, sent_at")
-        .eq("thread_id", thread.id)
-        .order("sent_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      const lastMsg = lastMsgMap.get(thread.id);
 
-      // Get listing title if exists
-      let listingTitle: string | undefined;
-      if (thread.listing_id) {
-        const { data: listing } = await supabase
-          .from("training_listings")
-          .select("title_en")
-          .eq("id", thread.listing_id)
-          .maybeSingle();
-        listingTitle = listing?.title_en || undefined;
-      }
-
-      enriched.push({
+      return {
         ...thread,
         otherUser,
         lastMessage: lastMsg?.content,
         lastMessageAt: lastMsg?.sent_at,
-        listingTitle,
-      });
-    }
+        listingTitle: thread.listing_id ? listingMap.get(thread.listing_id) : undefined,
+      };
+    });
 
     // Sort by last message time
     enriched.sort((a, b) => {
@@ -169,7 +196,6 @@ export default function Messages() {
     if (!activeThread) return;
     fetchMessages(activeThread.id);
 
-    // Real-time subscription
     const channel = supabase
       .channel(`messages-${activeThread.id}`)
       .on(
@@ -191,7 +217,6 @@ export default function Messages() {
     };
   }, [activeThread]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -202,7 +227,6 @@ export default function Messages() {
       .select("*")
       .eq("thread_id", threadId)
       .order("sent_at", { ascending: true });
-
     if (data) setMessages(data as Message[]);
   }
 
@@ -218,9 +242,7 @@ export default function Messages() {
       content,
     });
 
-    if (error) {
-      setNewMessage(content); // restore on error
-    }
+    if (error) setNewMessage(content);
     setSending(false);
   }
 
@@ -243,14 +265,13 @@ export default function Messages() {
   if (activeThread) {
     return (
       <div className="flex h-screen flex-col bg-background">
-        {/* Chat Header */}
-        <header className="flex items-center gap-3 border-b border-border/50 px-4 py-3 bg-background/90 backdrop-blur-xl">
+        <header
+          className="flex items-center gap-3 border-b border-border/50 px-4 py-3 bg-background/90 backdrop-blur-xl"
+          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+        >
           <button
-            onClick={() => {
-              setActiveThread(null);
-              setMessages([]);
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted"
+            onClick={() => { setActiveThread(null); setMessages([]); }}
+            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted transition-colors active:scale-95"
           >
             <ArrowLeft className="h-5 w-5 text-foreground" />
           </button>
@@ -274,23 +295,17 @@ export default function Messages() {
           </div>
         </header>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">
-                Start the conversation!
-              </p>
+              <p className="text-sm text-muted-foreground">Start the conversation!</p>
             </div>
           )}
           {messages.map((msg) => {
             const isMe = msg.sender_id === user?.id;
             return (
-              <div
-                key={msg.id}
-                className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-              >
+              <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
                     isMe
@@ -299,11 +314,7 @@ export default function Messages() {
                   }`}
                 >
                   <p className="text-[14px] leading-relaxed">{msg.content}</p>
-                  <p
-                    className={`text-[10px] mt-1 ${
-                      isMe ? "text-primary-foreground/60" : "text-muted-foreground"
-                    }`}
-                  >
+                  <p className={`text-[10px] mt-1 ${isMe ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
                     {formatMessageTime(msg.sent_at)}
                   </p>
                 </div>
@@ -313,8 +324,10 @@ export default function Messages() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="border-t border-border/50 bg-background/90 backdrop-blur-xl px-4 py-3 pb-8">
+        <div
+          className="border-t border-border/50 bg-background/90 backdrop-blur-xl px-4 py-3"
+          style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}
+        >
           <div className="flex items-center gap-2">
             <Input
               placeholder="Type a message..."
@@ -341,26 +354,31 @@ export default function Messages() {
     <div className="min-h-screen bg-background pb-24">
       <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
 
-      <header className="relative z-40 px-5 pt-6 pb-2">
-        <h1 className="text-2xl font-extrabold text-foreground">
-          {t("messages")}
-        </h1>
+      <header
+        className="relative z-40 px-5 pb-2"
+        style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}
+      >
+        <h1 className="text-2xl font-extrabold text-foreground">{t("messages")}</h1>
       </header>
 
       <main className="relative z-10 px-5 py-3 space-y-2">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="h-7 w-7 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card p-4">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : threads.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-3" />
-            <p className="text-sm font-medium text-muted-foreground">
-              No messages yet
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Book a training to chat with your trainer
-            </p>
+            <p className="text-sm font-medium text-muted-foreground">No messages yet</p>
+            <p className="mt-1 text-xs text-muted-foreground">Book a training to chat with your trainer</p>
           </div>
         ) : (
           threads.map((thread) => (
