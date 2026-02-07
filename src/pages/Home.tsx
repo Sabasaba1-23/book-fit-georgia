@@ -209,7 +209,7 @@ export default function Home() {
       <FilterChips options={sports} active={activeSport} onChange={setActiveSport} />
 
       {/* Feed */}
-      <main className="relative z-10 mx-auto max-w-lg space-y-5 px-5 py-3">
+      <main className="relative z-10 mx-auto max-w-lg space-y-7 px-5 py-5">
         {loading ? (
           <div className="flex justify-center py-16">
             <div className="flex flex-col items-center gap-2">
@@ -238,7 +238,7 @@ export default function Home() {
 
             {/* Single sessions */}
             {filteredListings.length > 0 && (
-              <div className="space-y-5">
+              <div className="space-y-7">
                 {filteredPackages.length > 0 && (
                   <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground pt-2">⚡ Single Sessions</h2>
                 )}
