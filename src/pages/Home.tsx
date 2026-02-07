@@ -288,12 +288,18 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="relative z-10 py-6 pb-28 flex justify-center">
+      <footer className="relative z-10 py-6 pb-28 flex justify-center gap-4">
         <button
           onClick={() => navigate("/privacy")}
           className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
         >
           Privacy Policy
+        </button>
+        <button
+          onClick={() => navigate("/terms")}
+          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          Terms & Conditions
         </button>
       </footer>
 
