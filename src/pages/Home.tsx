@@ -225,37 +225,59 @@ export default function Home() {
             <p className="text-muted-foreground">{t("noListings")}</p>
           </div>
         ) : (
-          <>
-            {/* Packages section */}
-            {filteredPackages.length > 0 && (
-              <div className="space-y-3">
-                <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">📦 Package Deals</h2>
-                {filteredPackages.map((pkg) => (
-                  <PackageCard key={pkg.id} pkg={pkg} />
-                ))}
-              </div>
-            )}
+          <div className="space-y-7">
+            {(() => {
+              // Interleave listings and packages
+              const items: { type: "listing" | "package"; data: any; sortKey: string }[] = [
+                ...filteredListings.map((l) => ({
+                  type: "listing" as const,
+                  data: l,
+                  sortKey: l.scheduled_at,
+                })),
+                ...filteredPackages.map((p) => ({
+                  type: "package" as const,
+                  data: p,
+                  sortKey: p.id, // packages don't have scheduled_at, mix them in
+                })),
+              ];
 
-            {/* Single sessions */}
-            {filteredListings.length > 0 && (
-              <div className="space-y-7">
-                {filteredPackages.length > 0 && (
-                  <h2 className="text-xs font-bold uppercase tracking-widest text-muted-foreground pt-2">⚡ Single Sessions</h2>
-                )}
-                {filteredListings.map((listing) => (
+              // Interleave: insert a package every 2-3 listings
+              const listings = items.filter((i) => i.type === "listing");
+              const packages = items.filter((i) => i.type === "package");
+              const mixed: typeof items = [];
+              let pkgIdx = 0;
+              listings.forEach((item, i) => {
+                mixed.push(item);
+                if ((i + 1) % 2 === 0 && pkgIdx < packages.length) {
+                  mixed.push(packages[pkgIdx++]);
+                }
+              });
+              // Add remaining packages
+              while (pkgIdx < packages.length) {
+                mixed.push(packages[pkgIdx++]);
+              }
+              // If no listings, just show packages
+              if (listings.length === 0) {
+                mixed.push(...packages);
+              }
+
+              return mixed.map((item) =>
+                item.type === "listing" ? (
                   <ListingCard
-                    key={listing.id}
+                    key={item.data.id}
                     listing={{
-                      ...listing,
-                      price_gel: Number(listing.price_gel),
-                      partner_id: listing.partner_id,
-                      partner: listing.partner_profiles as any,
+                      ...item.data,
+                      price_gel: Number(item.data.price_gel),
+                      partner_id: item.data.partner_id,
+                      partner: item.data.partner_profiles as any,
                     }}
                   />
-                ))}
-              </div>
-            )}
-          </>
+                ) : (
+                  <PackageCard key={item.data.id} pkg={item.data} />
+                )
+              );
+            })()}
+          </div>
         )}
       </main>
 
