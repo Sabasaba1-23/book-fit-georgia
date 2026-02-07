@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import BottomNav from "@/components/BottomNav";
+import BookingTicket from "@/components/BookingTicket";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Bell, Calendar, Clock, MapPin, Ticket, Navigation, X, MessageCircle } from "lucide-react";
 import { format, formatDistanceToNow, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
@@ -17,6 +18,7 @@ interface BookingWithListing {
   total_price: number;
   created_at: string;
   listing_id: string;
+  stripe_payment_id: string | null;
   training_listings: {
     id: string;
     title_en: string;
@@ -27,6 +29,7 @@ interface BookingWithListing {
     duration_minutes: number;
     price_gel: number;
     background_image_url: string | null;
+    location: string | null;
     partner_id: string;
     partner_profiles: {
       id: string;
@@ -63,6 +66,7 @@ export default function Bookings() {
   const [bookings, setBookings] = useState<BookingWithListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"upcoming" | "history">("upcoming");
+  const [ticketBooking, setTicketBooking] = useState<BookingWithListing | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -74,10 +78,10 @@ export default function Bookings() {
     const { data, error } = await supabase
       .from("bookings")
       .select(`
-        id, spots, booking_status, payment_status, total_price, created_at, listing_id,
+        id, spots, booking_status, payment_status, total_price, created_at, listing_id, stripe_payment_id,
         training_listings (
           id, title_en, title_ka, sport, training_type, scheduled_at,
-          duration_minutes, price_gel, background_image_url, partner_id,
+          duration_minutes, price_gel, background_image_url, location, partner_id,
           partner_profiles ( id, display_name, logo_url, partner_type )
         )
       `)
@@ -109,7 +113,6 @@ export default function Bookings() {
     const listing = booking.training_listings;
     const partnerId = listing.partner_id;
 
-    // Get the partner's user_id
     const { data: partner } = await supabase
       .from("partner_profiles")
       .select("user_id")
@@ -121,7 +124,6 @@ export default function Bookings() {
       return;
     }
 
-    // Check if a thread already exists for this listing between user and partner
     const { data: existingParticipations } = await supabase
       .from("conversation_participants")
       .select("thread_id")
@@ -129,8 +131,6 @@ export default function Bookings() {
 
     if (existingParticipations && existingParticipations.length > 0) {
       const threadIds = existingParticipations.map((p) => p.thread_id);
-
-      // Check if partner is in any of these threads for this listing
       const { data: partnerParticipations } = await supabase
         .from("conversation_participants")
         .select("thread_id")
@@ -139,8 +139,6 @@ export default function Bookings() {
 
       if (partnerParticipations && partnerParticipations.length > 0) {
         const partnerThreadIds = partnerParticipations.map((p) => p.thread_id);
-
-        // Check if any of these threads belong to this listing
         const { data: existingThread } = await supabase
           .from("conversation_threads")
           .select("id")
@@ -155,7 +153,6 @@ export default function Bookings() {
       }
     }
 
-    // Create new thread
     const { data: thread, error: threadError } = await supabase
       .from("conversation_threads")
       .insert({ listing_id: listing.id })
@@ -167,7 +164,6 @@ export default function Bookings() {
       return;
     }
 
-    // Add both participants
     await supabase.from("conversation_participants").insert([
       { thread_id: thread.id, user_id: user.id },
       { thread_id: thread.id, user_id: partner.user_id },
@@ -175,8 +171,6 @@ export default function Bookings() {
 
     navigate("/messages");
   }
-
-  const now = new Date();
 
   const upcoming = bookings.filter((b) => {
     if (b.booking_status === "cancelled") return false;
@@ -213,9 +207,7 @@ export default function Bookings() {
           <button
             onClick={() => setTab("upcoming")}
             className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              tab === "upcoming"
-                ? "bg-card text-primary ios-shadow"
-                : "text-muted-foreground"
+              tab === "upcoming" ? "bg-card text-primary ios-shadow" : "text-muted-foreground"
             }`}
           >
             Upcoming
@@ -228,9 +220,7 @@ export default function Bookings() {
           <button
             onClick={() => setTab("history")}
             className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              tab === "history"
-                ? "bg-card text-foreground ios-shadow"
-                : "text-muted-foreground"
+              tab === "history" ? "bg-card text-foreground ios-shadow" : "text-muted-foreground"
             }`}
           >
             History
@@ -370,6 +360,7 @@ export default function Bookings() {
                       Chat
                     </button>
                     <button
+                      onClick={() => setTicketBooking(booking)}
                       className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full bg-primary py-2.5 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
                     >
                       <Ticket className="h-3.5 w-3.5" />
@@ -381,8 +372,15 @@ export default function Bookings() {
                 {isCompleted && !isCancelled && (
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
+                      onClick={() => setTicketBooking(booking)}
+                      className="flex flex-[0.5] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                    >
+                      <Ticket className="h-3.5 w-3.5" />
+                      View Receipt
+                    </button>
+                    <button
                       onClick={() => navigate("/")}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                      className="flex flex-[0.5] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
                     >
                       Book Again
                     </button>
@@ -393,6 +391,28 @@ export default function Bookings() {
           })
         )}
       </main>
+
+      {/* Ticket Modal */}
+      {ticketBooking && (
+        <BookingTicket
+          open={!!ticketBooking}
+          onClose={() => setTicketBooking(null)}
+          booking={{
+            id: ticketBooking.id,
+            title: ticketBooking.training_listings.title_en,
+            sport: ticketBooking.training_listings.sport,
+            date: ticketBooking.training_listings.scheduled_at,
+            duration: ticketBooking.training_listings.duration_minutes,
+            price: ticketBooking.total_price,
+            trainerName: ticketBooking.training_listings.partner_profiles.display_name,
+            location: ticketBooking.training_listings.location || undefined,
+            paymentId: ticketBooking.stripe_payment_id || undefined,
+            bookedAt: ticketBooking.created_at,
+            spots: ticketBooking.spots,
+            bookingStatus: ticketBooking.booking_status,
+          }}
+        />
+      )}
 
       <BottomNav />
     </div>

@@ -17,6 +17,7 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminListings from "./pages/admin/AdminListings";
 import AdminPartners from "./pages/admin/AdminPartners";
+import AdminBookings from "./pages/admin/AdminBookings";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
                 <Route index element={<AdminDashboard />} />
                 <Route path="listings" element={<AdminListings />} />
                 <Route path="partners" element={<AdminPartners />} />
+                <Route path="bookings" element={<AdminBookings />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
