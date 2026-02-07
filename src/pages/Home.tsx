@@ -288,19 +288,22 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="relative z-10 py-6 pb-28 flex justify-center gap-4">
-        <button
-          onClick={() => navigate("/privacy")}
-          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
-        >
-          Privacy Policy
-        </button>
-        <button
-          onClick={() => navigate("/terms")}
-          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
-        >
-          Terms & Conditions
-        </button>
+      <footer className="relative z-10 py-6 pb-28 flex flex-col items-center gap-2">
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={() => navigate("/privacy")}
+            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+          >
+            Privacy Policy
+          </button>
+          <button
+            onClick={() => navigate("/terms")}
+            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+          >
+            Terms & Conditions
+          </button>
+        </div>
+        <p className="text-[11px] text-muted-foreground/60">© 2026 Fitbook Georgia. All rights reserved.</p>
       </footer>
 
       <BottomNav />

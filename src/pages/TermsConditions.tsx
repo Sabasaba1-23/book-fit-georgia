@@ -21,13 +21,13 @@ export default function TermsConditions() {
 
       <main className="max-w-2xl mx-auto px-5 py-6 pb-12">
         <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90 [&_h2]:text-foreground [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h3]:text-foreground [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1 [&_p]:text-sm [&_p]:leading-relaxed [&_p]:mb-3 [&_ul]:text-sm [&_ul]:mb-3 [&_li]:mb-1">
-          <h2 className="!text-xl !mt-0">Terms & Conditions — Fitbook</h2>
+          <h2 className="!text-xl !mt-0">Terms & Conditions — Fitbook Georgia</h2>
           <p><strong>Effective date:</strong> 7 February 2026<br /><strong>Last updated:</strong> 7 February 2026</p>
           <p>These Terms & Conditions ("Terms") govern your access to and use of Fitbook, including the Fitbook mobile application and website (the "Services").</p>
           <p>By accessing or using Fitbook, you agree to be bound by these Terms.</p>
 
           <h2>1) Who we are</h2>
-          <p>Fitbook is operated by an individual developer based in Tbilisi, Georgia ("Fitbook", "we", "us", "our"). Fitbook is not currently operated by a registered company or legal entity.</p>
+          <p>Fitbook Georgia is operated by an individual developer based in Tbilisi, Georgia ("Fitbook Georgia", "we", "us", "our"). Fitbook Georgia is not currently operated by a registered company or legal entity.</p>
           <p>Contact: 📧 support@fitbook.my</p>
 
           <h2>2) Acceptance of these Terms (IMPORTANT)</h2>
