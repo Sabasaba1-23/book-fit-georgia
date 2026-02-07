@@ -221,6 +221,50 @@ export type Database = {
           },
         ]
       }
+      partner_documents: {
+        Row: {
+          admin_notes: string | null
+          document_type: string
+          document_url: string
+          file_name: string | null
+          id: string
+          partner_id: string
+          reviewed_at: string | null
+          status: string
+          uploaded_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          document_type: string
+          document_url: string
+          file_name?: string | null
+          id?: string
+          partner_id: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          document_type?: string
+          document_url?: string
+          file_name?: string | null
+          id?: string
+          partner_id?: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_documents_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_profiles: {
         Row: {
           approved: boolean
@@ -235,10 +279,12 @@ export type Database = {
           location: string | null
           logo_url: string | null
           partner_type: Database["public"]["Enums"]["partner_type"]
+          phone_number: string | null
           review_count: number | null
           sports: string[] | null
           updated_at: string
           user_id: string
+          verification_status: string
         }
         Insert: {
           approved?: boolean
@@ -253,10 +299,12 @@ export type Database = {
           location?: string | null
           logo_url?: string | null
           partner_type: Database["public"]["Enums"]["partner_type"]
+          phone_number?: string | null
           review_count?: number | null
           sports?: string[] | null
           updated_at?: string
           user_id: string
+          verification_status?: string
         }
         Update: {
           approved?: boolean
@@ -271,12 +319,73 @@ export type Database = {
           location?: string | null
           logo_url?: string | null
           partner_type?: Database["public"]["Enums"]["partner_type"]
+          phone_number?: string | null
           review_count?: number | null
           sports?: string[] | null
           updated_at?: string
           user_id?: string
+          verification_status?: string
         }
         Relationships: []
+      }
+      partner_verifications: {
+        Row: {
+          address: string | null
+          admin_notes: string | null
+          created_at: string
+          date_of_birth: string | null
+          id: string
+          partner_id: string
+          personal_id_number: string | null
+          reviewed_at: string | null
+          social_facebook: string | null
+          social_instagram: string | null
+          social_tiktok: string | null
+          submitted_at: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          address?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          partner_id: string
+          personal_id_number?: string | null
+          reviewed_at?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_tiktok?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string | null
+          admin_notes?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          partner_id?: string
+          personal_id_number?: string | null
+          reviewed_at?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_tiktok?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_verifications_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: true
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

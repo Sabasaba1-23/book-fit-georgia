@@ -8,6 +8,7 @@ import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarCha
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
+import PartnerVerificationForm from "@/components/PartnerVerificationForm";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
@@ -338,8 +339,15 @@ export default function PartnerDashboard() {
       )}
 
       {activeTab === "settings" && (
-        <div className="relative z-10 px-5 pt-4">
-          <h2 className="text-lg font-bold text-foreground mb-4">Settings</h2>
+        <div className="relative z-10 px-5 pt-4 space-y-6">
+          <h2 className="text-lg font-bold text-foreground">Settings</h2>
+          
+          {/* Verification Section */}
+          <PartnerVerificationForm 
+            partnerId={profile.id} 
+            verificationStatus={profile.verification_status || "unverified"} 
+          />
+          
           <div className="space-y-3">
             <div className="rounded-2xl bg-card border border-border/50 p-4">
               <p className="text-sm font-bold text-foreground">Display Name</p>
@@ -348,6 +356,10 @@ export default function PartnerDashboard() {
             <div className="rounded-2xl bg-card border border-border/50 p-4">
               <p className="text-sm font-bold text-foreground">Partner Type</p>
               <p className="text-sm text-muted-foreground capitalize">{profile.partner_type}</p>
+            </div>
+            <div className="rounded-2xl bg-card border border-border/50 p-4">
+              <p className="text-sm font-bold text-foreground">Phone Number</p>
+              <p className="text-sm text-muted-foreground">{profile.phone_number || "Not set"}</p>
             </div>
             <div className="rounded-2xl bg-card border border-border/50 p-4">
               <p className="text-sm font-bold text-foreground">Account Status</p>
