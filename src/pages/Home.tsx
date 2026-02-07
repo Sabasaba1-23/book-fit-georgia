@@ -288,6 +288,15 @@ export default function Home() {
         )}
       </main>
 
+      <footer className="relative z-10 py-6 pb-28 flex justify-center">
+        <button
+          onClick={() => navigate("/privacy")}
+          className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          Privacy Policy
+        </button>
+      </footer>
+
       <BottomNav />
       <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
     </div>
