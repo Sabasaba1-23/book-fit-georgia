@@ -261,6 +261,7 @@ export type Database = {
           equipment_notes_ka: string | null
           id: string
           language: string
+          location: string | null
           max_spots: number
           partner_id: string
           price_gel: number
@@ -283,6 +284,7 @@ export type Database = {
           equipment_notes_ka?: string | null
           id?: string
           language?: string
+          location?: string | null
           max_spots?: number
           partner_id: string
           price_gel: number
@@ -305,6 +307,7 @@ export type Database = {
           equipment_notes_ka?: string | null
           id?: string
           language?: string
+          location?: string | null
           max_spots?: number
           partner_id?: string
           price_gel?: number
@@ -319,6 +322,77 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "training_listings_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_packages: {
+        Row: {
+          background_image_url: string | null
+          created_at: string
+          description_en: string | null
+          description_ka: string | null
+          duration_minutes: number
+          id: string
+          location: string | null
+          max_spots: number
+          partner_id: string
+          price_per_session_gel: number
+          sessions_count: number
+          sport: string
+          status: Database["public"]["Enums"]["listing_status"]
+          title_en: string
+          title_ka: string | null
+          total_price_gel: number
+          training_type: Database["public"]["Enums"]["training_type"]
+          updated_at: string
+        }
+        Insert: {
+          background_image_url?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_ka?: string | null
+          duration_minutes?: number
+          id?: string
+          location?: string | null
+          max_spots?: number
+          partner_id: string
+          price_per_session_gel: number
+          sessions_count?: number
+          sport: string
+          status?: Database["public"]["Enums"]["listing_status"]
+          title_en: string
+          title_ka?: string | null
+          total_price_gel: number
+          training_type?: Database["public"]["Enums"]["training_type"]
+          updated_at?: string
+        }
+        Update: {
+          background_image_url?: string | null
+          created_at?: string
+          description_en?: string | null
+          description_ka?: string | null
+          duration_minutes?: number
+          id?: string
+          location?: string | null
+          max_spots?: number
+          partner_id?: string
+          price_per_session_gel?: number
+          sessions_count?: number
+          sport?: string
+          status?: Database["public"]["Enums"]["listing_status"]
+          title_en?: string
+          title_ka?: string | null
+          total_price_gel?: number
+          training_type?: Database["public"]["Enums"]["training_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_packages_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "partner_profiles"
