@@ -28,6 +28,7 @@ export default function Auth() {
   const [partnerType, setPartnerType] = useState<"individual" | "gym">("individual");
   const [partnerName, setPartnerName] = useState("");
   const [partnerEmail, setPartnerEmail] = useState("");
+  const [partnerPhone, setPartnerPhone] = useState("");
 
   useEffect(() => {
     if (user) navigate("/", { replace: true });
@@ -76,6 +77,10 @@ export default function Auth() {
       setError("Please enter your professional email.");
       return;
     }
+    if (!partnerPhone.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
 
     setLoading(true);
 
@@ -105,6 +110,7 @@ export default function Auth() {
         user_id: signUpData.user.id,
         display_name: partnerName.trim(),
         partner_type: partnerType,
+        phone_number: partnerPhone.trim(),
         approved: false,
       });
 
@@ -451,6 +457,23 @@ export default function Auth() {
                     className="h-14 rounded-2xl border-0 bg-muted/60 px-4 pr-12 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/50"
                   />
                   <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/40" />
+                </div>
+              </div>
+
+              {/* Phone Number */}
+              <div>
+                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                  Phone Number <span className="text-destructive">*</span>
+                </label>
+                <div className="relative">
+                  <Input
+                    placeholder="+995 5XX XXX XXX"
+                    type="tel"
+                    value={partnerPhone}
+                    onChange={(e) => setPartnerPhone(e.target.value)}
+                    required
+                    className="h-14 rounded-2xl border-0 bg-muted/60 px-4 pr-12 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/50"
+                  />
                 </div>
               </div>
 
