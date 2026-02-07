@@ -370,6 +370,12 @@ export default function Auth() {
                 </div>
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
+              <p className="text-xs text-muted-foreground text-center">
+                By signing up, you agree to our{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
+                {" "}and{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+              </p>
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
                 {loading ? t("loading") : t("signUp")}
               </Button>
@@ -529,6 +535,13 @@ export default function Auth() {
               </div>
 
               {error && <p className="text-sm text-destructive">{error}</p>}
+
+              <p className="text-xs text-muted-foreground text-center">
+                By creating a partner account, you agree to our{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
+                {" "}and{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+              </p>
 
               {/* Submit */}
               <Button
