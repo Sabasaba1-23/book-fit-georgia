@@ -35,6 +35,8 @@ interface ListingWithPartner {
     logo_url: string | null;
     partner_type: string;
     bio: string | null;
+    avg_rating: number | null;
+    review_count: number | null;
   };
 }
 
@@ -56,6 +58,8 @@ interface PackageWithPartner {
     display_name: string;
     logo_url: string | null;
     partner_type: string;
+    avg_rating: number | null;
+    review_count: number | null;
   };
 }
 
@@ -76,13 +80,13 @@ export default function Home() {
       const [listingsRes, packagesRes] = await Promise.all([
         supabase
           .from("training_listings")
-          .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio)")
+          .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio, avg_rating, review_count)")
           .eq("status", "approved")
           .gte("scheduled_at", new Date().toISOString())
           .order("scheduled_at", { ascending: true }),
         supabase
           .from("training_packages")
-          .select("*, partner_profiles(id, display_name, logo_url, partner_type)")
+          .select("*, partner_profiles(id, display_name, logo_url, partner_type, avg_rating, review_count)")
           .eq("status", "approved")
           .order("created_at", { ascending: false }),
       ]);

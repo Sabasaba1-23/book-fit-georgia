@@ -120,6 +120,10 @@ interface PartnerData {
   sports: string[] | null;
   location: string | null;
   languages: string[] | null;
+  avg_rating: number | null;
+  review_count: number | null;
+  completion_rate: number | null;
+  dispute_rate: number | null;
 }
 
 interface ListingData {
@@ -190,11 +194,11 @@ export default function PartnerProfile() {
   const galleryImages = pickN(GALLERY_IMAGES, 5, rand);
   const bioPool = BIOS[partner.partner_type] || BIOS.individual;
   const bio = partner.bio || pick(bioPool, rand);
-  const rating = (4.3 + rand() * 0.7).toFixed(1);
-  const reviewCount = Math.floor(30 + rand() * 200);
+  const rating = partner.avg_rating ? Number(partner.avg_rating).toFixed(1) : (4.3 + rand() * 0.7).toFixed(1);
+  const reviewCount = partner.review_count || Math.floor(30 + rand() * 200);
+  const completionRate = partner.completion_rate ? Number(partner.completion_rate) : Math.floor(95 + rand() * 5);
   const yearsExp = Math.floor(2 + rand() * 12);
   const clientsTrained = Math.floor(50 + rand() * 500);
-  const sessionsCompleted = Math.floor(200 + rand() * 2000);
   const certs = pickN(CERTIFICATIONS, Math.floor(2 + rand() * 3), rand);
   const specialties = pickN(SPECIALTIES, Math.floor(3 + rand() * 3), rand);
   const location = partner.location || pick(LOCATIONS, rand);
@@ -260,7 +264,7 @@ export default function PartnerProfile() {
             { icon: Star, label: "Rating", value: rating, accent: true },
             { icon: Dumbbell, label: "Years", value: `${yearsExp}+` },
             { icon: Users, label: "Clients", value: `${clientsTrained}+` },
-            { icon: Trophy, label: "Sessions", value: `${sessionsCompleted}+` },
+            { icon: Trophy, label: "Complete", value: `${completionRate}%` },
           ].map((stat) => (
             <div key={stat.label} className="flex flex-col items-center rounded-2xl bg-muted/50 py-3 px-2">
               <stat.icon className={`h-4 w-4 mb-1 ${stat.accent ? "fill-primary text-primary" : "text-primary"}`} />
