@@ -325,8 +325,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
                   {listing.partner.display_name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <p className="text-[15px] font-bold text-foreground">{listing.partner.display_name}</p>
+              <div className="flex-1 cursor-pointer" onClick={(e) => {
+                  e.stopPropagation();
+                  const pid = listing.partner_id || listing.partner?.id;
+                  if (pid) navigate(`/partner/${pid}`);
+                }}>
+                <p className="text-[15px] font-bold text-foreground hover:text-primary transition-colors">{listing.partner.display_name}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <Star className="h-3.5 w-3.5 fill-primary text-primary" />
                   <span className="text-[12px] font-semibold text-foreground">4.9</span>
