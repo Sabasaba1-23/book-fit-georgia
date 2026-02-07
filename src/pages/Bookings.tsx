@@ -120,17 +120,22 @@ export default function Bookings() {
     setLoading(false);
   }
 
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
   async function handleCancel(bookingId: string) {
+    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+    setCancellingId(bookingId);
     const { error } = await supabase
       .from("bookings")
       .update({ booking_status: "cancelled" })
       .eq("id", bookingId);
     if (error) {
-      toast({ title: "Failed to cancel booking", variant: "destructive" });
+      toast({ title: "Failed to cancel booking", description: "Please try again later.", variant: "destructive" });
     } else {
       toast({ title: "Booking cancelled" });
       fetchAll();
     }
+    setCancellingId(null);
   }
 
   async function handleChat(booking: BookingWithListing) {
@@ -437,9 +442,10 @@ export default function Bookings() {
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => handleCancel(booking.id)}
-                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-destructive hover:text-destructive active:scale-95"
+                      disabled={cancellingId === booking.id}
+                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-destructive hover:text-destructive active:scale-95 disabled:opacity-50"
                     >
-                      Cancel
+                      {cancellingId === booking.id ? "..." : "Cancel"}
                     </button>
                     <button
                       onClick={() => handleChat(booking)}

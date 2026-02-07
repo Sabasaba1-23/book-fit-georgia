@@ -131,7 +131,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
         stripe_payment_id: `demo_${method}_${Date.now()}`,
       }).select("id").single();
       if (error) {
-        toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+        const msg = error.code === "23505" 
+          ? "You've already booked this session." 
+          : "Booking failed. Please try again.";
+        toast({ title: msg, variant: "destructive" });
       } else {
         setShowPayment(false);
         setConfirmedBookingId(data.id);
