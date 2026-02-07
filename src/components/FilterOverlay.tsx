@@ -5,7 +5,7 @@ import { X, Search, SlidersHorizontal, User, Users, CalendarDays, ArrowRight, Ma
 import { cn } from "@/lib/utils";
 import { addDays, format } from "date-fns";
 
-const ACTIVITIES = ["Yoga", "HIIT", "Tennis", "Boxing", "Pilates", "Swimming", "CrossFit", "MMA"];
+const ACTIVITIES = ["Yoga", "HIIT", "Tennis", "Boxing", "Pilates", "Swimming", "CrossFit", "MMA", "Weightlifting", "Personal Trainer"];
 
 const CITIES: Record<string, string[]> = {
   Tbilisi: ["Vake", "Saburtalo", "Old Town", "Vera", "Didube", "Gldani", "Isani", "Nadzaladevi", "Ortachala"],

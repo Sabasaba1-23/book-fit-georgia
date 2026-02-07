@@ -41,6 +41,7 @@ const SPORT_COLORS: Record<string, string> = {
   CrossFit: "bg-amber-100",
   MMA: "bg-rose-100",
   Weightlifting: "bg-teal-100",
+  "Personal Trainer": "bg-indigo-100",
 };
 
 type Tab = "dashboard" | "schedule" | "insights" | "settings";
