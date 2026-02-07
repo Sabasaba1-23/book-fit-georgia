@@ -158,15 +158,17 @@ export default function Auth() {
     setLoading(true);
 
     // Sign up the user with partner metadata
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    // Sign up - the handle_new_user trigger will create partner profile & role
+    const { error: signUpError } = await supabase.auth.signUp({
       email: partnerEmail,
-      password: password || undefined as any, // will be set below
+      password,
       options: {
         emailRedirectTo: window.location.origin,
         data: {
-          full_name: partnerName,
+          full_name: partnerName.trim(),
           is_partner: true,
           partner_type: partnerType,
+          phone_number: partnerPhone.trim(),
         },
       },
     });
@@ -175,32 +177,6 @@ export default function Auth() {
       setError(signUpError.message);
       setLoading(false);
       return;
-    }
-
-    // If signup succeeded and we have a user, create partner profile
-    if (signUpData.user) {
-      const { error: profileError } = await supabase.from("partner_profiles").insert({
-        user_id: signUpData.user.id,
-        display_name: partnerName.trim(),
-        partner_type: partnerType,
-        phone_number: partnerPhone.trim(),
-        approved: false,
-      });
-
-      if (profileError) {
-        // Profile creation might fail if trigger already created it or RLS
-        console.warn("Partner profile creation note:", profileError.message);
-      }
-
-      // Add partner role
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: signUpData.user.id,
-        role: "partner" as any,
-      });
-
-      if (roleError) {
-        console.warn("Role assignment note:", roleError.message);
-      }
     }
 
     toast({
