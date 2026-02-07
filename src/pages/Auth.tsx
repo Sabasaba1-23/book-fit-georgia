@@ -263,7 +263,14 @@ export default function Auth() {
               Continue with Google
             </button>
 
-            <p className="mt-6 pb-8 text-center text-sm text-muted-foreground">
+            <p className="mt-4 text-center text-[11px] text-muted-foreground">
+              By continuing, you agree to our{" "}
+              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
+              {" "}and{" "}
+              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+            </p>
+
+            <p className="mt-4 pb-8 text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
               <button type="button" onClick={() => setMode("register-choice")} className="font-semibold text-primary">{t("signUp")}</button>
             </p>
