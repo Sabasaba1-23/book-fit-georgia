@@ -215,11 +215,13 @@ export default function PartnerProfile() {
   return (
     <div className="relative min-h-screen bg-background pb-24">
       {/* Hero cover */}
-      <div className="relative h-80 w-full overflow-hidden">
-        <img src={coverImage} alt={partner.display_name} className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
+      <div className="relative h-80 w-full">
+        <div className="absolute inset-0 overflow-hidden">
+          <img src={coverImage} alt={partner.display_name} className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
+        </div>
 
-        <div className="absolute left-3 right-3 top-4 flex items-center justify-between">
+        <div className="absolute left-3 right-3 top-4 flex items-center justify-between z-10">
           <button
             onClick={() => navigate(-1)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm transition-colors hover:bg-black/50"
@@ -237,7 +239,7 @@ export default function PartnerProfile() {
         </div>
 
         {/* Avatar floating at bottom of hero */}
-        <div className="absolute -bottom-12 left-5">
+        <div className="absolute -bottom-12 left-5 z-10">
           <Avatar className="h-24 w-24 border-4 border-card shadow-xl">
             <AvatarImage src={avatarImage} />
             <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
