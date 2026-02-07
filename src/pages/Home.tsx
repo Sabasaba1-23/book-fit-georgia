@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import ListingCard from "@/components/ListingCard";
 import PackageCard from "@/components/PackageCard";
 import BottomNav from "@/components/BottomNav";
 import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
+import NotificationsPanel from "@/components/NotificationsPanel";
 import { Search, Bell } from "lucide-react";
 
 interface ListingWithPartner {
@@ -58,12 +61,15 @@ interface PackageWithPartner {
 
 export default function Home() {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [listings, setListings] = useState<ListingWithPartner[]>([]);
   const [packages, setPackages] = useState<PackageWithPartner[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSport, setActiveSport] = useState("All");
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     async function fetchAll() {
@@ -145,8 +151,10 @@ export default function Home() {
 
   const hasResults = filteredListings.length > 0 || filteredPackages.length > 0;
 
+  const userInitial = user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "?";
+
   return (
-    <div className="relative min-h-screen bg-background pb-24 overflow-hidden">
+    <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none">
       {/* Background blobs */}
       <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
@@ -155,18 +163,27 @@ export default function Home() {
       <header className="relative z-40 px-5 pt-6 pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-primary">Community</p>
-            <h1 className="text-[28px] font-extrabold tracking-tight text-foreground leading-none mt-0.5">Discovery</h1>
+            <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">Community</p>
+            <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">Discovery</h1>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground transition-transform active:scale-95">
+            <button
+              onClick={() => setShowNotifications(true)}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground transition-transform active:scale-95"
+            >
               <Bell className="h-5 w-5 text-background" />
             </button>
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary p-[2px]">
+            <button
+              onClick={() => {
+                if (user) navigate("/profile");
+                else navigate("/auth");
+              }}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary p-[2px] transition-transform active:scale-95"
+            >
               <div className="flex h-full w-full items-center justify-center rounded-full bg-background">
-                <span className="text-sm font-bold text-primary">K</span>
+                <span className="text-sm font-medium text-primary">{userInitial}</span>
               </div>
-            </div>
+            </button>
           </div>
         </div>
       </header>
@@ -243,6 +260,7 @@ export default function Home() {
       </main>
 
       <BottomNav />
+      <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
     </div>
   );
 }

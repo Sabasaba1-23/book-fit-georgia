@@ -8,6 +8,7 @@ import { Calendar, Clock, Users, CheckCircle2, MessageCircle, Star, MapPin, BarC
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import PaymentSheet from "@/components/PaymentSheet";
+import BookingTicket from "@/components/BookingTicket";
 
 // Generate a consistent pseudo-random description based on listing data
 function generateDescription(sport: string, trainingType: string, durationMinutes: number): string {
@@ -102,6 +103,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const [booking, setBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
+  const [showTicket, setShowTicket] = useState(false);
+  const [confirmedBookingId, setConfirmedBookingId] = useState("");
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -116,7 +119,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const handlePaymentSuccess = async (method: string) => {
     setBooking(true);
     try {
-      const { error } = await supabase.from("bookings").insert({
+      const { data, error } = await supabase.from("bookings").insert({
         user_id: user!.id,
         listing_id: listing.id,
         spots: 1,
@@ -124,18 +127,18 @@ export default function ListingCard({ listing }: ListingCardProps) {
         payment_status: "paid",
         booking_status: "confirmed",
         stripe_payment_id: `demo_${method}_${Date.now()}`,
-      });
+      }).select("id").single();
       if (error) {
         toast({ title: "Booking failed", description: error.message, variant: "destructive" });
       } else {
-        toast({ title: "Booked & Paid! 🎉", description: "Check your bookings to chat with the trainer." });
-        navigate("/bookings");
+        setShowPayment(false);
+        setConfirmedBookingId(data.id);
+        setShowTicket(true);
       }
     } catch {
       toast({ title: "Something went wrong", variant: "destructive" });
     } finally {
       setBooking(false);
-      setShowPayment(false);
     }
   };
 
@@ -236,7 +239,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             )}
           </div>
 
-          <h3 className="mb-2 text-[22px] font-extrabold leading-tight text-white drop-shadow-lg">
+          <h3 className="mb-2 text-[22px] font-semibold leading-tight text-white drop-shadow-lg">
             {title}
           </h3>
 
@@ -254,7 +257,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <div className="flex items-end justify-between">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-widest text-white/60">Starting at</p>
-              <p className="text-3xl font-extrabold text-white leading-none">{listing.price_gel}₾</p>
+              <p className="text-3xl font-semibold text-white leading-none">{listing.price_gel}₾</p>
             </div>
             <button
               onClick={(e) => {
@@ -384,6 +387,24 @@ export default function ListingCard({ listing }: ListingCardProps) {
         title={listing.title_en}
         onPaymentSuccess={handlePaymentSuccess}
         loading={booking}
+      />
+
+      {/* Booking Ticket */}
+      <BookingTicket
+        open={showTicket}
+        onClose={() => {
+          setShowTicket(false);
+          navigate("/bookings");
+        }}
+        booking={{
+          id: confirmedBookingId,
+          title: listing.title_en,
+          sport: listing.sport,
+          date: listing.scheduled_at,
+          duration: listing.duration_minutes,
+          price: listing.price_gel,
+          trainerName: listing.partner.display_name,
+        }}
       />
     </div>
   );

@@ -1,0 +1,117 @@
+import { CheckCircle2, Calendar, Clock, MapPin, Copy, X } from "lucide-react";
+import { format } from "date-fns";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+
+interface BookingTicketProps {
+  open: boolean;
+  onClose: () => void;
+  booking: {
+    id: string;
+    title: string;
+    sport: string;
+    date: string;
+    duration: number;
+    price: number;
+    trainerName: string;
+    location?: string;
+  };
+}
+
+export default function BookingTicket({ open, onClose, booking }: BookingTicketProps) {
+  const [copied, setCopied] = useState(false);
+
+  if (!open) return null;
+
+  const ticketCode = `FB-${booking.id.slice(0, 8).toUpperCase()}`;
+  const dateObj = new Date(booking.date);
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(ticketCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-in fade-in duration-200 p-5">
+      <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-300">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card shadow-lg"
+        >
+          <X className="h-4 w-4 text-muted-foreground" />
+        </button>
+
+        {/* Ticket card */}
+        <div className="overflow-hidden rounded-3xl bg-card shadow-2xl">
+          {/* Header */}
+          <div className="bg-gradient-to-br from-primary to-secondary px-6 py-8 text-center">
+            <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+              <CheckCircle2 className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-white">Booking Confirmed!</h3>
+            <p className="mt-1 text-sm text-white/80">Your session is secured</p>
+          </div>
+
+          {/* Perforated divider */}
+          <div className="relative h-6">
+            <div className="absolute -left-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-foreground/40" />
+            <div className="absolute -right-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-foreground/40" />
+            <div className="absolute inset-x-6 top-1/2 border-t border-dashed border-border" />
+          </div>
+
+          {/* Details */}
+          <div className="px-6 pb-6 space-y-4">
+            <div>
+              <p className="text-lg font-medium text-foreground">{booking.title}</p>
+              <p className="text-sm text-muted-foreground">with {booking.trainerName}</p>
+            </div>
+
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3 text-sm text-foreground">
+                <Calendar className="h-4 w-4 text-primary" />
+                <span>{format(dateObj, "EEEE, MMMM d, yyyy")}</span>
+              </div>
+              <div className="flex items-center gap-3 text-sm text-foreground">
+                <Clock className="h-4 w-4 text-primary" />
+                <span>{format(dateObj, "hh:mm a")} · {booking.duration} min</span>
+              </div>
+              {booking.location && (
+                <div className="flex items-center gap-3 text-sm text-foreground">
+                  <MapPin className="h-4 w-4 text-primary" />
+                  <span>{booking.location}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Ticket code */}
+            <div className="rounded-2xl bg-muted/50 p-4 text-center">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground mb-1">Ticket Code</p>
+              <div className="flex items-center justify-center gap-2">
+                <span className="font-mono text-xl tracking-widest text-foreground">{ticketCode}</span>
+                <button onClick={copyCode} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <Copy className={cn("h-4 w-4", copied && "text-primary")} />
+                </button>
+              </div>
+              {copied && <p className="mt-1 text-[10px] text-primary">Copied!</p>}
+            </div>
+
+            {/* Amount */}
+            <div className="flex items-center justify-between pt-2 border-t border-border/40">
+              <span className="text-sm text-muted-foreground">Amount Paid</span>
+              <span className="text-lg font-semibold text-foreground">{booking.price}₾</span>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="w-full rounded-full bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-all active:scale-95"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
