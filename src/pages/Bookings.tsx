@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import BottomNav from "@/components/BottomNav";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Calendar, Clock, MapPin, Ticket, Navigation, X } from "lucide-react";
+import { Bell, Calendar, Clock, MapPin, Ticket, Navigation, X, MessageCircle } from "lucide-react";
 import { format, formatDistanceToNow, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
@@ -102,6 +102,78 @@ export default function Bookings() {
       toast({ title: "Booking cancelled" });
       fetchBookings();
     }
+  }
+
+  async function handleChat(booking: BookingWithListing) {
+    if (!user) return;
+    const listing = booking.training_listings;
+    const partnerId = listing.partner_id;
+
+    // Get the partner's user_id
+    const { data: partner } = await supabase
+      .from("partner_profiles")
+      .select("user_id")
+      .eq("id", partnerId)
+      .maybeSingle();
+
+    if (!partner) {
+      toast({ title: "Could not find trainer", variant: "destructive" });
+      return;
+    }
+
+    // Check if a thread already exists for this listing between user and partner
+    const { data: existingParticipations } = await supabase
+      .from("conversation_participants")
+      .select("thread_id")
+      .eq("user_id", user.id);
+
+    if (existingParticipations && existingParticipations.length > 0) {
+      const threadIds = existingParticipations.map((p) => p.thread_id);
+
+      // Check if partner is in any of these threads for this listing
+      const { data: partnerParticipations } = await supabase
+        .from("conversation_participants")
+        .select("thread_id")
+        .eq("user_id", partner.user_id)
+        .in("thread_id", threadIds);
+
+      if (partnerParticipations && partnerParticipations.length > 0) {
+        const partnerThreadIds = partnerParticipations.map((p) => p.thread_id);
+
+        // Check if any of these threads belong to this listing
+        const { data: existingThread } = await supabase
+          .from("conversation_threads")
+          .select("id")
+          .in("id", partnerThreadIds)
+          .eq("listing_id", listing.id)
+          .maybeSingle();
+
+        if (existingThread) {
+          navigate("/messages");
+          return;
+        }
+      }
+    }
+
+    // Create new thread
+    const { data: thread, error: threadError } = await supabase
+      .from("conversation_threads")
+      .insert({ listing_id: listing.id })
+      .select("id")
+      .single();
+
+    if (threadError || !thread) {
+      toast({ title: "Failed to create chat", variant: "destructive" });
+      return;
+    }
+
+    // Add both participants
+    await supabase.from("conversation_participants").insert([
+      { thread_id: thread.id, user_id: user.id },
+      { thread_id: thread.id, user_id: partner.user_id },
+    ]);
+
+    navigate("/messages");
   }
 
   const now = new Date();
@@ -286,15 +358,22 @@ export default function Bookings() {
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => handleCancel(booking.id)}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-destructive hover:text-destructive active:scale-95"
+                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-destructive hover:text-destructive active:scale-95"
                     >
-                      Manage Booking
+                      Cancel
                     </button>
                     <button
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-primary py-2.5 text-xs font-bold text-white transition-all hover:bg-primary/90 active:scale-95"
+                      onClick={() => handleChat(booking)}
+                      className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full border-2 border-primary/30 bg-transparent py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      Chat
+                    </button>
+                    <button
+                      className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full bg-primary py-2.5 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
                     >
                       <Ticket className="h-3.5 w-3.5" />
-                      View Ticket
+                      Ticket
                     </button>
                   </div>
                 )}

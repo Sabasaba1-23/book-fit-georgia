@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calendar, Clock, Users, CheckCircle2, MessageCircle, Star, MapPin, BarChart3, ChevronUp } from "lucide-react";
+import { Calendar, Clock, Users, CheckCircle2, MessageCircle, Star, MapPin, BarChart3, ChevronUp, Bookmark } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import PaymentSheet from "@/components/PaymentSheet";
 
 // Generate a consistent pseudo-random description based on listing data
 function generateDescription(sport: string, trainingType: string, durationMinutes: number): string {
@@ -99,34 +100,67 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
 
   const [booking, setBooking] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [bookmarking, setBookmarking] = useState(false);
 
-  const handleBook = async (e?: React.MouseEvent) => {
+  const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!user) {
       toast({ title: t("loginToBook"), variant: "destructive" });
       navigate("/auth");
       return;
     }
-    if (booking) return;
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = async (method: string) => {
     setBooking(true);
     try {
       const { error } = await supabase.from("bookings").insert({
-        user_id: user.id,
+        user_id: user!.id,
         listing_id: listing.id,
         spots: 1,
         total_price: listing.price_gel,
+        payment_status: "paid",
+        booking_status: "confirmed",
+        stripe_payment_id: `demo_${method}_${Date.now()}`,
       });
       if (error) {
         toast({ title: "Booking failed", description: error.message, variant: "destructive" });
       } else {
-        toast({ title: "Booked successfully! 🎉" });
+        toast({ title: "Booked & Paid! 🎉", description: "Check your bookings to chat with the trainer." });
         navigate("/bookings");
       }
     } catch {
       toast({ title: "Something went wrong", variant: "destructive" });
     } finally {
       setBooking(false);
+      setShowPayment(false);
     }
+  };
+
+  const handleBookmark = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user) {
+      toast({ title: "Login to bookmark", variant: "destructive" });
+      navigate("/auth");
+      return;
+    }
+    if (bookmarking) return;
+    setBookmarking(true);
+    const partnerId = listing.partner_id || listing.partner?.id;
+    if (partnerId) {
+      const { error } = await supabase.from("bookmarks").insert({
+        user_id: user.id,
+        partner_id: partnerId,
+      });
+      if (error && error.code !== "23505") {
+        toast({ title: "Bookmark failed", variant: "destructive" });
+      } else {
+        toast({ title: "Bookmarked! 🔖", description: "You'll get notified when the session is coming up." });
+      }
+    }
+    setBookmarking(false);
   };
 
   const handleAsk = (e: React.MouseEvent) => {
@@ -318,15 +352,21 @@ export default function ListingCard({ listing }: ListingCardProps) {
           {/* Action buttons — larger touch targets */}
           <div className="flex gap-3 px-6 pb-6">
             <button
+              onClick={handleBookmark}
+              className="flex flex-[0.2] items-center justify-center rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
+            >
+              <Bookmark className="h-4 w-4 text-primary" />
+            </button>
+            <button
               onClick={handleAsk}
-              className="flex flex-[0.4] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
+              className="flex flex-[0.3] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
             >
               <MessageCircle className="h-4 w-4 text-primary" />
               Ask
             </button>
             <button
-              onClick={handleBook}
-              className="relative flex flex-[0.6] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-white transition-all hover:bg-primary/90 active:scale-95"
+              onClick={handleBookClick}
+              className="relative flex flex-[0.5] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
             >
               <Calendar className="h-4 w-4" />
               {booking ? "Booking..." : `${t("book")} Now`}
@@ -335,6 +375,16 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         </div>
       )}
+
+      {/* Payment Sheet */}
+      <PaymentSheet
+        open={showPayment}
+        onOpenChange={setShowPayment}
+        amount={listing.price_gel}
+        title={listing.title_en}
+        onPaymentSuccess={handlePaymentSuccess}
+        loading={booking}
+      />
     </div>
   );
 }
