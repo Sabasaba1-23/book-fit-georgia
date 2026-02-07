@@ -148,7 +148,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
       className="group overflow-hidden rounded-[1.5rem] ios-shadow cursor-pointer transition-all duration-300"
       onClick={() => setExpanded(!expanded)}
     >
-      {/* Full image card — no separate white bar when collapsed */}
+      {/* Image card */}
       <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : '380px' }}>
         {listing.background_image_url ? (
           <img
@@ -163,10 +163,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         )}
 
-        {/* Gradient overlay */}
         <div className="absolute inset-0 card-gradient-overlay" />
 
-        {/* Top: Partner pill + Verified badge */}
+        {/* Top badges */}
         <div className="absolute left-3 right-3 top-3 flex items-center justify-between">
           <div
             className="flex items-center gap-2 rounded-full bg-foreground/70 py-1.5 pl-1.5 pr-3.5 backdrop-blur-sm cursor-pointer transition-transform hover:scale-105 active:scale-95"
@@ -190,9 +189,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         </div>
 
-        {/* Content overlay — all inside the image */}
+        {/* Content overlay */}
         <div className="relative flex flex-col justify-end p-4" style={{ minHeight: '380px' }}>
-          {/* Sport tag + spots */}
           <div className="mb-1.5 flex items-center gap-2">
             <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
               {listing.sport}
@@ -204,12 +202,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
             )}
           </div>
 
-          {/* Title */}
           <h3 className="mb-2 text-[22px] font-extrabold leading-tight text-white drop-shadow-lg">
             {title}
           </h3>
 
-          {/* Date & Time */}
           <div className="mb-3 flex items-center gap-3 text-[12px] text-white/80">
             <span className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
@@ -221,7 +217,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </span>
           </div>
 
-          {/* Price + Book Now — bottom of the image */}
           <div className="flex items-end justify-between">
             <div>
               <p className="text-[9px] font-semibold uppercase tracking-widest text-white/60">Starting at</p>
@@ -240,98 +235,98 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </div>
       </div>
 
-      {/* Expanded detail panel */}
+      {/* ─── EXPANDED DETAIL PANEL ─── */}
       {expanded && (
         <div className="bg-card animate-in slide-in-from-top-2 fade-in duration-300">
-          {/* Price header */}
-          <div className="px-5 pt-4 pb-3 border-b border-border/50">
-            <div className="flex items-center justify-between">
+          {/* Price header — larger and more spacious */}
+          <div className="px-6 pt-5 pb-4 border-b border-border/40">
+            <div className="flex items-start justify-between">
               <div>
-                <p className="text-2xl font-extrabold text-foreground">{listing.price_gel}₾</p>
-                <p className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">Per Class</p>
+                <p className="text-3xl font-extrabold text-foreground">{listing.price_gel}₾</p>
+                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Per Class</p>
               </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setExpanded(false);
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-muted/60 transition-colors hover:bg-muted"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 transition-colors hover:bg-muted"
               >
                 <ChevronUp className="h-4 w-4 text-muted-foreground" />
               </button>
             </div>
           </div>
 
-          {/* Info pills */}
-          <div className="flex gap-2 px-5 py-3 overflow-x-auto hide-scrollbar">
-            <div className="flex items-center gap-1.5 rounded-full bg-muted/60 px-3 py-1.5 shrink-0">
-              <Clock className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[11px] font-semibold text-foreground">{listing.duration_minutes} mins</span>
+          {/* Info pills — more spacing */}
+          <div className="flex gap-2.5 px-6 py-4 overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="text-[13px] font-semibold text-foreground">{listing.duration_minutes} mins</span>
             </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-muted/60 px-3 py-1.5 shrink-0">
-              <BarChart3 className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[11px] font-semibold text-foreground">{level}</span>
+            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              <span className="text-[13px] font-semibold text-foreground">{level}</span>
             </div>
-            <div className="flex items-center gap-1.5 rounded-full bg-muted/60 px-3 py-1.5 shrink-0">
-              <MapPin className="h-3.5 w-3.5 text-primary" />
-              <span className="text-[11px] font-semibold text-foreground">Studio</span>
+            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
+              <MapPin className="h-4 w-4 text-primary" />
+              <span className="text-[13px] font-semibold text-foreground">Studio</span>
             </div>
           </div>
 
-          {/* The Experience */}
-          <div className="px-5 pb-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">The Experience</h4>
-            <p className="text-sm leading-relaxed text-foreground/80">{description}</p>
+          {/* The Experience — more breathing room */}
+          <div className="px-6 pb-5">
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">The Experience</h4>
+            <p className="text-[15px] leading-[1.7] text-foreground/80">{description}</p>
           </div>
 
-          {/* Trainer */}
-          <div className="mx-5 rounded-2xl bg-muted/40 p-4 mb-3">
-            <div className="flex items-center gap-3 mb-2">
-              <Avatar className="h-10 w-10 border-2 border-primary/20">
+          {/* Trainer card — larger and more spacious */}
+          <div className="mx-6 rounded-2xl bg-muted/40 p-5 mb-5">
+            <div className="flex items-center gap-3.5 mb-3">
+              <Avatar className="h-12 w-12 border-2 border-primary/20">
                 {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
                 <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">
                   {listing.partner.display_name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="text-sm font-bold text-foreground">{listing.partner.display_name}</p>
-                <div className="flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-primary text-primary" />
-                  <span className="text-[11px] font-semibold text-foreground">4.9</span>
-                  <span className="text-[10px] text-muted-foreground">(124 reviews)</span>
+                <p className="text-[15px] font-bold text-foreground">{listing.partner.display_name}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+                  <span className="text-[12px] font-semibold text-foreground">4.9</span>
+                  <span className="text-[11px] text-muted-foreground">(124 reviews)</span>
                 </div>
               </div>
             </div>
             {listing.partner.bio && (
-              <p className="text-xs italic text-foreground/70 leading-relaxed">"{listing.partner.bio}"</p>
+              <p className="text-[13px] italic leading-relaxed text-foreground/70">"{listing.partner.bio}"</p>
             )}
           </div>
 
-          {/* What to bring */}
-          <div className="px-5 pb-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">What to bring</h4>
-            <div className="flex flex-wrap gap-2">
+          {/* What to bring — better spacing */}
+          <div className="px-6 pb-5">
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">What to bring</h4>
+            <div className="flex flex-wrap gap-2.5">
               {equipment.map((item) => (
-                <div key={item} className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-[11px] font-semibold text-foreground">{item}</span>
+                <div key={item} className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5">
+                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                  <span className="text-[13px] font-semibold text-foreground">{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3 px-5 pb-5">
+          {/* Action buttons — larger touch targets */}
+          <div className="flex gap-3 px-6 pb-6">
             <button
               onClick={handleAsk}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-foreground/20 bg-transparent py-3 text-xs font-bold uppercase tracking-wider text-foreground transition-all hover:border-foreground/40 active:scale-95"
+              className="flex flex-[0.4] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
             >
-              <MessageCircle className="h-4 w-4" />
-              {t("askQuestion").split(" ")[0]}
+              <MessageCircle className="h-4 w-4 text-primary" />
+              Ask
             </button>
             <button
               onClick={handleBook}
-              className="relative flex flex-1 items-center justify-center gap-2 rounded-full bg-primary py-3 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-primary/90 active:scale-95"
+              className="relative flex flex-[0.6] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-white transition-all hover:bg-primary/90 active:scale-95"
             >
               <Calendar className="h-4 w-4" />
               {booking ? "Booking..." : `${t("book")} Now`}
