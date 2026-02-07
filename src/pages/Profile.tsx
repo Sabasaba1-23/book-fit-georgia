@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
+import DeleteAccountDialog from "@/components/DeleteAccountDialog";
 import {
   Pencil,
   CreditCard,
@@ -19,6 +20,7 @@ import {
   Plus,
   X,
   Camera,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -70,6 +72,7 @@ export default function Profile() {
   const [showPayment, setShowPayment] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -418,6 +421,12 @@ export default function Profile() {
             label="Help & Support"
             onClick={() => setShowHelp(true)}
           />
+          <SettingsRow
+            icon={<Trash2 className="h-5 w-5" />}
+            iconBg="bg-destructive/10 text-destructive"
+            label="Delete Account"
+            onClick={() => setShowDeleteAccount(true)}
+          />
         </div>
       </div>
 
@@ -425,6 +434,7 @@ export default function Profile() {
       <PaymentMethodsPanel open={showPayment} onOpenChange={setShowPayment} />
       <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
       <HelpSupportPanel open={showHelp} onOpenChange={setShowHelp} />
+      <DeleteAccountDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount} />
 
       {/* Language + Log out */}
       <div className="relative z-10 px-5 mb-6 space-y-3">
