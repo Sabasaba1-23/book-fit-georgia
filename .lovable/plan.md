@@ -1,117 +1,76 @@
 
+# Capacitor Native App Setup for FitBook Georgia
 
-# FitBook Georgia — Fitness & Sports Training Marketplace
+## What This Does
+This plan wraps your existing FitBook web app inside a native shell using **Capacitor**, so it can be published on the **Apple App Store** and **Google Play Store** while still working as a web app in the browser. Your existing code stays the same -- Capacitor simply packages it into a native container.
 
-A clean, mobile-first PWA marketplace connecting users with individual trainers and gyms/studios across Georgia. Bilingual (English + Georgian), with in-app booking and payments via Stripe.
+## What Changes in the Code
 
----
+### 1. Install Capacitor Dependencies
+Add the following packages:
+- `@capacitor/core` (runtime)
+- `@capacitor/cli` (dev dependency)
+- `@capacitor/ios` and `@capacitor/android` (platform targets)
+- `@capacitor/status-bar` and `@capacitor/splash-screen` (native UI polish)
+- `@capacitor/haptics` (tactile feedback for a native feel)
 
-## Phase 1: Foundation & Authentication
+### 2. Create Capacitor Config File
+Create `capacitor.config.ts` with:
+- **App ID**: `app.lovable.0f39d5b9e35d4113beb4e383909c1d7f`
+- **App Name**: `book-fit-georgia`
+- **Web Dir**: `dist` (Vite's build output)
+- **Live Reload Server**: Points to the Lovable preview URL for development
 
-### User Registration & Login
-- Email/password authentication with Supabase Auth
-- Two registration paths: **User** or **Partner** (trainer / gym)
-- After login, users land directly on the Home feed — no onboarding walls
-- Language toggle (EN / KA) accessible from profile settings
+### 3. Native UI Polish
+- **Status Bar**: Add a helper that detects Capacitor and styles the native status bar (transparent overlay, light/dark text)
+- **Splash Screen**: Auto-hide after app loads
+- **Safe Areas**: Update CSS to respect device notches and home indicators (iPhone safe areas)
+- **Bottom Nav**: Adjust padding to sit above the home indicator on modern phones
+- **Haptic Feedback**: Add subtle vibration on button taps for a native feel
 
-### Partner Registration
-- Choose partner type: **Individual Trainer** or **Gym / Studio / Place**
-- Individual trainers fill out a personal profile (name, photo, bio, sports, languages)
-- Gyms fill out a brand profile (business name, logo, description, location)
-- Partner profiles start in "pending" state, not visible to users until approved
+### 4. Platform Detection Utility
+Create a small `src/lib/platform.ts` helper:
+- `isNative()` -- returns true when running inside Capacitor
+- `isIOS()` / `isAndroid()` -- platform checks
+- Used to conditionally apply native-only behaviors (status bar, haptics)
 
----
+### 5. CSS Adjustments for Native Feel
+- Add `env(safe-area-inset-*)` padding to header and bottom nav
+- Disable text selection and context menus in native mode (feels more app-like)
+- Ensure the glassmorphism bottom nav clears the iPhone home bar
 
-## Phase 2: Partner Dashboard
+## What You Need To Do After (on your computer)
 
-### Listing Management
-- Partners create training listings with: title, sport/activity type, description, date & time, duration, price, max spots (for group), background image, equipment/preparation notes
-- Each listing has a status: **Draft → Pending → Approved / Rejected**
-- New listings are submitted as applications (pending admin review)
-- Editing an approved listing resets it to "pending"
-- Partners see all their listings with clear status indicators
+1. **Export to GitHub** using the button in Lovable
+2. Clone the repo and run `npm install`
+3. Run `npx cap add ios` and/or `npx cap add android`
+4. Run `npm run build && npx cap sync`
+5. Open in Xcode (`npx cap open ios`) or Android Studio (`npx cap open android`)
+6. Build and submit to the App Store / Google Play
 
-### Dashboard Views
-- Overview of listings by status
-- Booking management (once listings are approved and booked)
-- Profile editing
+For development with live reload, the config points to your Lovable preview URL so changes appear instantly on your phone.
 
----
+## Technical Details
 
-## Phase 3: Admin Panel
+### Files Created
+| File | Purpose |
+|------|---------|
+| `capacitor.config.ts` | Capacitor project configuration |
+| `src/lib/platform.ts` | Platform detection utilities |
+| `src/lib/native.ts` | Status bar, splash screen, haptics initialization |
 
-### Separate Admin Route (`/admin`)
-- Accessible only to users with an admin role
-- Review queue for new partner profiles and training listings
-- Approve or reject listings with optional notes
-- View all partners, listings, and their statuses
-- Simple, functional interface — not user-facing
+### Files Modified
+| File | Change |
+|------|--------|
+| `package.json` | Add Capacitor dependencies |
+| `src/main.tsx` | Initialize native plugins on app start |
+| `src/index.css` | Add safe-area padding, native-feel CSS |
+| `src/components/BottomNav.tsx` | Safe-area bottom padding |
+| `src/pages/Home.tsx` | Safe-area top padding for header |
 
----
+### No Breaking Changes
+- The web app continues to work exactly as before in the browser
+- Native-only code is guarded by `isNative()` checks
+- All existing functionality (bookings, profiles, payments, reviews) is untouched
 
-## Phase 4: User Home Feed & Browsing
-
-### Home Screen
-- Mixed feed of approved listings from both trainers and gyms
-- Each listing card shows: small profile photo/logo, background image, training name, sport type, date/time, price, available spots, verified badge
-- Clean, consistent card design for both partner types
-
-### Search & Filters
-- Search bar at the top of the Home screen
-- Filter by: sport/activity, date & time range, price range, training type (1-on-1, group, event), language
-- Default view: all approved listings, no filters applied
-
-### Inline Expansion
-- Tapping a listing card expands it inline within the feed
-- Expanded view shows: full description, trainer/gym bio, equipment notes, "Ask a Question" button, "Book" button
-- Option to open full partner profile page from expanded view
-
----
-
-## Phase 5: Booking & Payments
-
-### Booking Flow
-- Users book directly from the expanded listing view
-- Select number of spots (for group sessions)
-- Stripe-powered in-app payment
-- Booking confirmation with details
-
-### Bookings Tab
-- Users see upcoming and past bookings
-- Booking status tracking
-- Partners see incoming bookings in their dashboard
-
----
-
-## Phase 6: Messaging
-
-### In-App Messaging
-- Users can message partners via "Ask a Question" on listings
-- Simple conversation threads between user and partner
-- Real-time messaging using Supabase Realtime
-- Accessible from the Messages tab in bottom navigation
-
----
-
-## Phase 7: Navigation & PWA
-
-### Bottom Navigation Bar (Users)
-- **Home** — listing feed
-- **Bookings** — user's bookings
-- **Messages** — conversations
-- **Profile** — settings, language, account
-
-### PWA Setup
-- Installable from mobile browser to home screen
-- App icon, splash screen, offline shell
-- Mobile-optimized responsive design throughout
-
----
-
-## Phase 8: Bilingual Support (EN / KA)
-
-### Internationalization
-- All UI text available in English and Georgian
-- Language toggle in profile/settings
-- Partner listings support bilingual content (title, description)
-
+For the full guide on building and deploying, read: [Lovable Capacitor Blog Post](https://docs.lovable.dev)
