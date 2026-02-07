@@ -1,12 +1,33 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowRight, User, Users, CalendarDays, Upload } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ArrowRight,
+  ArrowLeft,
+  User,
+  Users,
+  Upload,
+  Camera,
+  CalendarDays,
+  Send,
+  Info,
+  X,
+  Pencil,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 interface CreateListingSheetProps {
   open: boolean;
@@ -15,39 +36,85 @@ interface CreateListingSheetProps {
   onCreated: () => void;
 }
 
-const SPORTS = ["Yoga", "HIIT", "Boxing", "Tennis", "Pilates", "Swimming", "CrossFit", "MMA", "Weightlifting"];
+const SPORTS = [
+  "Yoga",
+  "HIIT",
+  "Pilates",
+  "Tennis",
+  "Boxing",
+  "Swimming",
+  "CrossFit",
+  "MMA",
+  "Weightlifting",
+];
 
-export default function CreateListingSheet({ open, onOpenChange, partnerId, onCreated }: CreateListingSheetProps) {
+export default function CreateListingSheet({
+  open,
+  onOpenChange,
+  partnerId,
+  onCreated,
+}: CreateListingSheetProps) {
   const { toast } = useToast();
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    title_en: "",
-    description_en: "",
-    sport: "Yoga",
-    training_type: "one_on_one" as "one_on_one" | "group" | "event",
-    scheduled_at: "",
-    duration_minutes: 60,
-    price_gel: 0,
-    max_spots: 1,
-    equipment_notes_en: "",
-    location: "",
-  });
+
+  // Step 1 fields
+  const [title, setTitle] = useState("");
+  const [sport, setSport] = useState("");
+  const [trainingType, setTrainingType] = useState<"one_on_one" | "group">(
+    "one_on_one"
+  );
+
+  // Step 2 fields
+  const [description, setDescription] = useState("");
+  const [priceGel, setPriceGel] = useState("");
+  const [maxSpots, setMaxSpots] = useState("");
+  const [scheduledAt, setScheduledAt] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const updateField = (key: string, value: any) => setForm((p) => ({ ...p, [key]: value }));
+  const resetForm = () => {
+    setStep(1);
+    setTitle("");
+    setSport("");
+    setTrainingType("one_on_one");
+    setDescription("");
+    setPriceGel("");
+    setMaxSpots("");
+    setScheduledAt("");
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title_en.trim() || !form.scheduled_at || form.price_gel <= 0) {
-      toast({ title: "Please fill in all required fields", variant: "destructive" });
+  const handleClose = () => {
+    onOpenChange(false);
+    resetForm();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const canContinue = title.trim() && sport;
+
+  const handleSubmit = async () => {
+    if (!scheduledAt || !priceGel || parseFloat(priceGel) <= 0) {
+      toast({
+        title: "Please fill in price and date/time",
+        variant: "destructive",
+      });
       return;
     }
 
     setLoading(true);
-
     let backgroundImageUrl: string | null = null;
 
-    // Upload image if selected
     if (imageFile) {
       const ext = imageFile.name.split(".").pop();
       const path = `${partnerId}/${Date.now()}.${ext}`;
@@ -56,231 +123,409 @@ export default function CreateListingSheet({ open, onOpenChange, partnerId, onCr
         .upload(path, imageFile);
 
       if (!uploadError) {
-        const { data: urlData } = supabase.storage.from("listing-images").getPublicUrl(path);
+        const { data: urlData } = supabase.storage
+          .from("listing-images")
+          .getPublicUrl(path);
         backgroundImageUrl = urlData.publicUrl;
       }
     }
 
     const { error } = await supabase.from("training_listings").insert({
       partner_id: partnerId,
-      title_en: form.title_en.trim(),
-      description_en: form.description_en.trim() || null,
-      sport: form.sport,
-      training_type: form.training_type,
-      scheduled_at: new Date(form.scheduled_at).toISOString(),
-      duration_minutes: form.duration_minutes,
-      price_gel: form.price_gel,
-      max_spots: form.max_spots,
-      equipment_notes_en: form.equipment_notes_en.trim() || null,
+      title_en: title.trim(),
+      description_en: description.trim() || null,
+      sport,
+      training_type: trainingType,
+      scheduled_at: new Date(scheduledAt).toISOString(),
+      duration_minutes: 60,
+      price_gel: parseFloat(priceGel),
+      max_spots: parseInt(maxSpots) || 1,
       background_image_url: backgroundImageUrl,
-      location: form.location.trim() || null,
       status: "pending",
     });
 
     if (error) {
-      toast({ title: "Failed to create listing", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Listing submitted for review! 🎉", description: "Our admin team will review it shortly." });
-      onCreated();
-      onOpenChange(false);
-      // Reset form
-      setForm({
-        title_en: "", description_en: "", sport: "Yoga", training_type: "one_on_one",
-        scheduled_at: "", duration_minutes: 60, price_gel: 0, max_spots: 1,
-        equipment_notes_en: "", location: "",
+      toast({
+        title: "Failed to create listing",
+        description: error.message,
+        variant: "destructive",
       });
-      setImageFile(null);
+    } else {
+      toast({
+        title: "Listing submitted for review! 🎉",
+        description: "Our admin team will review it shortly.",
+      });
+      onCreated();
+      handleClose();
     }
     setLoading(false);
   };
 
+  const scheduledDate = scheduledAt ? new Date(scheduledAt) : null;
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[92vh] rounded-t-[2rem] p-0 overflow-hidden border-0">
-        <div className="flex h-full flex-col">
-          <SheetHeader className="px-6 pt-5 pb-3 border-b border-border/40">
-            <SheetTitle className="text-xl font-extrabold text-foreground">Create New Listing</SheetTitle>
-          </SheetHeader>
-
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 pb-32 space-y-5 pt-4">
-            {/* Title */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Training Title *</label>
-              <Input
-                placeholder="e.g. Morning Yoga Flow"
-                value={form.title_en}
-                onChange={(e) => updateField("title_en", e.target.value)}
-                required
-                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
-              />
-            </div>
-
-            {/* Sport */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Sport / Activity *</label>
-              <div className="flex flex-wrap gap-2">
-                {SPORTS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => updateField("sport", s)}
-                    className={cn(
-                      "shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-all active:scale-95",
-                      form.sport === s
-                        ? "bg-foreground text-background shadow-lg"
-                        : "border border-border bg-card text-muted-foreground"
-                    )}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Training Type */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Training Type *</label>
-              <div className="flex gap-2">
-                {[
-                  { key: "one_on_one" as const, label: "Individual", icon: <User className="h-4 w-4" /> },
-                  { key: "group" as const, label: "Group", icon: <Users className="h-4 w-4" /> },
-                  { key: "event" as const, label: "Event", icon: <CalendarDays className="h-4 w-4" /> },
-                ].map((t) => (
-                  <button
-                    key={t.key}
-                    type="button"
-                    onClick={() => updateField("training_type", t.key)}
-                    className={cn(
-                      "flex flex-1 flex-col items-center gap-1.5 rounded-2xl py-3 transition-all active:scale-95",
-                      form.training_type === t.key
-                        ? "bg-foreground text-background shadow-lg"
-                        : "border border-border bg-card text-muted-foreground"
-                    )}
-                  >
-                    {t.icon}
-                    <span className="text-xs font-semibold">{t.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Date & Time + Duration */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Date & Time *</label>
-                <Input
-                  type="datetime-local"
-                  value={form.scheduled_at}
-                  onChange={(e) => updateField("scheduled_at", e.target.value)}
-                  required
-                  className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-sm font-medium shadow-none"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Duration (min)</label>
-                <Input
-                  type="number"
-                  min={15}
-                  max={240}
-                  value={form.duration_minutes}
-                  onChange={(e) => updateField("duration_minutes", parseInt(e.target.value) || 60)}
-                  className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-sm font-medium shadow-none"
-                />
-              </div>
-            </div>
-
-            {/* Price & Spots */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Price (₾) *</label>
-                <Input
-                  type="number"
-                  min={1}
-                  step={0.5}
-                  value={form.price_gel || ""}
-                  onChange={(e) => updateField("price_gel", parseFloat(e.target.value) || 0)}
-                  required
-                  placeholder="25"
-                  className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-sm font-medium shadow-none"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Max Spots</label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={form.max_spots}
-                  onChange={(e) => updateField("max_spots", parseInt(e.target.value) || 1)}
-                  className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-sm font-medium shadow-none"
-                />
-              </div>
-            </div>
-
-            {/* Location */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Location</label>
-              <Input
-                placeholder="e.g. Tbilisi, Vake"
-                value={form.location}
-                onChange={(e) => updateField("location", e.target.value)}
-                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Description</label>
-              <Textarea
-                placeholder="Describe the training session..."
-                value={form.description_en}
-                onChange={(e) => updateField("description_en", e.target.value)}
-                rows={4}
-                className="rounded-2xl border-0 bg-muted/60 px-4 py-3 text-[15px] font-medium shadow-none resize-none"
-              />
-            </div>
-
-            {/* Equipment */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Equipment Notes</label>
-              <Input
-                placeholder="Yoga Mat, Water, Towel"
-                value={form.equipment_notes_en}
-                onChange={(e) => updateField("equipment_notes_en", e.target.value)}
-                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
-              />
-            </div>
-
-            {/* Image upload */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Cover Image</label>
-              <label className="flex cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/30 py-6 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/30">
-                <Upload className="h-5 w-5" />
-                {imageFile ? imageFile.name : "Tap to upload an image"}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                />
-              </label>
-            </div>
-          </form>
-
-          {/* Submit button */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl px-6 pb-8 pt-4 border-t border-border/50">
-            <Button
-              type="submit"
-              disabled={loading}
-              onClick={handleSubmit}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 h-14 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-lg hover:bg-primary/90"
+    <Sheet open={open} onOpenChange={handleClose}>
+      <SheetContent
+        side="bottom"
+        className="h-[95vh] rounded-t-[2rem] p-0 overflow-hidden border-0"
+      >
+        <div className="flex h-full flex-col bg-background">
+          {/* Header */}
+          <header className="flex items-center justify-between px-5 pt-5 pb-2">
+            {step === 2 ? (
+              <button
+                onClick={() => setStep(1)}
+                className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5 text-foreground" />
+              </button>
+            ) : (
+              <button
+                onClick={handleClose}
+                className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5 text-foreground" />
+              </button>
+            )}
+            <h2 className="text-lg font-bold text-foreground">
+              {step === 1 ? "New Training" : "Training Details"}
+            </h2>
+            <button
+              onClick={handleClose}
+              className="text-sm font-bold text-primary"
             >
-              {loading ? "Submitting..." : "Submit for Review"}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+              Cancel
+            </button>
+          </header>
+
+          {/* Step indicator */}
+          <div className="px-5 pt-2 pb-1">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-muted-foreground">
+                {step === 1 ? "Step 1 of 2" : "Step 2 of 2"}
+              </p>
+              <p className="text-xs font-bold text-foreground">
+                {step === 1 ? "Basics" : "Details & Pricing"}
+              </p>
+            </div>
+            <Progress
+              value={step === 1 ? 50 : 100}
+              className="h-1.5 bg-muted"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto px-5 pb-32 pt-5">
+            {step === 1 ? (
+              <StepBasics
+                title={title}
+                setTitle={setTitle}
+                sport={sport}
+                setSport={setSport}
+                trainingType={trainingType}
+                setTrainingType={setTrainingType}
+              />
+            ) : (
+              <StepDetails
+                imagePreview={imagePreview}
+                onImageChange={handleImageChange}
+                description={description}
+                setDescription={setDescription}
+                priceGel={priceGel}
+                setPriceGel={setPriceGel}
+                maxSpots={maxSpots}
+                setMaxSpots={setMaxSpots}
+                scheduledAt={scheduledAt}
+                setScheduledAt={setScheduledAt}
+                scheduledDate={scheduledDate}
+              />
+            )}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl px-5 pb-8 pt-4 border-t border-border/40">
+            {step === 1 ? (
+              <Button
+                disabled={!canContinue}
+                onClick={() => setStep(2)}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 h-14 text-base font-bold text-primary-foreground shadow-lg hover:bg-primary/90"
+              >
+                Continue
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            ) : (
+              <>
+                <Button
+                  disabled={loading}
+                  onClick={handleSubmit}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-secondary py-4 h-14 text-base font-bold text-primary-foreground shadow-lg"
+                >
+                  {loading ? "Submitting..." : "Submit for Review"}
+                  <Send className="h-4 w-4" />
+                </Button>
+                <p className="mt-3 text-center text-[11px] text-muted-foreground">
+                  By submitting, you agree to our{" "}
+                  <span className="underline">Partner Terms of Service</span>
+                </p>
+              </>
+            )}
           </div>
         </div>
       </SheetContent>
     </Sheet>
+  );
+}
+
+/* ─── Step 1: Basics ─────────────────────────────── */
+
+function StepBasics({
+  title,
+  setTitle,
+  sport,
+  setSport,
+  trainingType,
+  setTrainingType,
+}: {
+  title: string;
+  setTitle: (v: string) => void;
+  sport: string;
+  setSport: (v: string) => void;
+  trainingType: "one_on_one" | "group";
+  setTrainingType: (v: "one_on_one" | "group") => void;
+}) {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold text-foreground">Basic Info</h1>
+        <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+          Let's start with the basics of your training session. You can edit
+          this later.
+        </p>
+      </div>
+
+      {/* Training Name */}
+      <div>
+        <label className="mb-2 block text-base font-bold text-foreground">
+          Training Name
+        </label>
+        <Input
+          placeholder="e.g., Morning Yoga Flow"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/60"
+        />
+      </div>
+
+      {/* Activity */}
+      <div>
+        <label className="mb-2 block text-base font-bold text-foreground">
+          Activity
+        </label>
+        <Select value={sport} onValueChange={setSport}>
+          <SelectTrigger className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none">
+            <SelectValue placeholder="Select Sport" />
+          </SelectTrigger>
+          <SelectContent>
+            {SPORTS.map((s) => (
+              <SelectItem key={s} value={s}>
+                {s}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Session Type */}
+      <div>
+        <label className="mb-2 block text-base font-bold text-foreground">
+          Session Type
+        </label>
+        <div className="flex rounded-2xl border border-border bg-muted/30 p-1">
+          <button
+            type="button"
+            onClick={() => setTrainingType("one_on_one")}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all",
+              trainingType === "one_on_one"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground"
+            )}
+          >
+            <User className="h-4 w-4" />
+            Individual
+          </button>
+          <button
+            type="button"
+            onClick={() => setTrainingType("group")}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all",
+              trainingType === "group"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground"
+            )}
+          >
+            <Users className="h-4 w-4" />
+            Group
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Step 2: Details & Pricing ──────────────────── */
+
+function StepDetails({
+  imagePreview,
+  onImageChange,
+  description,
+  setDescription,
+  priceGel,
+  setPriceGel,
+  maxSpots,
+  setMaxSpots,
+  scheduledAt,
+  setScheduledAt,
+  scheduledDate,
+}: {
+  imagePreview: string | null;
+  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  description: string;
+  setDescription: (v: string) => void;
+  priceGel: string;
+  setPriceGel: (v: string) => void;
+  maxSpots: string;
+  setMaxSpots: (v: string) => void;
+  scheduledAt: string;
+  setScheduledAt: (v: string) => void;
+  scheduledDate: Date | null;
+}) {
+  return (
+    <div className="space-y-7">
+      {/* Cover Image */}
+      <div>
+        <label className="mb-1 block text-base font-bold text-foreground">
+          Cover Image
+        </label>
+        <p className="mb-3 text-[13px] text-muted-foreground">
+          This image will appear on the listing card.
+        </p>
+        <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border bg-muted/20 py-10 transition-colors hover:border-primary/30">
+          {imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              className="h-28 w-full rounded-xl object-cover px-4"
+            />
+          ) : (
+            <>
+              <Camera className="h-8 w-8 text-primary/60" />
+              <span className="text-sm font-medium text-muted-foreground">
+                Upload photo
+              </span>
+            </>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={onImageChange}
+          />
+        </label>
+      </div>
+
+      {/* Description */}
+      <div>
+        <label className="mb-2 block text-base font-bold text-foreground">
+          Description
+        </label>
+        <Textarea
+          placeholder="Describe what participants should expect from this training session..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={5}
+          className="rounded-2xl border-0 bg-muted/60 px-4 py-3 text-[15px] font-medium shadow-none resize-none placeholder:text-muted-foreground/60"
+        />
+      </div>
+
+      {/* Price & Spots */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="mb-2 block text-base font-bold text-foreground">
+            Price (GEL)
+          </label>
+          <Input
+            type="number"
+            min={0}
+            step={0.5}
+            value={priceGel}
+            onChange={(e) => setPriceGel(e.target.value)}
+            placeholder="0.00"
+            className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+          />
+        </div>
+        <div>
+          <label className="mb-2 block text-base font-bold text-foreground">
+            Available Spots
+          </label>
+          <Input
+            type="number"
+            min={1}
+            max={100}
+            value={maxSpots}
+            onChange={(e) => setMaxSpots(e.target.value)}
+            placeholder="e.g. 10"
+            className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+          />
+        </div>
+      </div>
+
+      {/* Date & Time */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-base font-bold text-foreground">
+            Date & Time
+          </label>
+        </div>
+
+        <div className="relative">
+          <Input
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={(e) => setScheduledAt(e.target.value)}
+            className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+          />
+        </div>
+
+        {scheduledDate && (
+          <div className="mt-3 flex items-center gap-3 rounded-2xl border border-border/50 bg-card p-3.5">
+            <CalendarDays className="h-5 w-5 text-primary shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-bold text-foreground">
+                {format(scheduledDate, "EEEE, MMMM d")}
+              </p>
+              <p className="text-xs text-primary font-medium">
+                {format(scheduledDate, "hh:mm a")}
+              </p>
+            </div>
+            <button
+              onClick={() => setScheduledAt("")}
+              className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted"
+            >
+              <Pencil className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Info notice */}
+      <div className="flex gap-3 rounded-2xl bg-primary/5 p-4">
+        <Info className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+        <p className="text-[13px] leading-relaxed text-foreground/70">
+          Listings are reviewed within 24 hours. Ensure your description is
+          clear and follows our community guidelines.
+        </p>
+      </div>
+    </div>
   );
 }
