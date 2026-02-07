@@ -46,6 +46,7 @@ const SPORTS = [
   "CrossFit",
   "MMA",
   "Weightlifting",
+  "Personal Trainer",
 ];
 
 export default function CreateListingSheet({
