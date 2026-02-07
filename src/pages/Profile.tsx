@@ -242,7 +242,7 @@ export default function Profile() {
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-secondary/[0.06]" />
 
       {/* Avatar section */}
-      <div className="relative z-10 flex flex-col items-center pt-10 pb-4">
+      <div className="relative z-10 flex flex-col items-center pb-4" style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top, 2.5rem))' }}>
         <div className="relative">
           <div className="rounded-full p-[3px] bg-gradient-to-br from-primary to-secondary">
             <Avatar className="h-28 w-28 border-4 border-background">
@@ -291,7 +291,7 @@ export default function Profile() {
             onClick={() => setEditingName(true)}
             className="mt-3 flex items-center gap-1.5 group"
           >
-            <h1 className="text-2xl font-extrabold text-foreground">{displayName}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
             <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
         )}
@@ -300,17 +300,17 @@ export default function Profile() {
 
       {/* Stats card */}
       <div className="relative z-10 mx-5 mb-6">
-        <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
+          <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
           <div className="flex-1 py-4 text-center">
-            <p className="text-2xl font-extrabold text-primary">{stats.sessions}</p>
+            <p className="text-2xl font-bold text-primary">{stats.sessions}</p>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sessions</p>
           </div>
           <div className="flex-1 py-4 text-center">
-            <p className="text-2xl font-extrabold text-foreground">{stats.studios}</p>
+            <p className="text-2xl font-bold text-foreground">{stats.studios}</p>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Studios</p>
           </div>
           <div className="flex-1 py-4 text-center">
-            <p className="text-2xl font-extrabold text-primary">{stats.hours}</p>
+            <p className="text-2xl font-bold text-primary">{stats.hours}</p>
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Hours</p>
           </div>
         </div>

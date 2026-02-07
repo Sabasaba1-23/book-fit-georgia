@@ -105,11 +105,16 @@ export default function CreateListingSheet({
   const canContinue = title.trim() && sport;
 
   const handleSubmit = async () => {
-    if (!scheduledAt || !priceGel || parseFloat(priceGel) <= 0) {
-      toast({
-        title: "Please fill in price and date/time",
-        variant: "destructive",
-      });
+    if (!scheduledAt) {
+      toast({ title: "Please select a date and time", variant: "destructive" });
+      return;
+    }
+    if (!priceGel || parseFloat(priceGel) <= 0) {
+      toast({ title: "Please enter a valid price", variant: "destructive" });
+      return;
+    }
+    if (new Date(scheduledAt) <= new Date()) {
+      toast({ title: "Date must be in the future", variant: "destructive" });
       return;
     }
 
@@ -146,9 +151,12 @@ export default function CreateListingSheet({
     });
 
     if (error) {
+      const msg = error.message.includes("violates") 
+        ? "Something went wrong. Please check your inputs and try again."
+        : error.message;
       toast({
         title: "Failed to create listing",
-        description: error.message,
+        description: msg,
         variant: "destructive",
       });
     } else {

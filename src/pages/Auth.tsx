@@ -39,13 +39,25 @@ export default function Auth() {
     setError("");
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
+    if (error) {
+      if (error.message === "Invalid login credentials") {
+        setError("Incorrect email or password. Please try again.");
+      } else if (error.message.includes("Email not confirmed")) {
+        setError("Please check your email and confirm your account first.");
+      } else {
+        setError(error.message);
+      }
+    }
     setLoading(false);
   };
 
   const handleRegisterUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
@@ -55,8 +67,13 @@ export default function Auth() {
         data: { full_name: fullName },
       },
     });
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      if (error.message.includes("already registered")) {
+        setError("This email is already registered. Try logging in instead.");
+      } else {
+        setError(error.message);
+      }
+    } else {
       toast({
         title: "Check your email",
         description: "We sent you a confirmation link to verify your account.",
@@ -79,6 +96,10 @@ export default function Auth() {
     }
     if (!partnerPhone.trim()) {
       setError("Please enter your phone number.");
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
 
@@ -181,7 +202,7 @@ export default function Auth() {
       {mode === "login" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -253,7 +274,7 @@ export default function Auth() {
       {/* ─── FORGOT PASSWORD ─── */}
       {mode === "forgot-password" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -286,7 +307,7 @@ export default function Auth() {
       {/* ─── REGISTER CHOICE ─── */}
       {mode === "register-choice" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -318,7 +339,7 @@ export default function Auth() {
       {/* ─── REGISTER USER ─── */}
       {mode === "register-user" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -365,7 +386,7 @@ export default function Auth() {
       {mode === "register-partner" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
