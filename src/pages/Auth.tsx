@@ -1,15 +1,57 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronLeft, Eye, EyeOff, Handshake, ArrowRight, User, Building2, Mail, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ChevronLeft, Eye, EyeOff, Handshake, ArrowRight, User, Building2, Mail, BadgeCheck, ShieldCheck, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register-choice" | "register-user" | "register-partner" | "forgot-password";
+
+function ContactPopover() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div className="relative inline-block" ref={ref}>
+      <button type="button" onClick={() => setOpen(!open)} className="underline text-primary">
+        Contact Us
+      </button>
+      {open && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-48 rounded-2xl bg-card border border-border shadow-lg p-3 space-y-2 animate-in fade-in zoom-in-95 duration-150">
+          <a
+            href="mailto:support@fitbook.my"
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <Mail className="h-3.5 w-3.5 text-primary" />
+            Email Us
+          </a>
+          <a
+            href="https://wa.me/995511102916"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <MessageCircle className="h-3.5 w-3.5 text-green-500" />
+            WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Auth() {
   const { t } = useLanguage();
@@ -263,12 +305,14 @@ export default function Auth() {
               Continue with Google
             </button>
 
-            <p className="mt-4 text-center text-[11px] text-muted-foreground">
-              By continuing, you agree to our{" "}
-              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
-              {" "}and{" "}
-              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
-            </p>
+            <div className="mt-4 flex items-center justify-center gap-1.5 flex-wrap text-[11px] text-muted-foreground">
+              <span>By continuing, you agree to our</span>
+              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms</button>
+              <span>&</span>
+              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy</button>
+              <span>·</span>
+              <ContactPopover />
+            </div>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
