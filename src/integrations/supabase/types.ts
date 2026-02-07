@@ -422,6 +422,7 @@ export type Database = {
           booking_id: string
           created_at: string
           id: string
+          photos: string[] | null
           rating: number
           review_text: string | null
           reviewer_id: string
@@ -432,6 +433,7 @@ export type Database = {
           booking_id: string
           created_at?: string
           id?: string
+          photos?: string[] | null
           rating: number
           review_text?: string | null
           reviewer_id: string
@@ -442,6 +444,7 @@ export type Database = {
           booking_id?: string
           created_at?: string
           id?: string
+          photos?: string[] | null
           rating?: number
           review_text?: string | null
           reviewer_id?: string

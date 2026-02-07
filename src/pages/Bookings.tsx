@@ -56,6 +56,7 @@ interface ReviewData {
   rating: number;
   review_text: string | null;
   tags: string[] | null;
+  photos: string[] | null;
 }
 
 function getTimeLabel(scheduledAt: string): { text: string; urgent: boolean } {
@@ -110,7 +111,7 @@ export default function Bookings() {
         .select("id, booking_id, user_status, partner_status"),
       supabase
         .from("reviews")
-        .select("booking_id, reviewer_role, rating, review_text, tags")
+        .select("booking_id, reviewer_role, rating, review_text, tags, photos")
         .eq("reviewer_id", user!.id),
     ]);
 
@@ -420,6 +421,8 @@ export default function Bookings() {
                     <ReviewForm
                       bookingId={booking.id}
                       role="user"
+                      partnerName={partner.display_name}
+                      sessionTitle={title}
                       onSubmitted={fetchAll}
                     />
                   </div>
