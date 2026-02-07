@@ -10,6 +10,7 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import { Search, Bell } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ListingWithPartner {
   id: string;
@@ -215,11 +216,12 @@ export default function Home() {
       {/* Feed */}
       <main className="relative z-10 mx-auto max-w-lg space-y-7 px-5 py-5">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="flex flex-col items-center gap-2">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-sm text-muted-foreground">{t("loading")}</p>
-            </div>
+          <div className="space-y-7">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="overflow-hidden rounded-[1.75rem] ios-shadow">
+                <Skeleton className="h-[420px] w-full" />
+              </div>
+            ))}
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-16">
