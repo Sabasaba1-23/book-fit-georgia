@@ -29,7 +29,7 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       <div className="glass-card mx-auto max-w-lg rounded-t-3xl border-t border-border/30">
         <div className="flex h-[76px] items-center justify-around px-4 pb-1">
           {navItems.map(({ key, label, icon: Icon, path, requiresAuth }) => {

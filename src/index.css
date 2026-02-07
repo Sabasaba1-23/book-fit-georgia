@@ -123,6 +123,19 @@
   }
 }
 
+/* Native app feel when running inside Capacitor */
+.capacitor-native {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.capacitor-native input,
+.capacitor-native textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
 @layer components {
   .glass-card {
     background: rgba(255, 255, 255, 0.7);
