@@ -90,6 +90,53 @@ export type Database = {
           },
         ]
       }
+      completion_requests: {
+        Row: {
+          auto_complete_at: string | null
+          booking_id: string
+          created_at: string
+          id: string
+          partner_confirmed_at: string | null
+          partner_status: Database["public"]["Enums"]["confirmation_status"]
+          reminder_sent_at: string | null
+          updated_at: string
+          user_confirmed_at: string | null
+          user_status: Database["public"]["Enums"]["confirmation_status"]
+        }
+        Insert: {
+          auto_complete_at?: string | null
+          booking_id: string
+          created_at?: string
+          id?: string
+          partner_confirmed_at?: string | null
+          partner_status?: Database["public"]["Enums"]["confirmation_status"]
+          reminder_sent_at?: string | null
+          updated_at?: string
+          user_confirmed_at?: string | null
+          user_status?: Database["public"]["Enums"]["confirmation_status"]
+        }
+        Update: {
+          auto_complete_at?: string | null
+          booking_id?: string
+          created_at?: string
+          id?: string
+          partner_confirmed_at?: string | null
+          partner_status?: Database["public"]["Enums"]["confirmation_status"]
+          reminder_sent_at?: string | null
+          updated_at?: string
+          user_confirmed_at?: string | null
+          user_status?: Database["public"]["Enums"]["confirmation_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "completion_requests_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversation_participants: {
         Row: {
           id: string
@@ -177,42 +224,54 @@ export type Database = {
       partner_profiles: {
         Row: {
           approved: boolean
+          avg_rating: number | null
           bio: string | null
+          completion_rate: number | null
           created_at: string
           display_name: string
+          dispute_rate: number | null
           id: string
           languages: string[] | null
           location: string | null
           logo_url: string | null
           partner_type: Database["public"]["Enums"]["partner_type"]
+          review_count: number | null
           sports: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
           approved?: boolean
+          avg_rating?: number | null
           bio?: string | null
+          completion_rate?: number | null
           created_at?: string
           display_name: string
+          dispute_rate?: number | null
           id?: string
           languages?: string[] | null
           location?: string | null
           logo_url?: string | null
           partner_type: Database["public"]["Enums"]["partner_type"]
+          review_count?: number | null
           sports?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
           approved?: boolean
+          avg_rating?: number | null
           bio?: string | null
+          completion_rate?: number | null
           created_at?: string
           display_name?: string
+          dispute_rate?: number | null
           id?: string
           languages?: string[] | null
           location?: string | null
           logo_url?: string | null
           partner_type?: Database["public"]["Enums"]["partner_type"]
+          review_count?: number | null
           sports?: string[] | null
           updated_at?: string
           user_id?: string
@@ -248,6 +307,97 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string
+          created_at: string
+          id: string
+          rating: number
+          review_text: string | null
+          reviewer_id: string
+          reviewer_role: string
+          tags: string[] | null
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          reviewer_id: string
+          reviewer_role: string
+          tags?: string[] | null
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          reviewer_id?: string
+          reviewer_role?: string
+          tags?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_issues: {
+        Row: {
+          admin_note: string | null
+          booking_id: string
+          created_at: string
+          id: string
+          note: string | null
+          reason: string
+          reporter_id: string
+          reporter_role: string
+          resolved_at: string | null
+          status: Database["public"]["Enums"]["issue_status"]
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          booking_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason: string
+          reporter_id: string
+          reporter_role: string
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["issue_status"]
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          booking_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason?: string
+          reporter_id?: string
+          reporter_role?: string
+          resolved_at?: string | null
+          status?: Database["public"]["Enums"]["issue_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_issues_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       training_listings: {
         Row: {
@@ -458,7 +608,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "partner" | "user"
-      booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "cancelled"
+        | "completed"
+        | "disputed"
+      confirmation_status: "pending" | "confirmed" | "disputed"
+      issue_status: "open" | "under_review" | "resolved" | "dismissed"
       listing_status: "draft" | "pending" | "approved" | "rejected"
       partner_type: "individual" | "gym"
       payment_status: "pending" | "paid" | "refunded" | "failed"
@@ -591,7 +748,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "partner", "user"],
-      booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed",
+        "disputed",
+      ],
+      confirmation_status: ["pending", "confirmed", "disputed"],
+      issue_status: ["open", "under_review", "resolved", "dismissed"],
       listing_status: ["draft", "pending", "approved", "rejected"],
       partner_type: ["individual", "gym"],
       payment_status: ["pending", "paid", "refunded", "failed"],

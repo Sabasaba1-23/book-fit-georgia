@@ -5,9 +5,11 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import BottomNav from "@/components/BottomNav";
 import BookingTicket from "@/components/BookingTicket";
+import SessionConfirmationCard from "@/components/SessionConfirmationCard";
+import ReviewForm from "@/components/ReviewForm";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Calendar, Clock, MapPin, Ticket, Navigation, X, MessageCircle } from "lucide-react";
-import { format, formatDistanceToNow, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
+import { Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import { format, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
 interface BookingWithListing {
@@ -40,14 +42,26 @@ interface BookingWithListing {
   };
 }
 
+interface CompletionRequest {
+  id: string;
+  booking_id: string;
+  user_status: string;
+  partner_status: string;
+}
+
+interface ReviewData {
+  booking_id: string;
+  reviewer_role: string;
+  rating: number;
+  review_text: string | null;
+  tags: string[] | null;
+}
+
 function getTimeLabel(scheduledAt: string): { text: string; urgent: boolean } {
   const date = new Date(scheduledAt);
   const now = new Date();
-
   if (isPast(date)) return { text: "Completed", urgent: false };
-
   const hoursUntil = differenceInHours(date, now);
-
   if (isToday(date)) {
     if (hoursUntil <= 0) return { text: "Starting Now", urgent: true };
     if (hoursUntil <= 2) return { text: `Starting in ${hoursUntil}h`, urgent: true };
@@ -64,33 +78,44 @@ export default function Bookings() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [bookings, setBookings] = useState<BookingWithListing[]>([]);
+  const [completionRequests, setCompletionRequests] = useState<CompletionRequest[]>([]);
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"upcoming" | "history">("upcoming");
   const [ticketBooking, setTicketBooking] = useState<BookingWithListing | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    fetchBookings();
+    fetchAll();
   }, [user]);
 
-  async function fetchBookings() {
+  async function fetchAll() {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .select(`
-        id, spots, booking_status, payment_status, total_price, created_at, listing_id, stripe_payment_id,
-        training_listings (
-          id, title_en, title_ka, sport, training_type, scheduled_at,
-          duration_minutes, price_gel, background_image_url, location, partner_id,
-          partner_profiles ( id, display_name, logo_url, partner_type )
-        )
-      `)
-      .eq("user_id", user!.id)
-      .order("created_at", { ascending: false });
+    const [bookingsRes, crRes, reviewsRes] = await Promise.all([
+      supabase
+        .from("bookings")
+        .select(`
+          id, spots, booking_status, payment_status, total_price, created_at, listing_id, stripe_payment_id,
+          training_listings (
+            id, title_en, title_ka, sport, training_type, scheduled_at,
+            duration_minutes, price_gel, background_image_url, location, partner_id,
+            partner_profiles ( id, display_name, logo_url, partner_type )
+          )
+        `)
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("completion_requests")
+        .select("id, booking_id, user_status, partner_status"),
+      supabase
+        .from("reviews")
+        .select("booking_id, reviewer_role, rating, review_text, tags")
+        .eq("reviewer_id", user!.id),
+    ]);
 
-    if (!error && data) {
-      setBookings(data as unknown as BookingWithListing[]);
-    }
+    if (bookingsRes.data) setBookings(bookingsRes.data as unknown as BookingWithListing[]);
+    if (crRes.data) setCompletionRequests(crRes.data as CompletionRequest[]);
+    if (reviewsRes.data) setReviews(reviewsRes.data as ReviewData[]);
     setLoading(false);
   }
 
@@ -99,12 +124,11 @@ export default function Bookings() {
       .from("bookings")
       .update({ booking_status: "cancelled" })
       .eq("id", bookingId);
-
     if (error) {
       toast({ title: "Failed to cancel booking", variant: "destructive" });
     } else {
       toast({ title: "Booking cancelled" });
-      fetchBookings();
+      fetchAll();
     }
   }
 
@@ -186,12 +210,16 @@ export default function Bookings() {
 
   const displayBookings = tab === "upcoming" ? upcoming : history;
 
+  const getCR = (bookingId: string) =>
+    completionRequests.find((cr) => cr.booking_id === bookingId) || null;
+
+  const getMyReview = (bookingId: string) =>
+    reviews.find((r) => r.booking_id === bookingId && r.reviewer_role === "user") || null;
+
   return (
     <div className="relative min-h-screen bg-background pb-24">
-      {/* Subtle gradient bg */}
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      {/* Header */}
       <header className="relative z-40 px-5 pt-5 pb-1">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-extrabold text-foreground">My Bookings</h1>
@@ -201,7 +229,6 @@ export default function Bookings() {
         </div>
       </header>
 
-      {/* Tabs */}
       <div className="relative z-30 px-5 py-3">
         <div className="flex rounded-2xl bg-muted/50 p-1">
           <button
@@ -228,7 +255,6 @@ export default function Bookings() {
         </div>
       </div>
 
-      {/* Content */}
       <main className="relative z-10 mx-auto max-w-lg space-y-4 px-5 py-2">
         {loading ? (
           <div className="flex justify-center py-16">
@@ -263,7 +289,13 @@ export default function Bookings() {
             const endTime = addMinutes(scheduledDate, listing.duration_minutes);
             const { text: timeLabel, urgent } = getTimeLabel(listing.scheduled_at);
             const isCancelled = booking.booking_status === "cancelled";
-            const isCompleted = isPast(endTime) && !isCancelled;
+            const isDisputed = booking.booking_status === "disputed";
+            const sessionEnded = isPast(endTime) && !isCancelled;
+            const isCompleted = booking.booking_status === "completed";
+            const cr = getCR(booking.id);
+            const myReview = getMyReview(booking.id);
+            const needsConfirmation = sessionEnded && !isCompleted && !isDisputed && !isCancelled;
+            const canReview = isCompleted && !myReview;
 
             return (
               <div
@@ -272,35 +304,42 @@ export default function Bookings() {
                   isCancelled ? "opacity-60" : ""
                 }`}
               >
-                {/* Time label badge */}
+                {/* Status badge */}
                 <div className="flex justify-end px-4 pt-3">
                   <span
                     className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       isCancelled
                         ? "bg-destructive/10 text-destructive"
-                        : urgent
-                          ? "bg-primary/10 text-primary"
-                          : isCompleted
-                            ? "bg-muted text-muted-foreground"
-                            : "bg-muted text-foreground/70"
+                        : isDisputed
+                          ? "bg-destructive/10 text-destructive"
+                          : urgent
+                            ? "bg-primary/10 text-primary"
+                            : isCompleted
+                              ? "bg-primary/10 text-primary"
+                              : sessionEnded
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-muted text-foreground/70"
                     }`}
                   >
-                    {isCancelled ? (
-                      "Cancelled"
-                    ) : isCompleted ? (
-                      "Completed"
-                    ) : (
-                      <>
-                        {urgent && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
-                        {timeLabel}
-                      </>
-                    )}
+                    {isCancelled
+                      ? "Cancelled"
+                      : isDisputed
+                        ? "Disputed"
+                        : isCompleted
+                          ? "✓ Completed"
+                          : sessionEnded
+                            ? "Awaiting Confirmation"
+                            : (
+                              <>
+                                {urgent && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+                                {timeLabel}
+                              </>
+                            )}
                   </span>
                 </div>
 
                 {/* Card body */}
                 <div className="px-5 pb-2 pt-2">
-                  {/* Partner + title */}
                   <div className="flex items-start gap-3 mb-3">
                     <Avatar
                       className="h-12 w-12 rounded-xl border border-border/50 shrink-0 cursor-pointer"
@@ -322,16 +361,11 @@ export default function Bookings() {
                     </div>
                   </div>
 
-                  {/* Date & time */}
                   <div className="flex items-center gap-4 mb-4">
                     <div className="flex items-center gap-1.5 text-sm text-foreground/80">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">
-                        {isToday(scheduledDate)
-                          ? "Today"
-                          : isTomorrow(scheduledDate)
-                            ? "Tomorrow"
-                            : format(scheduledDate, "EEE, MMM d")}
+                        {isToday(scheduledDate) ? "Today" : isTomorrow(scheduledDate) ? "Tomorrow" : format(scheduledDate, "EEE, MMM d")}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-sm text-foreground/80">
@@ -343,8 +377,43 @@ export default function Bookings() {
                   </div>
                 </div>
 
-                {/* Action buttons */}
-                {!isCancelled && !isCompleted && (
+                {/* Confirmation card for ended sessions */}
+                {needsConfirmation && (
+                  <div className="px-5 pb-3">
+                    <SessionConfirmationCard
+                      bookingId={booking.id}
+                      completionRequest={cr}
+                      isPartner={false}
+                      onUpdate={fetchAll}
+                    />
+                  </div>
+                )}
+
+                {/* Review form for completed sessions */}
+                {canReview && (
+                  <div className="px-5 pb-3">
+                    <ReviewForm
+                      bookingId={booking.id}
+                      role="user"
+                      onSubmitted={fetchAll}
+                    />
+                  </div>
+                )}
+
+                {/* Show existing review */}
+                {myReview && (
+                  <div className="px-5 pb-3">
+                    <ReviewForm
+                      bookingId={booking.id}
+                      role="user"
+                      existingReview={myReview}
+                      onSubmitted={fetchAll}
+                    />
+                  </div>
+                )}
+
+                {/* Action buttons for upcoming */}
+                {!isCancelled && !sessionEnded && (
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => handleCancel(booking.id)}
@@ -369,7 +438,8 @@ export default function Bookings() {
                   </div>
                 )}
 
-                {isCompleted && !isCancelled && (
+                {/* Completed/disputed actions */}
+                {(isCompleted || isDisputed || (sessionEnded && isCancelled)) && (
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => setTicketBooking(booking)}
@@ -392,7 +462,6 @@ export default function Bookings() {
         )}
       </main>
 
-      {/* Ticket Modal */}
       {ticketBooking && (
         <BookingTicket
           open={!!ticketBooking}

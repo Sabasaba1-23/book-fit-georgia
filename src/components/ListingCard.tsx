@@ -84,6 +84,8 @@ interface ListingCardProps {
       logo_url: string | null;
       partner_type: string;
       bio: string | null;
+      avg_rating?: number | null;
+      review_count?: number | null;
     };
   };
 }
@@ -333,8 +335,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
                 <p className="text-[15px] font-bold text-foreground hover:text-primary transition-colors">{listing.partner.display_name}</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                  <span className="text-[12px] font-semibold text-foreground">4.9</span>
-                  <span className="text-[11px] text-muted-foreground">(124 reviews)</span>
+                  <span className="text-[12px] font-semibold text-foreground">
+                    {listing.partner.avg_rating ? Number(listing.partner.avg_rating).toFixed(1) : "New"}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">
+                    ({listing.partner.review_count || 0} reviews)
+                  </span>
                 </div>
               </div>
             </div>
