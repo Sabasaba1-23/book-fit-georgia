@@ -18,10 +18,14 @@ import {
   Calendar,
   Zap,
   Trophy,
+  Shield,
+  Heart,
+  Award,
+  Target,
+  Flame,
 } from "lucide-react";
 import { format } from "date-fns";
 
-// Random cover images for partners who don't have one
 const COVER_IMAGES = [
   "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
   "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80",
@@ -29,6 +33,19 @@ const COVER_IMAGES = [
   "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80",
   "https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&q=80",
   "https://images.unsplash.com/photo-1605296867424-35fc25c9212a?w=800&q=80",
+  "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800&q=80",
+  "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
+];
+
+const AVATAR_IMAGES = [
+  "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&q=80",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80",
+  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80",
+  "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&q=80",
+  "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&q=80",
 ];
 
 const GALLERY_IMAGES = [
@@ -38,6 +55,10 @@ const GALLERY_IMAGES = [
   "https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=400&q=80",
   "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80",
   "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80",
+  "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=400&q=80",
+  "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&q=80",
+  "https://images.unsplash.com/photo-1550345332-09e3ac987658?w=400&q=80",
+  "https://images.unsplash.com/photo-1574680178050-55c6a6a96e0a?w=400&q=80",
 ];
 
 const BIOS: Record<string, string[]> = {
@@ -45,6 +66,7 @@ const BIOS: Record<string, string[]> = {
     "Helping you redefine your limits. Specialist in explosive power and high-intensity hybrid training. My methodology focuses on sustainable gains through science-backed movements.",
     "Passionate about transforming lives through movement. With years of experience coaching athletes and beginners alike, I create personalized programs that deliver real results.",
     "Dedicated to making fitness accessible and fun. Whether you're training for competition or personal wellness, I'll meet you where you are and push you further.",
+    "Former national athlete turned coach. I bring competition-level discipline to everyday training, helping clients unlock potential they never knew they had.",
   ],
   gym: [
     "A premier training facility equipped with state-of-the-art equipment and expert coaches. We offer group classes, personal training, and open gym access in a motivating environment.",
@@ -53,7 +75,41 @@ const BIOS: Record<string, string[]> = {
   ],
 };
 
-const LISTING_ICONS = [Zap, Dumbbell, Trophy];
+const CERTIFICATIONS = [
+  "NASM Certified", "ACE Personal Trainer", "CrossFit L2", "ISSA Specialist",
+  "Precision Nutrition L1", "TRX Certified", "Kettlebell Athletics", "Olympic Lifting Coach",
+  "Yoga Alliance RYT-200", "First Aid & CPR",
+];
+
+const SPECIALTIES = [
+  "Weight Loss", "Muscle Building", "Athletic Performance", "Injury Rehabilitation",
+  "Flexibility & Mobility", "Competition Prep", "Prenatal Fitness", "Senior Fitness",
+  "HIIT Programming", "Functional Training", "Combat Sports", "Endurance Coaching",
+];
+
+const LOCATIONS = [
+  "Vake, Tbilisi", "Saburtalo, Tbilisi", "Old Tbilisi", "Vera, Tbilisi",
+  "Didube, Tbilisi", "Gldani, Tbilisi", "Mtatsminda, Tbilisi",
+];
+
+const LISTING_ICONS = [Zap, Dumbbell, Trophy, Flame, Target];
+
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 12345) % 2147483647;
+    return s / 2147483647;
+  };
+}
+
+function pick<T>(arr: T[], rand: () => number): T {
+  return arr[Math.floor(rand() * arr.length)];
+}
+
+function pickN<T>(arr: T[], n: number, rand: () => number): T[] {
+  const shuffled = [...arr].sort(() => rand() - 0.5);
+  return shuffled.slice(0, n);
+}
 
 interface PartnerData {
   id: string;
@@ -87,8 +143,8 @@ export default function PartnerProfile() {
   const [listings, setListings] = useState<ListingData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Deterministic random based on id
-  const seed = id ? id.charCodeAt(0) + id.charCodeAt(id.length - 1) : 0;
+  const seed = id ? [...id].reduce((a, c) => a + c.charCodeAt(0), 0) : 0;
+  const rand = seededRandom(seed);
 
   useEffect(() => {
     if (!id) return;
@@ -129,13 +185,19 @@ export default function PartnerProfile() {
     );
   }
 
-  const coverImage = COVER_IMAGES[seed % COVER_IMAGES.length];
-  const galleryImages = [0, 1, 2].map((i) => GALLERY_IMAGES[(seed + i) % GALLERY_IMAGES.length]);
+  const coverImage = pick(COVER_IMAGES, rand);
+  const avatarImage = partner.logo_url || pick(AVATAR_IMAGES, rand);
+  const galleryImages = pickN(GALLERY_IMAGES, 5, rand);
   const bioPool = BIOS[partner.partner_type] || BIOS.individual;
-  const bio = partner.bio || bioPool[seed % bioPool.length];
-  const rating = (4.5 + (seed % 5) * 0.1).toFixed(1);
-  const reviewCount = 40 + ((seed * 17) % 160);
-  const yearsExp = 3 + (seed % 8);
+  const bio = partner.bio || pick(bioPool, rand);
+  const rating = (4.3 + rand() * 0.7).toFixed(1);
+  const reviewCount = Math.floor(30 + rand() * 200);
+  const yearsExp = Math.floor(2 + rand() * 12);
+  const clientsTrained = Math.floor(50 + rand() * 500);
+  const sessionsCompleted = Math.floor(200 + rand() * 2000);
+  const certs = pickN(CERTIFICATIONS, Math.floor(2 + rand() * 3), rand);
+  const specialties = pickN(SPECIALTIES, Math.floor(3 + rand() * 3), rand);
+  const location = partner.location || pick(LOCATIONS, rand);
 
   const trainingTypeLabel = (tt: string) => {
     switch (tt) {
@@ -148,12 +210,11 @@ export default function PartnerProfile() {
 
   return (
     <div className="relative min-h-screen bg-background pb-24">
-      {/* Hero cover image */}
+      {/* Hero cover */}
       <div className="relative h-80 w-full overflow-hidden">
         <img src={coverImage} alt={partner.display_name} className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
 
-        {/* Top nav */}
         <div className="absolute left-3 right-3 top-4 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
@@ -163,85 +224,160 @@ export default function PartnerProfile() {
           </button>
           <div className="flex items-center gap-2">
             <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm">
-              <Share2 className="h-4.5 w-4.5 text-white" />
+              <Share2 className="h-4 w-4 text-white" />
             </button>
             <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-sm">
-              <MoreHorizontal className="h-4.5 w-4.5 text-white" />
+              <MoreHorizontal className="h-4 w-4 text-white" />
             </button>
           </div>
         </div>
+
+        {/* Avatar floating at bottom of hero */}
+        <div className="absolute -bottom-12 left-5">
+          <Avatar className="h-24 w-24 border-4 border-card shadow-xl">
+            <AvatarImage src={avatarImage} />
+            <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
+              {partner.display_name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+        </div>
       </div>
 
-      {/* Profile card overlapping hero */}
-      <div className="relative -mt-16 mx-4 rounded-3xl bg-card ios-shadow px-5 pt-6 pb-5">
-        {/* Name + verified */}
+      {/* Profile info card */}
+      <div className="relative pt-16 px-5">
         <div className="flex items-center gap-2 mb-1">
           <h1 className="text-2xl font-extrabold text-foreground">{partner.display_name}</h1>
           <CheckCircle2 className="h-5 w-5 fill-primary text-white" />
         </div>
 
-        {/* Subtitle */}
-        <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-3">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-4">
           {partner.partner_type === "gym" ? "Gym & Studio" : (partner.sports?.join(" & ") || "Fitness")} Specialist
         </p>
 
-        {/* Stats row */}
-        <div className="flex items-center gap-4 text-sm mb-5">
-          <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-primary text-primary" />
-            <span className="font-bold text-foreground">{rating}</span>
-            <span className="text-muted-foreground text-xs">({reviewCount}+)</span>
-          </div>
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <Dumbbell className="h-4 w-4 text-primary" />
-            <span className="font-bold text-foreground">{yearsExp} Yrs</span>
-            <span className="text-xs">Exp.</span>
-          </div>
-          {partner.location && (
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-xs">{partner.location}</span>
+        {/* Stats grid */}
+        <div className="grid grid-cols-4 gap-2 mb-5">
+          {[
+            { icon: Star, label: "Rating", value: rating, accent: true },
+            { icon: Dumbbell, label: "Years", value: `${yearsExp}+` },
+            { icon: Users, label: "Clients", value: `${clientsTrained}+` },
+            { icon: Trophy, label: "Sessions", value: `${sessionsCompleted}+` },
+          ].map((stat) => (
+            <div key={stat.label} className="flex flex-col items-center rounded-2xl bg-muted/50 py-3 px-2">
+              <stat.icon className={`h-4 w-4 mb-1 ${stat.accent ? "fill-primary text-primary" : "text-primary"}`} />
+              <span className="text-base font-extrabold text-foreground">{stat.value}</span>
+              <span className="text-[10px] text-muted-foreground">{stat.label}</span>
             </div>
+          ))}
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-5">
+          <MapPin className="h-4 w-4 text-primary" />
+          <span>{location}</span>
+          {partner.languages && partner.languages.length > 0 && (
+            <>
+              <span className="mx-1">•</span>
+              <span>{partner.languages.join(", ")}</span>
+            </>
           )}
         </div>
 
-        {/* About */}
-        <h3 className="text-base font-bold text-foreground mb-2">About</h3>
-        <p className="text-sm leading-relaxed text-foreground/75 mb-4">{bio}</p>
-
-        {/* Book a Session button */}
-        <div className="flex items-center gap-3 mb-4">
-          <button className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 shrink-0">
+        {/* Action buttons */}
+        <div className="flex items-center gap-3 mb-6">
+          <button className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/60 shrink-0 transition-colors hover:bg-muted">
             <Bookmark className="h-5 w-5 text-primary" />
           </button>
           <button
-            onClick={() => {
-              // Scroll to sessions
-              document.getElementById("sessions-section")?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="relative flex-1 rounded-full bg-primary py-3.5 text-center text-sm font-bold uppercase tracking-wider text-white transition-all hover:bg-primary/90 active:scale-[0.98]"
+            onClick={() => document.getElementById("sessions-section")?.scrollIntoView({ behavior: "smooth" })}
+            className="relative flex-1 rounded-full bg-primary py-3.5 text-center text-sm font-bold uppercase tracking-wider text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]"
           >
             Book a Session
             <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl" />
           </button>
         </div>
 
+        {/* About */}
+        <div className="mb-6">
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">About</h3>
+          <p className="text-[15px] leading-[1.7] text-foreground/80">{bio}</p>
+        </div>
+
         {/* Gallery */}
-        <div className="flex gap-2 overflow-x-auto hide-scrollbar -mx-1 px-1">
-          {galleryImages.map((img, i) => (
-            <div key={i} className="h-24 w-28 shrink-0 overflow-hidden rounded-2xl">
-              <img src={img} alt="Gallery" className="h-full w-full object-cover" loading="lazy" />
-            </div>
-          ))}
+        <div className="mb-6">
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Gallery</h3>
+          <div className="flex gap-2.5 overflow-x-auto hide-scrollbar -mx-1 px-1 pb-1">
+            {galleryImages.map((img, i) => (
+              <div key={i} className="h-32 w-36 shrink-0 overflow-hidden rounded-2xl ios-shadow">
+                <img src={img} alt="Gallery" className="h-full w-full object-cover" loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Specialties */}
+        <div className="mb-6">
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Specialties</h3>
+          <div className="flex flex-wrap gap-2">
+            {specialties.map((s) => (
+              <div key={s} className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3.5 py-2">
+                <Target className="h-3.5 w-3.5 text-primary" />
+                <span className="text-[12px] font-semibold text-foreground">{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Certifications */}
+        <div className="mb-6">
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Certifications</h3>
+          <div className="space-y-2">
+            {certs.map((c) => (
+              <div key={c} className="flex items-center gap-2.5 rounded-xl bg-muted/40 px-4 py-3">
+                <Shield className="h-4 w-4 text-primary" />
+                <span className="text-[13px] font-semibold text-foreground">{c}</span>
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary ml-auto" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Reviews preview */}
+        <div className="mb-6">
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Reviews</h3>
+          <div className="space-y-3">
+            {[
+              { name: "Ana M.", text: "Incredible energy and very professional. Every session feels tailored just for me!", stars: 5 },
+              { name: "Giorgi K.", text: "Best trainer I've ever worked with. Results speak for themselves. Highly recommended!", stars: 5 },
+              { name: "Nino T.", text: "Great atmosphere and motivating coaching style. I always leave feeling accomplished.", stars: 4 },
+            ].map((review, i) => (
+              <div key={i} className="rounded-2xl bg-muted/40 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={AVATAR_IMAGES[(seed + i + 3) % AVATAR_IMAGES.length]} />
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary">{review.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-[13px] font-bold text-foreground">{review.name}</p>
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: review.stars }).map((_, si) => (
+                        <Star key={si} className="h-3 w-3 fill-primary text-primary" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-[13px] leading-relaxed text-foreground/70 italic">"{review.text}"</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Approved Sessions */}
-      <div id="sessions-section" className="px-5 pt-6">
-        <h3 className="text-lg font-bold text-foreground mb-3">Approved Sessions</h3>
+      {/* Sessions */}
+      <div id="sessions-section" className="px-5 pt-2 pb-4">
+        <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Upcoming Sessions</h3>
         <div className="space-y-3">
           {listings.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">No upcoming sessions</p>
+            <p className="text-sm text-muted-foreground py-6 text-center">No upcoming sessions</p>
           ) : (
             listings.map((listing, idx) => {
               const Icon = LISTING_ICONS[idx % LISTING_ICONS.length];
@@ -254,15 +390,15 @@ export default function PartnerProfile() {
                   className="flex items-center gap-3 rounded-2xl bg-card ios-shadow p-4 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
                   onClick={() => navigate("/")}
                 >
-                  {/* Icon */}
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
                     <Icon className="h-5 w-5 text-primary" />
                   </div>
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground truncate">{title}</p>
                     <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                      <span className="flex items-center gap-0.5">
+                        <Calendar className="h-3 w-3" /> {format(nextDate, "MMM d")}
+                      </span>
                       <span className="flex items-center gap-0.5">
                         <Clock className="h-3 w-3" /> {listing.duration_minutes} min
                       </span>
@@ -271,15 +407,13 @@ export default function PartnerProfile() {
                       </span>
                     </div>
                   </div>
-
-                  {/* Price + next date */}
                   <div className="text-right shrink-0">
                     <p className="text-base font-extrabold text-primary">{listing.price_gel}₾</p>
                     {isLimitedSpots ? (
-                      <p className="text-[9px] font-bold uppercase tracking-wider text-destructive">Limited Spots</p>
+                      <p className="text-[9px] font-bold uppercase tracking-wider text-destructive">Limited</p>
                     ) : (
                       <p className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                        Next: {format(nextDate, "EEE")}
+                        {format(nextDate, "hh:mm a")}
                       </p>
                     )}
                   </div>
