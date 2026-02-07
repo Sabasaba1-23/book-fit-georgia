@@ -227,55 +227,56 @@ export default function Home() {
         ) : (
           <div className="space-y-7">
             {(() => {
-              // Interleave listings and packages
-              const items: { type: "listing" | "package"; data: any; sortKey: string }[] = [
-                ...filteredListings.map((l) => ({
-                  type: "listing" as const,
-                  data: l,
-                  sortKey: l.scheduled_at,
-                })),
-                ...filteredPackages.map((p) => ({
-                  type: "package" as const,
-                  data: p,
-                  sortKey: p.id, // packages don't have scheduled_at, mix them in
-                })),
-              ];
+              type FeedItem = 
+                | { type: "listing"; data: ListingWithPartner }
+                | { type: "package"; data: PackageWithPartner };
 
-              // Interleave: insert a package every 2-3 listings
-              const listings = items.filter((i) => i.type === "listing");
-              const packages = items.filter((i) => i.type === "package");
-              const mixed: typeof items = [];
+              const listingItems: FeedItem[] = filteredListings.map((l) => ({
+                type: "listing",
+                data: l,
+              }));
+              const packageItems: FeedItem[] = filteredPackages.map((p) => ({
+                type: "package",
+                data: p,
+              }));
+
+              const mixed: FeedItem[] = [];
               let pkgIdx = 0;
-              listings.forEach((item, i) => {
-                mixed.push(item);
-                if ((i + 1) % 2 === 0 && pkgIdx < packages.length) {
-                  mixed.push(packages[pkgIdx++]);
+
+              if (listingItems.length === 0) {
+                mixed.push(...packageItems);
+              } else if (packageItems.length === 0) {
+                mixed.push(...listingItems);
+              } else {
+                listingItems.forEach((item, i) => {
+                  mixed.push(item);
+                  if ((i + 1) % 2 === 0 && pkgIdx < packageItems.length) {
+                    mixed.push(packageItems[pkgIdx++]);
+                  }
+                });
+                while (pkgIdx < packageItems.length) {
+                  mixed.push(packageItems[pkgIdx++]);
                 }
-              });
-              // Add remaining packages
-              while (pkgIdx < packages.length) {
-                mixed.push(packages[pkgIdx++]);
-              }
-              // If no listings, just show packages
-              if (listings.length === 0) {
-                mixed.push(...packages);
               }
 
-              return mixed.map((item) =>
-                item.type === "listing" ? (
-                  <ListingCard
-                    key={item.data.id}
-                    listing={{
-                      ...item.data,
-                      price_gel: Number(item.data.price_gel),
-                      partner_id: item.data.partner_id,
-                      partner: item.data.partner_profiles as any,
-                    }}
-                  />
-                ) : (
-                  <PackageCard key={item.data.id} pkg={item.data} />
-                )
-              );
+              return mixed.map((item) => {
+                if (item.type === "listing") {
+                  const l = item.data;
+                  return (
+                    <ListingCard
+                      key={l.id}
+                      listing={{
+                        ...l,
+                        price_gel: Number(l.price_gel),
+                        partner_id: l.partner_id,
+                        partner: l.partner_profiles as any,
+                      }}
+                    />
+                  );
+                }
+                const p = item.data;
+                return <PackageCard key={p.id} pkg={p} />;
+              });
             })()}
           </div>
         )}
