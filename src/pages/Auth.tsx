@@ -73,7 +73,17 @@ export default function Auth() {
   const [partnerPhone, setPartnerPhone] = useState("");
 
   useEffect(() => {
-    if (user) navigate("/", { replace: true });
+    if (!user) return;
+    // Check if user is a partner and redirect accordingly
+    supabase
+      .rpc("has_role", { _user_id: user.id, _role: "partner" as any })
+      .then(({ data: isPartner }) => {
+        if (isPartner) {
+          navigate("/partner/dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      });
   }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
