@@ -5,6 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/BottomNav";
+import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
+import NotificationsPanel from "@/components/NotificationsPanel";
+import HelpSupportPanel from "@/components/HelpSupportPanel";
 import {
   Pencil,
   CreditCard,
@@ -63,6 +66,9 @@ export default function Profile() {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [showInterestPicker, setShowInterestPicker] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -382,19 +388,27 @@ export default function Profile() {
             icon={<CreditCard className="h-5 w-5" />}
             iconBg="bg-primary/10 text-primary"
             label="Payment Methods"
+            onClick={() => setShowPayment(true)}
           />
           <SettingsRow
             icon={<Bell className="h-5 w-5" />}
             iconBg="bg-blue-500/10 text-blue-500"
             label="Notifications"
+            onClick={() => setShowNotifications(true)}
           />
           <SettingsRow
             icon={<HelpCircle className="h-5 w-5" />}
             iconBg="bg-emerald-500/10 text-emerald-500"
             label="Help & Support"
+            onClick={() => setShowHelp(true)}
           />
         </div>
       </div>
+
+      {/* Settings panels */}
+      <PaymentMethodsPanel open={showPayment} onOpenChange={setShowPayment} />
+      <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
+      <HelpSupportPanel open={showHelp} onOpenChange={setShowHelp} />
 
       {/* Language + Log out */}
       <div className="relative z-10 px-5 mb-6 space-y-3">
@@ -435,13 +449,15 @@ function SettingsRow({
   icon,
   iconBg,
   label,
+  onClick,
 }: {
   icon: React.ReactNode;
   iconBg: string;
   label: string;
+  onClick?: () => void;
 }) {
   return (
-    <button className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30 active:bg-muted/50">
+    <button onClick={onClick} className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30 active:bg-muted/50">
       <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}>
         {icon}
       </div>
