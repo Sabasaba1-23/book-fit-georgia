@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'book-fit-georgia',
   webDir: 'dist',
   server: {
-    url: 'https://0f39d5b9-e35d-4113-beb4-e383909c1d7f.lovableproject.com?forceHideBadge=true',
+    url: 'https://fitbook.my',
     cleartext: true,
   },
 };
