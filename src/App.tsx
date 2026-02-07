@@ -18,6 +18,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminListings from "./pages/admin/AdminListings";
 import AdminPartners from "./pages/admin/AdminPartners";
 import AdminBookings from "./pages/admin/AdminBookings";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="bookings" element={<AdminBookings />} />
               </Route>
 
+              <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
