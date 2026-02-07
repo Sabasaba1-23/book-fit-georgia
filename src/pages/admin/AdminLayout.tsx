@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Users,
-  Plus,
+  Ticket,
   BarChart3,
   Settings,
   LogOut,
@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 const bottomTabs = [
   { label: "Queue", icon: LayoutDashboard, to: "/admin" },
   { label: "Partners", icon: Users, to: "/admin/partners" },
-  { label: "Create", icon: Plus, to: "" }, // placeholder FAB
+  { label: "Bookings", icon: Ticket, to: "/admin/bookings" },
   { label: "Reports", icon: BarChart3, to: "/admin/reports" },
   { label: "Settings", icon: Settings, to: "/admin/settings" },
 ];
@@ -55,22 +55,7 @@ export default function AdminLayout() {
       {/* Bottom Nav */}
       {!isListingDetail && (
         <nav className="fixed inset-x-0 bottom-0 z-50 flex items-end justify-around border-t border-border/50 bg-background/90 backdrop-blur-xl px-2 pb-6 pt-2">
-          {bottomTabs.map((tab, i) => {
-            // Create FAB in center
-            if (tab.label === "Create") {
-              return (
-                <button
-                  key="create"
-                  className="relative -top-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg text-primary-foreground transition-transform active:scale-95"
-                  onClick={() => {
-                    /* Could open a create dialog */
-                  }}
-                >
-                  <Plus className="h-7 w-7" />
-                </button>
-              );
-            }
-
+          {bottomTabs.map((tab) => {
             const isActive =
               tab.to === "/admin"
                 ? location.pathname === "/admin" ||

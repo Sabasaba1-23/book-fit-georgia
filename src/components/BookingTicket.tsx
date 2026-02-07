@@ -1,4 +1,4 @@
-import { CheckCircle2, Calendar, Clock, MapPin, Copy, X } from "lucide-react";
+import { CheckCircle2, Calendar, Clock, MapPin, Copy, X, CreditCard, Hash, Receipt } from "lucide-react";
 import { format } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -15,7 +15,27 @@ interface BookingTicketProps {
     price: number;
     trainerName: string;
     location?: string;
+    paymentMethod?: string;
+    paymentId?: string;
+    bookedAt?: string;
+    spots?: number;
+    bookingStatus?: string;
   };
+}
+
+function extractPaymentMethod(paymentId?: string, method?: string): string {
+  if (method) return method;
+  if (!paymentId) return "Unknown";
+  if (paymentId.includes("card")) return "Credit Card";
+  if (paymentId.includes("apple")) return "Apple Pay";
+  if (paymentId.includes("google")) return "Google Pay";
+  if (paymentId.includes("bog")) return "BOG Pay";
+  if (paymentId.includes("demo")) {
+    const parts = paymentId.split("_");
+    if (parts[1]) return parts[1].replace(/^\w/, (c) => c.toUpperCase()) + " (Demo)";
+    return "Demo Payment";
+  }
+  return "Online Payment";
 }
 
 export default function BookingTicket({ open, onClose, booking }: BookingTicketProps) {
@@ -25,6 +45,11 @@ export default function BookingTicket({ open, onClose, booking }: BookingTicketP
 
   const ticketCode = `FB-${booking.id.slice(0, 8).toUpperCase()}`;
   const dateObj = new Date(booking.date);
+  const bookedDate = booking.bookedAt ? new Date(booking.bookedAt) : new Date();
+  const paymentMethod = extractPaymentMethod(booking.paymentId, booking.paymentMethod);
+  const transactionId = booking.paymentId
+    ? booking.paymentId.slice(0, 20).toUpperCase()
+    : ticketCode;
 
   const copyCode = () => {
     navigator.clipboard.writeText(ticketCode);
@@ -34,7 +59,7 @@ export default function BookingTicket({ open, onClose, booking }: BookingTicketP
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-in fade-in duration-200 p-5">
-      <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-300">
+      <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-300 max-h-[90vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={onClose}
@@ -95,6 +120,45 @@ export default function BookingTicket({ open, onClose, booking }: BookingTicketP
                 </button>
               </div>
               {copied && <p className="mt-1 text-[10px] text-primary">Copied!</p>}
+            </div>
+
+            {/* Payment details */}
+            <div className="rounded-2xl border border-border/50 p-4 space-y-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                <Receipt className="h-3.5 w-3.5" />
+                Payment Receipt
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <CreditCard className="h-3.5 w-3.5" />
+                    Payment Method
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">{paymentMethod}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Hash className="h-3.5 w-3.5" />
+                    Transaction ID
+                  </span>
+                  <span className="text-[10px] font-mono font-semibold text-foreground">{transactionId}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5" />
+                    Booked On
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">
+                    {format(bookedDate, "MMM d, yyyy · HH:mm")}
+                  </span>
+                </div>
+                {booking.spots && booking.spots > 1 && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Spots</span>
+                    <span className="text-xs font-semibold text-foreground">{booking.spots}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Amount */}
