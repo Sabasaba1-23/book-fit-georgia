@@ -165,17 +165,21 @@ export default function CreateListingSheet({
     let backgroundImageUrl: string | null = null;
 
     if (imageFile) {
-      const ext = imageFile.name.split(".").pop();
-      const path = `${partnerId}/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("listing-images")
-        .upload(path, imageFile);
-
-      if (!uploadError) {
-        const { data: urlData } = supabase.storage
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const userId = currentUser?.id;
+      if (userId) {
+        const ext = imageFile.name.split(".").pop();
+        const path = `${userId}/${Date.now()}.${ext}`;
+        const { error: uploadError } = await supabase.storage
           .from("listing-images")
-          .getPublicUrl(path);
-        backgroundImageUrl = urlData.publicUrl;
+          .upload(path, imageFile);
+
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage
+            .from("listing-images")
+            .getPublicUrl(path);
+          backgroundImageUrl = urlData.publicUrl;
+        }
       }
     }
 

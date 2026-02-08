@@ -103,8 +103,8 @@ export default function Home() {
   const { data, isLoading: loading } = useQuery({
     queryKey: ["homeFeed"],
     queryFn: fetchHomeFeed,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
   });
 
   const listings = data?.listings ?? [];
