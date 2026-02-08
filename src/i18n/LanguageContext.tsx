@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { translations, Language, TranslationKey } from "./translations";
 
 interface LanguageContextType {
@@ -17,6 +17,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLang = useCallback((newLang: Language) => {
     setLangState(newLang);
     localStorage.setItem("fitbook-lang", newLang);
+    document.documentElement.setAttribute("data-lang", newLang);
+  }, []);
+
+  // Set data-lang on mount
+  useEffect(() => {
+    document.documentElement.setAttribute("data-lang", lang);
   }, []);
 
   const t = useCallback(
