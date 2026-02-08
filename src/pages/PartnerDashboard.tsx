@@ -4,11 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePartnerProfile } from "@/hooks/usePartnerProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, Settings, MessageCircle } from "lucide-react";
+import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
-import PartnerVerificationForm from "@/components/PartnerVerificationForm";
+import VerificationStatusCard from "@/components/verification/VerificationStatusCard";
+import VerificationSheet from "@/components/verification/VerificationSheet";
+import VerificationNudgeDialog from "@/components/verification/VerificationNudgeDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import PartnerScheduleTab from "@/components/PartnerScheduleTab";
@@ -45,7 +47,7 @@ const SPORT_COLORS: Record<string, string> = {
   "Rock Climbing": "bg-stone-100", Gymnastics: "bg-sky-100",
 };
 
-type Tab = "dashboard" | "schedule" | "messages" | "insights" | "settings";
+type Tab = "dashboard" | "schedule" | "messages" | "insights" | "profile";
 
 export default function PartnerDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -56,6 +58,7 @@ export default function PartnerDashboard() {
   const [listings, setListings] = useState<PartnerListing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [showAll, setShowAll] = useState(false);
 
@@ -152,7 +155,7 @@ export default function PartnerDashboard() {
     { key: "schedule", label: "Schedule", icon: <CalendarDays className="h-5 w-5" /> },
     { key: "messages", label: "Messages", icon: <MessageCircle className="h-5 w-5" /> },
     { key: "insights", label: "Insights", icon: <BarChart3 className="h-5 w-5" /> },
-    { key: "settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
+    { key: "profile", label: "Profile", icon: <User className="h-5 w-5" /> },
   ];
 
   return (
@@ -182,6 +185,13 @@ export default function PartnerDashboard() {
 
       {activeTab === "dashboard" && (
         <div className="relative z-10 px-5 pt-4 space-y-6">
+          {/* Verification Status Card */}
+          <VerificationStatusCard
+            verificationStatus={profile.verification_status || "unverified"}
+            partnerType={profile.partner_type as "individual" | "gym"}
+            onGetVerified={() => setShowVerification(true)}
+          />
+
           {/* Create New Listing button */}
           <button
             onClick={() => setShowCreate(true)}
@@ -325,15 +335,9 @@ export default function PartnerDashboard() {
         </div>
       )}
 
-      {activeTab === "settings" && (
+      {activeTab === "profile" && (
         <div className="relative z-10 px-5 pt-4 space-y-6">
-          <h2 className="text-lg font-bold text-foreground">Settings</h2>
-          
-          {/* Verification Section */}
-          <PartnerVerificationForm 
-            partnerId={profile.id} 
-            verificationStatus={profile.verification_status || "unverified"} 
-          />
+          <h2 className="text-lg font-bold text-foreground">Profile</h2>
           
           <div className="space-y-3">
             <div className="rounded-2xl bg-card border border-border/50 p-4">
@@ -370,6 +374,23 @@ export default function PartnerDashboard() {
         onOpenChange={setShowCreate}
         partnerId={profile.id}
         onCreated={fetchListings}
+      />
+
+      {/* Verification Sheet */}
+      <VerificationSheet
+        open={showVerification}
+        onOpenChange={setShowVerification}
+        partnerId={profile.id}
+        partnerType={profile.partner_type as "individual" | "gym"}
+        displayName={profile.display_name}
+        existingBio={profile.bio}
+        onComplete={() => refetchProfile()}
+      />
+
+      {/* Soft Nudge Dialog */}
+      <VerificationNudgeDialog
+        verificationStatus={profile.verification_status || "unverified"}
+        onGetVerified={() => setShowVerification(true)}
       />
 
       {/* Bottom Nav */}
