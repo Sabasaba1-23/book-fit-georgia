@@ -518,6 +518,7 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_ka: string | null
+          difficulty_level: string | null
           duration_minutes: number
           equipment_notes_en: string | null
           equipment_notes_ka: string | null
@@ -527,6 +528,8 @@ export type Database = {
           max_spots: number
           partner_id: string
           price_gel: number
+          rental_info_en: string | null
+          rental_info_ka: string | null
           scheduled_at: string
           sport: string
           status: Database["public"]["Enums"]["listing_status"]
@@ -541,6 +544,7 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
@@ -550,6 +554,8 @@ export type Database = {
           max_spots?: number
           partner_id: string
           price_gel: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           scheduled_at: string
           sport: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -564,6 +570,7 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
@@ -573,6 +580,8 @@ export type Database = {
           max_spots?: number
           partner_id?: string
           price_gel?: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           scheduled_at?: string
           sport?: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -597,12 +606,15 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_ka: string | null
+          difficulty_level: string | null
           duration_minutes: number
           id: string
           location: string | null
           max_spots: number
           partner_id: string
           price_per_session_gel: number
+          rental_info_en: string | null
+          rental_info_ka: string | null
           sessions_count: number
           sport: string
           status: Database["public"]["Enums"]["listing_status"]
@@ -617,12 +629,15 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           id?: string
           location?: string | null
           max_spots?: number
           partner_id: string
           price_per_session_gel: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           sessions_count?: number
           sport: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -637,12 +652,15 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           id?: string
           location?: string | null
           max_spots?: number
           partner_id?: string
           price_per_session_gel?: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           sessions_count?: number
           sport?: string
           status?: Database["public"]["Enums"]["listing_status"]
