@@ -46,7 +46,7 @@ const DEFAULT_FILTERS: FilterState = {
   activities: [],
   selectedDate: null,
   timeRange: null,
-  budgetRange: [0, 500],
+  budgetRange: [0, 2000],
   trainingType: null,
   sessionType: null,
   languages: [],
@@ -349,7 +349,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                 </div>
                 <Slider
                   min={0}
-                  max={500}
+                  max={2000}
                   step={10}
                   value={local.budgetRange}
                   onValueChange={(v) => setLocal((p) => ({ ...p, budgetRange: v as [number, number] }))}
