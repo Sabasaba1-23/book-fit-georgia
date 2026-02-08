@@ -236,7 +236,7 @@ export default function Auth() {
       {mode === "login" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -319,7 +319,7 @@ export default function Auth() {
       {/* ─── FORGOT PASSWORD ─── */}
       {mode === "forgot-password" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -352,7 +352,7 @@ export default function Auth() {
       {/* ─── REGISTER CHOICE ─── */}
       {mode === "register-choice" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -384,7 +384,7 @@ export default function Auth() {
       {/* ─── REGISTER USER ─── */}
       {mode === "register-user" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -452,7 +452,7 @@ export default function Auth() {
       {mode === "register-partner" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>

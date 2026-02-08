@@ -8,7 +8,7 @@ export default function TermsConditions() {
     <div className="min-h-screen bg-background">
       <header
         className="sticky top-0 z-20 flex items-center gap-3 bg-background/80 backdrop-blur-lg border-b border-border px-4 py-3"
-        style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top, 0.75rem))" }}
+        style={{ paddingTop: "calc(var(--safe-top, 0px) + 0.75rem)" }}
       >
         <button
           onClick={() => navigate(-1)}

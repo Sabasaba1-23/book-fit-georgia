@@ -245,7 +245,7 @@ export default function Profile() {
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-secondary/[0.06]" />
 
       {/* Avatar section */}
-      <div className="relative z-10 flex flex-col items-center pb-4" style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top, 2.5rem))' }}>
+      <div className="relative z-10 flex flex-col items-center pb-4" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
         <div className="relative">
           <div className="rounded-full p-[3px] bg-gradient-to-br from-primary to-secondary">
             <Avatar className="h-28 w-28 border-4 border-background">

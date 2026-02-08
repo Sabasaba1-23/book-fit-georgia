@@ -230,7 +230,7 @@ export default function Bookings() {
     <div className="relative min-h-screen bg-background pb-24">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      <header className="relative z-40 px-5 pb-1" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top, 1.25rem))' }}>
+      <header className="relative z-40 px-5 pb-1" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button

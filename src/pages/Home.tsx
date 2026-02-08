@@ -210,7 +210,7 @@ export default function Home() {
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}>
+      <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">{t("community")}</p>
