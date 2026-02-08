@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Upload, Shield, ArrowLeft, ArrowRight, CheckCircle2, FileText, Trash2 } from "lucide-react";
+import { Upload, Shield, ArrowLeft, ArrowRight, CheckCircle2, FileText, Trash2, Search, Star } from "lucide-react";
 import { SPORTS } from "@/constants/sports";
 
 const TRAINER_TYPES = [
@@ -21,13 +22,8 @@ const TRAINER_TYPES = [
   "Other",
 ];
 
-const EXPERIENCE_OPTIONS = [
-  { value: "less_than_1", label: "Less than 1 year" },
-  { value: "1_3", label: "1–3 years" },
-  { value: "3_5", label: "3–5 years" },
-  { value: "5_10", label: "5–10 years" },
-  { value: "10_plus", label: "10+ years" },
-];
+const EXPERIENCE_LABELS = ["< 1 year", "1–3 years", "3–5 years", "5–10 years", "10+ years"];
+const EXPERIENCE_VALUES = ["less_than_1", "1_3", "3_5", "5_10", "10_plus"];
 
 const DOC_TYPES = [
   { value: "id_card", label: "ID Card" },
@@ -61,6 +57,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [documents, setDocuments] = useState<DocData[]>([]);
+  const [specSearch, setSpecSearch] = useState("");
 
   // Step 1
   const [fullName, setFullName] = useState(displayName || "");
@@ -69,7 +66,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
 
   // Step 2
   const [trainerType, setTrainerType] = useState("");
-  const [yearsExp, setYearsExp] = useState("");
+  const [yearsExp, setYearsExp] = useState(0);
   const [specializations, setSpecializations] = useState<string[]>([]);
 
   // Step 3
@@ -94,7 +91,8 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       setCountryCity(d.country_city || d.address || "");
       setDescription(d.professional_description || existingBio || "");
       setTrainerType(d.trainer_type || "");
-      setYearsExp(d.years_experience || "");
+      const expIdx = EXPERIENCE_VALUES.indexOf(d.years_experience || "");
+      setYearsExp(expIdx >= 0 ? expIdx : 0);
       setSpecializations(d.specializations || []);
       if (d.verification_step) setStep(Math.min(d.verification_step, 3));
     }
@@ -117,7 +115,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       country_city: countryCity.trim(),
       professional_description: description.trim(),
       trainer_type: trainerType,
-      years_experience: yearsExp,
+      years_experience: EXPERIENCE_VALUES[yearsExp],
       specializations,
       verification_step: nextStep,
     } as any;
@@ -157,7 +155,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       country_city: countryCity.trim(),
       professional_description: description.trim(),
       trainer_type: trainerType,
-      years_experience: yearsExp,
+      years_experience: EXPERIENCE_VALUES[yearsExp],
       specializations,
       verification_step: 3,
       submitted_at: new Date().toISOString(),
@@ -327,49 +325,77 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
 
               <div>
                 <label className="mb-2 block text-xs font-semibold text-foreground">Years of experience</label>
-                <div className="flex flex-wrap gap-2">
-                  {EXPERIENCE_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setYearsExp(opt.value)}
-                      className={cn(
-                        "rounded-full px-3.5 py-2 text-xs font-semibold transition-all",
-                        yearsExp === opt.value
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      )}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                <div className="px-1 pt-2 pb-1">
+                  <Slider
+                    value={[yearsExp]}
+                    onValueChange={(v) => setYearsExp(v[0])}
+                    min={0}
+                    max={4}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="mt-2 flex justify-between">
+                    {EXPERIENCE_LABELS.map((label, i) => (
+                      <span
+                        key={label}
+                        className={cn(
+                          "text-[10px] font-medium transition-colors",
+                          yearsExp === i ? "text-primary font-bold" : "text-muted-foreground"
+                        )}
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <div>
                 <label className="mb-2 block text-xs font-semibold text-foreground">Specializations</label>
-                <p className="mb-2 text-[11px] text-muted-foreground">Select the sports and activities you specialize in</p>
-                <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto">
-                  {SPORTS.filter(s => s !== "Other").map((sport) => (
-                    <button
-                      key={sport}
-                      onClick={() => toggleSpecialization(sport)}
-                      className={cn(
-                        "rounded-full px-2.5 py-1.5 text-[11px] font-medium transition-all",
-                        specializations.includes(sport)
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/60 text-muted-foreground hover:bg-muted"
-                      )}
-                    >
-                      {sport}
-                    </button>
-                  ))}
+                <p className="mb-2 text-[11px] text-muted-foreground">Search and select the sports you specialize in</p>
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={specSearch}
+                    onChange={(e) => setSpecSearch(e.target.value)}
+                    placeholder="Search specializations..."
+                    className="h-10 w-full rounded-xl border border-border bg-card pl-9 pr-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary"
+                  />
+                </div>
+                {specializations.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-1.5">
+                    {specializations.map((sport) => (
+                      <button
+                        key={sport}
+                        onClick={() => toggleSpecialization(sport)}
+                        className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1.5 text-[11px] font-medium text-primary-foreground"
+                      >
+                        {sport} ✕
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                  {SPORTS.filter(s => s !== "Other")
+                    .filter(s => s.toLowerCase().includes(specSearch.toLowerCase()))
+                    .filter(s => !specializations.includes(s))
+                    .map((sport) => (
+                      <button
+                        key={sport}
+                        onClick={() => toggleSpecialization(sport)}
+                        className="rounded-full bg-muted/60 px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-all hover:bg-muted"
+                      >
+                        {sport}
+                      </button>
+                    ))}
                 </div>
               </div>
 
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-foreground">
                   Certificate Upload
-                  <span className="ml-1.5 text-[10px] font-normal text-muted-foreground">(optional)</span>
+                  <span className="ml-1.5 inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary"><Star className="h-3 w-3" /> Recommended</span>
                 </label>
                 <p className="mb-2 text-[11px] text-muted-foreground">
                   Have a training certification? Upload it to strengthen your profile.
