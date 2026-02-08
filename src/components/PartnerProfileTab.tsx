@@ -5,7 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Camera, LogOut, ExternalLink, Pencil, Check, X, MapPin, Phone, Globe, Languages } from "lucide-react";
+import { Camera, LogOut, ExternalLink, Pencil, Check, X, MapPin, Phone, Globe, Languages, Dumbbell } from "lucide-react";
+import EditableTagsField from "@/components/EditableTagsField";
+import { SPORTS } from "@/constants/sports";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 
@@ -209,23 +211,27 @@ export default function PartnerProfileTab({ profile, user, onRefetch, onSignOut 
           </p>
         </div>
 
-        {profile.sports && profile.sports.length > 0 && (
-          <div className="rounded-2xl bg-card border border-border/50 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Sports</p>
-            <div className="flex flex-wrap gap-1.5">
-              {profile.sports.map((s) => (
-                <span key={s} className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">{s}</span>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Editable Sports */}
+        <EditableTagsField
+          label="Sports"
+          icon={<Dumbbell className="h-4 w-4 text-muted-foreground" />}
+          values={profile.sports || []}
+          allOptions={[...SPORTS]}
+          field="sports"
+          profileId={profile.id}
+          onRefetch={onRefetch}
+        />
 
-        {profile.languages && profile.languages.length > 0 && (
-          <div className="rounded-2xl bg-card border border-border/50 p-4">
-            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Languages</p>
-            <p className="text-sm text-foreground">{profile.languages.join(", ")}</p>
-          </div>
-        )}
+        {/* Editable Languages */}
+        <EditableTagsField
+          label="Languages"
+          icon={<Languages className="h-4 w-4 text-muted-foreground" />}
+          values={profile.languages || []}
+          allOptions={["English", "Georgian", "Russian", "Turkish", "Arabic", "French", "German", "Spanish", "Chinese", "Japanese", "Korean"]}
+          field="languages"
+          profileId={profile.id}
+          onRefetch={onRefetch}
+        />
       </div>
 
       {/* Log Out */}

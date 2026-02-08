@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import MultiLangDescriptionField from "@/components/MultiLangDescriptionField";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,6 +54,8 @@ export default function CreateListingSheet({
 
   // Step 2 fields
   const [description, setDescription] = useState("");
+  const [descriptionKa, setDescriptionKa] = useState("");
+  const [descriptionRu, setDescriptionRu] = useState("");
   const [priceGel, setPriceGel] = useState("");
   const [maxSpots, setMaxSpots] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
@@ -62,7 +65,11 @@ export default function CreateListingSheet({
   // Step 3 fields (optional extras)
   const [difficultyLevel, setDifficultyLevel] = useState("");
   const [equipmentNotes, setEquipmentNotes] = useState("");
+  const [equipmentNotesKa, setEquipmentNotesKa] = useState("");
+  const [equipmentNotesRu, setEquipmentNotesRu] = useState("");
   const [rentalInfo, setRentalInfo] = useState("");
+  const [rentalInfoKa, setRentalInfoKa] = useState("");
+  const [rentalInfoRu, setRentalInfoRu] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("60");
 
   const totalSteps = 3;
@@ -74,6 +81,8 @@ export default function CreateListingSheet({
     setTrainingType("one_on_one");
     setLocation("");
     setDescription("");
+    setDescriptionKa("");
+    setDescriptionRu("");
     setPriceGel("");
     setMaxSpots("");
     setScheduledAt("");
@@ -81,7 +90,11 @@ export default function CreateListingSheet({
     setImagePreview(null);
     setDifficultyLevel("");
     setEquipmentNotes("");
+    setEquipmentNotesKa("");
+    setEquipmentNotesRu("");
     setRentalInfo("");
+    setRentalInfoKa("");
+    setRentalInfoRu("");
     setDurationMinutes("60");
   };
 
@@ -126,6 +139,7 @@ export default function CreateListingSheet({
       partner_id: partnerId,
       title_en: title.trim(),
       description_en: description.trim() || null,
+      description_ka: descriptionKa.trim() || null,
       sport,
       training_type: trainingType,
       scheduled_at: new Date(scheduledAt).toISOString(),
@@ -136,7 +150,9 @@ export default function CreateListingSheet({
       location: location.trim(),
       difficulty_level: difficultyLevel || null,
       equipment_notes_en: equipmentNotes.trim() || null,
+      equipment_notes_ka: equipmentNotesKa.trim() || null,
       rental_info_en: rentalInfo.trim() || null,
+      rental_info_ka: rentalInfoKa.trim() || null,
       status: "pending",
     });
 
@@ -202,6 +218,8 @@ export default function CreateListingSheet({
               <StepDetails
                 imagePreview={imagePreview} onImageChange={handleImageChange}
                 description={description} setDescription={setDescription}
+                descriptionKa={descriptionKa} setDescriptionKa={setDescriptionKa}
+                descriptionRu={descriptionRu} setDescriptionRu={setDescriptionRu}
                 priceGel={priceGel} setPriceGel={setPriceGel}
                 maxSpots={maxSpots} setMaxSpots={setMaxSpots}
                 scheduledAt={scheduledAt} setScheduledAt={setScheduledAt}
@@ -213,7 +231,11 @@ export default function CreateListingSheet({
               <StepExtras
                 difficultyLevel={difficultyLevel} setDifficultyLevel={setDifficultyLevel}
                 equipmentNotes={equipmentNotes} setEquipmentNotes={setEquipmentNotes}
+                equipmentNotesKa={equipmentNotesKa} setEquipmentNotesKa={setEquipmentNotesKa}
+                equipmentNotesRu={equipmentNotesRu} setEquipmentNotesRu={setEquipmentNotesRu}
                 rentalInfo={rentalInfo} setRentalInfo={setRentalInfo}
+                rentalInfoKa={rentalInfoKa} setRentalInfoKa={setRentalInfoKa}
+                rentalInfoRu={rentalInfoRu} setRentalInfoRu={setRentalInfoRu}
               />
             )}
           </div>
@@ -356,6 +378,8 @@ function StepBasics({
 function StepDetails({
   imagePreview, onImageChange,
   description, setDescription,
+  descriptionKa, setDescriptionKa,
+  descriptionRu, setDescriptionRu,
   priceGel, setPriceGel,
   maxSpots, setMaxSpots,
   scheduledAt, setScheduledAt,
@@ -365,6 +389,8 @@ function StepDetails({
   imagePreview: string | null;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   description: string; setDescription: (v: string) => void;
+  descriptionKa: string; setDescriptionKa: (v: string) => void;
+  descriptionRu: string; setDescriptionRu: (v: string) => void;
   priceGel: string; setPriceGel: (v: string) => void;
   maxSpots: string; setMaxSpots: (v: string) => void;
   scheduledAt: string; setScheduledAt: (v: string) => void;
@@ -390,17 +416,18 @@ function StepDetails({
         </label>
       </div>
 
-      {/* Description */}
-      <div>
-        <label className="mb-2 block text-base font-bold text-foreground">Description</label>
-        <Textarea
-          placeholder="Describe what participants should expect..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          className="rounded-2xl border-0 bg-muted/60 px-4 py-3 text-[15px] font-medium shadow-none resize-none placeholder:text-muted-foreground/60"
-        />
-      </div>
+      {/* Description with multi-language */}
+      <MultiLangDescriptionField
+        label="Description"
+        placeholder="Describe what participants should expect..."
+        mainValue={description}
+        onMainChange={setDescription}
+        kaValue={descriptionKa}
+        onKaChange={setDescriptionKa}
+        ruValue={descriptionRu}
+        onRuChange={setDescriptionRu}
+        rows={4}
+      />
 
       {/* Price, Spots, Duration */}
       <div className="grid grid-cols-3 gap-3">
@@ -457,11 +484,19 @@ function StepDetails({
 function StepExtras({
   difficultyLevel, setDifficultyLevel,
   equipmentNotes, setEquipmentNotes,
+  equipmentNotesKa, setEquipmentNotesKa,
+  equipmentNotesRu, setEquipmentNotesRu,
   rentalInfo, setRentalInfo,
+  rentalInfoKa, setRentalInfoKa,
+  rentalInfoRu, setRentalInfoRu,
 }: {
   difficultyLevel: string; setDifficultyLevel: (v: string) => void;
   equipmentNotes: string; setEquipmentNotes: (v: string) => void;
+  equipmentNotesKa: string; setEquipmentNotesKa: (v: string) => void;
+  equipmentNotesRu: string; setEquipmentNotesRu: (v: string) => void;
   rentalInfo: string; setRentalInfo: (v: string) => void;
+  rentalInfoKa: string; setRentalInfoKa: (v: string) => void;
+  rentalInfoRu: string; setRentalInfoRu: (v: string) => void;
 }) {
   return (
     <div className="space-y-8">
@@ -497,33 +532,37 @@ function StepExtras({
         </div>
       </div>
 
-      {/* What to Bring */}
+      {/* What to Bring - multi-language */}
       <div>
         <label className="mb-2 flex items-center gap-1.5 text-base font-bold text-foreground">
           <Backpack className="h-4 w-4 text-primary" />
-          What to Bring
         </label>
-        <Textarea
-          placeholder="e.g., Yoga mat, towel, water bottle, comfortable shoes..."
-          value={equipmentNotes}
-          onChange={(e) => setEquipmentNotes(e.target.value)}
-          rows={3}
-          className="rounded-2xl border-0 bg-muted/60 px-4 py-3 text-[15px] font-medium shadow-none resize-none placeholder:text-muted-foreground/60"
+        <MultiLangDescriptionField
+          label="What to Bring"
+          placeholder="e.g., Yoga mat, towel, water bottle..."
+          mainValue={equipmentNotes}
+          onMainChange={setEquipmentNotes}
+          kaValue={equipmentNotesKa}
+          onKaChange={setEquipmentNotesKa}
+          ruValue={equipmentNotesRu}
+          onRuChange={setEquipmentNotesRu}
         />
       </div>
 
-      {/* Rental / Available Equipment */}
+      {/* Rental / Available Equipment - multi-language */}
       <div>
         <label className="mb-2 flex items-center gap-1.5 text-base font-bold text-foreground">
           <ShoppingBag className="h-4 w-4 text-primary" />
-          Equipment Available to Rent / Use
         </label>
-        <Textarea
-          placeholder="e.g., Boxing gloves available for 5₾, mats provided free..."
-          value={rentalInfo}
-          onChange={(e) => setRentalInfo(e.target.value)}
-          rows={3}
-          className="rounded-2xl border-0 bg-muted/60 px-4 py-3 text-[15px] font-medium shadow-none resize-none placeholder:text-muted-foreground/60"
+        <MultiLangDescriptionField
+          label="Equipment Available to Rent / Use"
+          placeholder="e.g., Boxing gloves available for 5₾..."
+          mainValue={rentalInfo}
+          onMainChange={setRentalInfo}
+          kaValue={rentalInfoKa}
+          onKaChange={setRentalInfoKa}
+          ruValue={rentalInfoRu}
+          onRuChange={setRentalInfoRu}
         />
       </div>
     </div>
