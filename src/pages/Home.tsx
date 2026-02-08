@@ -204,19 +204,28 @@ export default function Home() {
   const hasResults = feedItems.length > 0;
 
   return (
-    <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none">
+    <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none mx-auto max-w-7xl">
       {/* Background blobs */}
       <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
+      <header className="relative z-40 px-5 md:px-8 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">{t("community")}</p>
             <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">{t("discovery")}</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {/* Desktop nav links */}
+            <nav className="hidden md:flex items-center gap-1 mr-2">
+              <button onClick={() => navigate("/bookings")} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
+                {t("navBookings")}
+              </button>
+              <button onClick={() => navigate("/messages")} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
+                {t("navChat")}
+              </button>
+            </nav>
             <button
               onClick={() => setShowNotifications(true)}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground transition-transform active:scale-95"
@@ -229,7 +238,7 @@ export default function Home() {
       </header>
 
       {/* Search bar + filter button */}
-      <div className="relative z-30 px-5 pt-4 pb-3">
+      <div className="relative z-30 px-5 md:px-8 pt-4 pb-3">
         <div className="flex items-center gap-3">
           <div className="glass-card flex flex-1 items-center gap-3 rounded-2xl px-4 py-3.5 ios-shadow">
             <Search className="h-5 w-5 text-muted-foreground" />
@@ -249,9 +258,9 @@ export default function Home() {
       <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
       {/* Feed */}
-      <main className="relative z-10 mx-auto max-w-lg space-y-7 px-5 py-5">
+      <main className="relative z-10 px-5 md:px-8 py-5">
         {loading ? (
-          <div className="space-y-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="overflow-hidden rounded-[1.75rem] ios-shadow">
                 <Skeleton className="h-[420px] w-full" />
@@ -266,7 +275,7 @@ export default function Home() {
             <p className="text-muted-foreground">{t("noListings")}</p>
           </div>
         ) : (
-          <div className="space-y-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {feedItems.map((item) => {
               if (item.type === "listing") {
                 const l = item.data;

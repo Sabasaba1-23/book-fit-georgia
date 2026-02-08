@@ -248,7 +248,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
       onClick={() => setExpanded(!expanded)}
     >
       {/* Image card */}
-      <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : '420px' }}>
+      <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : 'clamp(320px, 50vw, 420px)' }}>
         {listing.background_image_url ? (
           <img
             src={listing.background_image_url}
@@ -289,7 +289,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </div>
 
         {/* Content overlay */}
-        <div className="relative flex flex-col justify-end p-5" style={{ minHeight: '420px' }}>
+        <div className="relative flex flex-col justify-end p-5" style={{ minHeight: 'clamp(320px, 50vw, 420px)' }}>
           <div className="mb-2 flex items-center gap-2.5">
             <span className="rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white">
               {listing.sport}
