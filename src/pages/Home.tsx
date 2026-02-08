@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -65,50 +66,63 @@ interface PackageWithPartner {
   };
 }
 
+async function fetchHomeFeed() {
+  const [listingsRes, packagesRes] = await Promise.all([
+    supabase
+      .from("training_listings")
+      .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio, avg_rating, review_count)")
+      .eq("status", "approved")
+      .gte("scheduled_at", new Date().toISOString())
+      .order("scheduled_at", { ascending: true }),
+    supabase
+      .from("training_packages")
+      .select("*, partner_profiles(id, display_name, logo_url, partner_type, avg_rating, review_count)")
+      .eq("status", "approved")
+      .order("created_at", { ascending: false }),
+  ]);
+
+  return {
+    listings: (listingsRes.data ?? []) as unknown as ListingWithPartner[],
+    packages: (packagesRes.data ?? []) as unknown as PackageWithPartner[],
+  };
+}
+
+type FeedItem =
+  | { type: "listing"; data: ListingWithPartner }
+  | { type: "package"; data: PackageWithPartner };
+
 export default function Home() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [listings, setListings] = useState<ListingWithPartner[]>([]);
-  const [packages, setPackages] = useState<PackageWithPartner[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSport, setActiveSport] = useState("All");
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  useEffect(() => {
-    async function fetchAll() {
-      const [listingsRes, packagesRes] = await Promise.all([
-        supabase
-          .from("training_listings")
-          .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio, avg_rating, review_count)")
-          .eq("status", "approved")
-          .gte("scheduled_at", new Date().toISOString())
-          .order("scheduled_at", { ascending: true }),
-        supabase
-          .from("training_packages")
-          .select("*, partner_profiles(id, display_name, logo_url, partner_type, avg_rating, review_count)")
-          .eq("status", "approved")
-          .order("created_at", { ascending: false }),
-      ]);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["homeFeed"],
+    queryFn: fetchHomeFeed,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-      if (!listingsRes.error && listingsRes.data) {
-        setListings(listingsRes.data as unknown as ListingWithPartner[]);
-      }
-      if (!packagesRes.error && packagesRes.data) {
-        setPackages(packagesRes.data as unknown as PackageWithPartner[]);
-      }
-      setLoading(false);
-    }
-    fetchAll();
-  }, []);
+  const listings = data?.listings ?? [];
+  const packages = data?.packages ?? [];
 
-  // Unique sports for filter chips
-  const sports = ["All", ...Array.from(new Set([...listings.map((l) => l.sport), ...packages.map((p) => p.sport)]))];
+  // Stable callbacks
+  const handleSportChange = useCallback((v: string) => setActiveSport(v), []);
+  const handleFiltersApply = useCallback((f: FilterState) => setFilters(f), []);
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value), []);
 
-  // Apply all filters
-  const filteredListings = listings.filter((l) => {
+  // Memoized sports list
+  const sports = useMemo(
+    () => ["All", ...Array.from(new Set([...listings.map((l) => l.sport), ...packages.map((p) => p.sport)]))],
+    [listings, packages]
+  );
+
+  // Memoized filtered listings
+  const filteredListings = useMemo(() => listings.filter((l) => {
     if (filters.sessionType === "package") return false;
     if (activeSport !== "All" && l.sport !== activeSport) return false;
     if (filters.activities.length > 0 && !filters.activities.includes(l.sport)) return false;
@@ -138,9 +152,10 @@ export default function Home() {
       if (!matchesSearch) return false;
     }
     return true;
-  });
+  }), [listings, filters, activeSport, searchQuery]);
 
-  const filteredPackages = packages.filter((p) => {
+  // Memoized filtered packages
+  const filteredPackages = useMemo(() => packages.filter((p) => {
     if (filters.sessionType === "single") return false;
     if (activeSport !== "All" && p.sport !== activeSport) return false;
     if (filters.activities.length > 0 && !filters.activities.includes(p.sport)) return false;
@@ -158,9 +173,35 @@ export default function Home() {
       if (!matchesSearch) return false;
     }
     return true;
-  });
+  }), [packages, filters, activeSport, searchQuery]);
 
-  const hasResults = filteredListings.length > 0 || filteredPackages.length > 0;
+  // Memoized feed items (interleave listings & packages)
+  const feedItems = useMemo(() => {
+    const listingItems: FeedItem[] = filteredListings.map((l) => ({ type: "listing", data: l }));
+    const packageItems: FeedItem[] = filteredPackages.map((p) => ({ type: "package", data: p }));
+    const mixed: FeedItem[] = [];
+    let pkgIdx = 0;
+
+    if (listingItems.length === 0) {
+      return packageItems;
+    }
+    if (packageItems.length === 0) {
+      return listingItems;
+    }
+
+    listingItems.forEach((item, i) => {
+      mixed.push(item);
+      if ((i + 1) % 2 === 0 && pkgIdx < packageItems.length) {
+        mixed.push(packageItems[pkgIdx++]);
+      }
+    });
+    while (pkgIdx < packageItems.length) {
+      mixed.push(packageItems[pkgIdx++]);
+    }
+    return mixed;
+  }, [filteredListings, filteredPackages]);
+
+  const hasResults = feedItems.length > 0;
 
   return (
     <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none">
@@ -196,16 +237,16 @@ export default function Home() {
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60"
             />
           </div>
-          <FilterOverlay filters={filters} onApply={setFilters} />
+          <FilterOverlay filters={filters} onApply={handleFiltersApply} />
         </div>
       </div>
 
       {/* Filter chips */}
-      <FilterChips options={sports} active={activeSport} onChange={setActiveSport} />
+      <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
       {/* Feed */}
       <main className="relative z-10 mx-auto max-w-lg space-y-7 px-5 py-5">
@@ -226,58 +267,24 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-7">
-            {(() => {
-              type FeedItem = 
-                | { type: "listing"; data: ListingWithPartner }
-                | { type: "package"; data: PackageWithPartner };
-
-              const listingItems: FeedItem[] = filteredListings.map((l) => ({
-                type: "listing",
-                data: l,
-              }));
-              const packageItems: FeedItem[] = filteredPackages.map((p) => ({
-                type: "package",
-                data: p,
-              }));
-
-              const mixed: FeedItem[] = [];
-              let pkgIdx = 0;
-
-              if (listingItems.length === 0) {
-                mixed.push(...packageItems);
-              } else if (packageItems.length === 0) {
-                mixed.push(...listingItems);
-              } else {
-                listingItems.forEach((item, i) => {
-                  mixed.push(item);
-                  if ((i + 1) % 2 === 0 && pkgIdx < packageItems.length) {
-                    mixed.push(packageItems[pkgIdx++]);
-                  }
-                });
-                while (pkgIdx < packageItems.length) {
-                  mixed.push(packageItems[pkgIdx++]);
-                }
+            {feedItems.map((item) => {
+              if (item.type === "listing") {
+                const l = item.data;
+                return (
+                  <ListingCard
+                    key={l.id}
+                    listing={{
+                      ...l,
+                      price_gel: Number(l.price_gel),
+                      partner_id: l.partner_id,
+                      partner: l.partner_profiles as any,
+                    }}
+                  />
+                );
               }
-
-              return mixed.map((item) => {
-                if (item.type === "listing") {
-                  const l = item.data;
-                  return (
-                    <ListingCard
-                      key={l.id}
-                      listing={{
-                        ...l,
-                        price_gel: Number(l.price_gel),
-                        partner_id: l.partner_id,
-                        partner: l.partner_profiles as any,
-                      }}
-                    />
-                  );
-                }
-                const p = item.data;
-                return <PackageCard key={p.id} pkg={p} />;
-              });
-            })()}
+              const p = item.data as PackageWithPartner;
+              return <PackageCard key={p.id} pkg={p} />;
+            })}
           </div>
         )}
       </main>

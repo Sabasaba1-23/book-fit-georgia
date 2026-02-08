@@ -1,3 +1,4 @@
+import { memo, useCallback } from "react";
 import { Home, CalendarCheck, MessageSquareMore } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -11,21 +12,21 @@ const navItems = [
   { key: "messages" as const, labelKey: "navChat" as const, icon: MessageSquareMore, path: "/messages", requiresAuth: true },
 ];
 
-export default function BottomNav() {
+export default memo(function BottomNav() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleNav = (path: string, requiresAuth: boolean) => {
+  const handleNav = useCallback((path: string, requiresAuth: boolean) => {
     if (requiresAuth && !user) {
       toast({ title: t("loginRequired"), variant: "destructive" });
       navigate("/auth");
       return;
     }
     navigate(path);
-  };
+  }, [user, toast, t, navigate]);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
@@ -63,4 +64,4 @@ export default function BottomNav() {
       </div>
     </nav>
   );
-}
+});
