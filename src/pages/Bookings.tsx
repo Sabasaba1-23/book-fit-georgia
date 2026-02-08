@@ -223,7 +223,7 @@ export default function Bookings() {
     reviews.find((r) => r.booking_id === bookingId && r.reviewer_role === "user") || null;
 
   return (
-    <div className="relative min-h-screen bg-background pb-24">
+    <div className="relative min-h-screen bg-background pb-[calc(60px+var(--sab))]">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
       <header className="relative z-40 px-5 pb-1 pt-4">
