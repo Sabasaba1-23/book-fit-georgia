@@ -455,6 +455,14 @@ export default function Profile() {
           >
             ქართული
           </button>
+          <button
+            onClick={() => setLang("ru")}
+            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
+              lang === "ru" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+            }`}
+          >
+            Русский
+          </button>
         </div>
 
         <button
