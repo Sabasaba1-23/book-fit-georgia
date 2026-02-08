@@ -14,6 +14,7 @@ interface ConfirmationCardProps {
   } | null;
   isPartner: boolean;
   onUpdate: () => void;
+  onConfirmed?: () => void;
 }
 
 export default function SessionConfirmationCard({
@@ -21,6 +22,7 @@ export default function SessionConfirmationCard({
   completionRequest,
   isPartner,
   onUpdate,
+  onConfirmed,
 }: ConfirmationCardProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -97,6 +99,7 @@ export default function SessionConfirmationCard({
 
       toast({ title: t("sessionConfirmed") });
       onUpdate();
+      onConfirmed?.();
     } catch (err: any) {
       toast({ title: t("failedToConfirm"), description: err.message, variant: "destructive" });
     } finally {
