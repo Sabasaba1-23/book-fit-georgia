@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { translateSport } from "@/i18n/sportTranslations";
@@ -8,7 +9,7 @@ interface FilterChipsProps {
   onChange: (value: string) => void;
 }
 
-export default function FilterChips({ options, active, onChange }: FilterChipsProps) {
+export default memo(function FilterChips({ options, active, onChange }: FilterChipsProps) {
   const { lang } = useLanguage();
   return (
     <div className="hide-scrollbar relative z-30 flex gap-2.5 overflow-x-auto px-5 pb-2">
@@ -28,4 +29,4 @@ export default function FilterChips({ options, active, onChange }: FilterChipsPr
       ))}
     </div>
   );
-}
+});
