@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePartnerProfile } from "@/hooks/usePartnerProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle } from "lucide-react";
+import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle, Camera, LogOut, ExternalLink, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
@@ -15,6 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 import PartnerScheduleTab from "@/components/PartnerScheduleTab";
 import PartnerMessagesTab from "@/components/PartnerMessagesTab";
+import PartnerProfileTab from "@/components/PartnerProfileTab";
 
 interface PartnerListing {
   id: string;
@@ -50,7 +51,7 @@ const SPORT_COLORS: Record<string, string> = {
 type Tab = "dashboard" | "schedule" | "messages" | "insights" | "profile";
 
 export default function PartnerDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading, refetch: refetchProfile } = usePartnerProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -336,36 +337,15 @@ export default function PartnerDashboard() {
       )}
 
       {activeTab === "profile" && (
-        <div className="relative z-10 px-5 pt-4 space-y-6">
-          <h2 className="text-lg font-bold text-foreground">Profile</h2>
-          
-          <div className="space-y-3">
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Display Name</p>
-              <p className="text-sm text-muted-foreground">{profile.display_name}</p>
-            </div>
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Partner Type</p>
-              <p className="text-sm text-muted-foreground capitalize">{profile.partner_type}</p>
-            </div>
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Phone Number</p>
-              <p className="text-sm text-muted-foreground">{profile.phone_number || "Not set"}</p>
-            </div>
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Account Status</p>
-              <p className={cn("text-sm font-semibold", profile.approved ? "text-emerald-600" : "text-amber-600")}>
-                {profile.approved ? "Approved" : "Pending Approval"}
-              </p>
-            </div>
-            {profile.location && (
-              <div className="rounded-2xl bg-card border border-border/50 p-4">
-                <p className="text-sm font-bold text-foreground">Location</p>
-                <p className="text-sm text-muted-foreground">{profile.location}</p>
-              </div>
-            )}
-          </div>
-        </div>
+        <PartnerProfileTab
+          profile={profile}
+          user={user!}
+          onRefetch={refetchProfile}
+          onSignOut={async () => {
+            await signOut();
+            navigate("/auth", { replace: true });
+          }}
+        />
       )}
 
       {/* Create Listing Sheet */}
