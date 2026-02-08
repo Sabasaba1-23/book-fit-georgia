@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { addDays, format } from "date-fns";
 import { SPORTS } from "@/constants/sports";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { translateSport, translateCity, translateLanguageName } from "@/i18n/sportTranslations";
 
 const ACTIVITIES = [...SPORTS];
 
@@ -46,7 +47,7 @@ interface FilterOverlayProps {
 }
 
 export default function FilterOverlay({ filters, onApply, children }: FilterOverlayProps) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [local, setLocal] = useState<FilterState>(filters);
 
@@ -131,7 +132,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
               <div className="flex flex-wrap gap-2">
                 {ACTIVITIES.map((a) => (
                   <ChipButton key={a} active={local.activities.includes(a)} onClick={() => toggleActivity(a)}>
-                    {a}
+                    {translateSport(a, lang)}
                   </ChipButton>
                 ))}
               </div>
@@ -146,7 +147,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                     active={local.city === city}
                     onClick={() => setLocal((p) => ({ ...p, city: p.city === city ? null : city, district: null }))}
                   >
-                    {city}
+                    {translateCity(city, lang)}
                   </ChipButton>
                 ))}
               </div>
@@ -159,7 +160,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                       onClick={() => setLocal((p) => ({ ...p, district: p.district === d ? null : d }))}
                       variant="outline"
                     >
-                      {d}
+                      {translateCity(d, lang)}
                     </ChipButton>
                   ))}
                 </div>
@@ -261,7 +262,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
               <div className="flex flex-wrap gap-2">
                 {LANGUAGES_LIST.map((l) => (
                   <ChipButton key={l} active={local.languages.includes(l)} onClick={() => toggleLanguage(l)}>
-                    {l}
+                    {translateLanguageName(l, lang)}
                   </ChipButton>
                 ))}
               </div>

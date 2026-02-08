@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CreditCard, Smartphone, Plus, ChevronRight } from "lucide-react";
+import { CreditCard, Smartphone, ChevronRight } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -7,6 +7,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface PaymentMethodsPanelProps {
   open: boolean;
@@ -14,7 +15,7 @@ interface PaymentMethodsPanelProps {
 }
 
 export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMethodsPanelProps) {
-  // Local state for future payment methods
+  const { t } = useLanguage();
   const [methods] = useState<{ id: string; type: string; label: string; last4?: string }[]>([]);
 
   return (
@@ -22,13 +23,12 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
       <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-8 pt-2 max-h-[85vh] overflow-y-auto">
         <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-muted" />
         <SheetHeader className="text-left mb-5">
-          <SheetTitle className="text-xl font-extrabold text-foreground">Payment Methods</SheetTitle>
+          <SheetTitle className="text-xl font-extrabold text-foreground">{t("paymentMethodsTitle")}</SheetTitle>
           <SheetDescription className="text-sm text-muted-foreground">
-            Manage how you pay for training sessions
+            {t("paymentMethodsDesc")}
           </SheetDescription>
         </SheetHeader>
 
-        {/* Existing methods */}
         {methods.length > 0 ? (
           <div className="space-y-3 mb-5">
             {methods.map((m) => (
@@ -36,9 +36,7 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
                 <CreditCard className="h-5 w-5 text-primary" />
                 <div className="flex-1">
                   <p className="text-sm font-bold text-foreground">{m.label}</p>
-                  {m.last4 && (
-                    <p className="text-xs text-muted-foreground">•••• {m.last4}</p>
-                  )}
+                  {m.last4 && <p className="text-xs text-muted-foreground">•••• {m.last4}</p>}
                 </div>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </div>
@@ -47,13 +45,12 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
         ) : (
           <div className="mb-5 rounded-2xl bg-muted/30 p-6 text-center">
             <CreditCard className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm font-medium text-muted-foreground">No payment methods added yet</p>
+            <p className="text-sm font-medium text-muted-foreground">{t("noPaymentMethods")}</p>
           </div>
         )}
 
-        {/* Add payment options */}
         <div className="space-y-2">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Add Payment Method</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">{t("addPaymentMethod")}</h3>
 
           <button className="flex w-full items-center gap-3 rounded-2xl bg-card ios-shadow p-4 transition-all hover:bg-muted/30 active:scale-[0.98]">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
@@ -63,9 +60,9 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-bold text-foreground">Apple Pay</p>
-              <p className="text-[11px] text-muted-foreground">Coming soon</p>
+              <p className="text-[11px] text-muted-foreground">{t("comingSoon")}</p>
             </div>
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">SOON</span>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">{t("soonLabel")}</span>
           </button>
 
           <button className="flex w-full items-center gap-3 rounded-2xl bg-card ios-shadow p-4 transition-all hover:bg-muted/30 active:scale-[0.98]">
@@ -74,9 +71,9 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-bold text-foreground">Google Pay</p>
-              <p className="text-[11px] text-muted-foreground">Coming soon</p>
+              <p className="text-[11px] text-muted-foreground">{t("comingSoon")}</p>
             </div>
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">SOON</span>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">{t("soonLabel")}</span>
           </button>
 
           <button className="flex w-full items-center gap-3 rounded-2xl bg-card ios-shadow p-4 transition-all hover:bg-muted/30 active:scale-[0.98]">
@@ -84,15 +81,15 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
               <CreditCard className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-bold text-foreground">Credit / Debit Card</p>
-              <p className="text-[11px] text-muted-foreground">Coming soon</p>
+              <p className="text-sm font-bold text-foreground">{t("creditDebitCard")}</p>
+              <p className="text-[11px] text-muted-foreground">{t("comingSoon")}</p>
             </div>
-            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">SOON</span>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">{t("soonLabel")}</span>
           </button>
         </div>
 
         <p className="mt-5 text-center text-[11px] text-muted-foreground">
-          Payment processing will be available soon. Sessions can currently be paid at the venue.
+          {t("paymentAtVenue")}
         </p>
       </SheetContent>
     </Sheet>

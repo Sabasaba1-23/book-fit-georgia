@@ -6,6 +6,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface HelpSupportPanelProps {
   open: boolean;
@@ -13,23 +14,13 @@ interface HelpSupportPanelProps {
 }
 
 export default function HelpSupportPanel({ open, onOpenChange }: HelpSupportPanelProps) {
+  const { t } = useLanguage();
+
   const faqs = [
-    {
-      q: "How do I book a training session?",
-      a: "Browse the Home feed, tap a listing to see details, then tap 'Book Now'. You'll receive a confirmation instantly.",
-    },
-    {
-      q: "Can I cancel a booking?",
-      a: "Yes! Go to My Bookings, find the session, and tap 'Manage Booking' to cancel. Cancellations are free up to 24 hours before the session.",
-    },
-    {
-      q: "How do payments work?",
-      a: "Currently, payments are handled at the venue. In-app payment with Apple Pay, Google Pay, and cards is coming soon.",
-    },
-    {
-      q: "How do I become a trainer/partner?",
-      a: "Sign up and select 'I offer trainings' during registration. Complete your profile and submit for admin approval.",
-    },
+    { q: t("faqBookSession"), a: t("faqBookSessionAnswer") },
+    { q: t("faqCancelBooking"), a: t("faqCancelBookingAnswer") },
+    { q: t("faqPayments"), a: t("faqPaymentsAnswer") },
+    { q: t("faqBecomeTrainer"), a: t("faqBecomeTrainerAnswer") },
   ];
 
   return (
@@ -37,15 +28,14 @@ export default function HelpSupportPanel({ open, onOpenChange }: HelpSupportPane
       <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-8 pt-2 max-h-[85vh] overflow-y-auto">
         <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-muted" />
         <SheetHeader className="text-left mb-5">
-          <SheetTitle className="text-xl font-extrabold text-foreground">Help & Support</SheetTitle>
+          <SheetTitle className="text-xl font-extrabold text-foreground">{t("helpSupportTitle")}</SheetTitle>
           <SheetDescription className="text-sm text-muted-foreground">
-            Get help, find answers, or contact us
+            {t("helpSupportDesc")}
           </SheetDescription>
         </SheetHeader>
 
-        {/* Contact options */}
         <div className="space-y-2 mb-6">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Contact Us</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">{t("contactUsTitle")}</h3>
 
           <a
             href="mailto:support@fitbook.ge"
@@ -55,7 +45,7 @@ export default function HelpSupportPanel({ open, onOpenChange }: HelpSupportPane
               <Mail className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-bold text-foreground">Email Support</p>
+              <p className="text-sm font-bold text-foreground">{t("emailSupportLabel")}</p>
               <p className="text-[11px] text-muted-foreground">support@fitbook.ge</p>
             </div>
             <ExternalLink className="h-4 w-4 text-muted-foreground" />
@@ -66,16 +56,15 @@ export default function HelpSupportPanel({ open, onOpenChange }: HelpSupportPane
               <MessageCircle className="h-5 w-5 text-blue-500" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-bold text-foreground">Live Chat</p>
-              <p className="text-[11px] text-muted-foreground">Available Mon-Fri 9am-6pm</p>
+              <p className="text-sm font-bold text-foreground">{t("liveChatLabel")}</p>
+              <p className="text-[11px] text-muted-foreground">{t("liveChatHours")}</p>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
 
-        {/* FAQ */}
         <div>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Frequently Asked Questions</h3>
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">{t("faqTitle")}</h3>
           <div className="space-y-2">
             {faqs.map((faq, i) => (
               <details key={i} className="group rounded-2xl bg-muted/30 overflow-hidden">
@@ -94,7 +83,7 @@ export default function HelpSupportPanel({ open, onOpenChange }: HelpSupportPane
 
         <div className="mt-6 rounded-2xl bg-primary/5 p-4 text-center">
           <p className="text-xs font-medium text-foreground/70">FitBook Georgia v1.0</p>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Made with ❤️ in Tbilisi</p>
+          <p className="text-[11px] text-muted-foreground mt-0.5">{t("madeWithLove")}</p>
         </div>
       </SheetContent>
     </Sheet>

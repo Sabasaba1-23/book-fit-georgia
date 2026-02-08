@@ -2,13 +2,26 @@ import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { Star, Send, X, ImagePlus, Camera } from "lucide-react";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { Star, Send, X, Camera } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-const REVIEW_TAGS = [
-  "Great Music", "Expert Coach", "Clean Gym", "Punctual",
-  "Motivating", "High Energy", "Well Structured", "Fun Atmosphere",
-];
+const REVIEW_TAG_KEYS = [
+  "tagGreatMusic", "tagExpertCoach", "tagCleanGym", "tagPunctual",
+  "tagMotivating", "tagHighEnergy", "tagWellStructured", "tagFunAtmosphere",
+] as const;
+
+// Map translated display back to English for DB storage
+const TAG_DB_VALUES: Record<string, string> = {
+  tagGreatMusic: "Great Music",
+  tagExpertCoach: "Expert Coach",
+  tagCleanGym: "Clean Gym",
+  tagPunctual: "Punctual",
+  tagMotivating: "Motivating",
+  tagHighEnergy: "High Energy",
+  tagWellStructured: "Well Structured",
+  tagFunAtmosphere: "Fun Atmosphere",
+};
 
 interface ReviewFormProps {
   bookingId: string;
@@ -33,6 +46,7 @@ export default function ReviewForm({
 }: ReviewFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [hoverRating, setHoverRating] = useState(0);
   const [text, setText] = useState(existingReview?.review_text || "");
@@ -44,7 +58,6 @@ export default function ReviewForm({
 
   if (!user) return null;
 
-  // Existing review display (inline, not dialog)
   if (existingReview) {
     return (
       <div className="rounded-2xl bg-primary/5 border border-primary/10 p-4">
@@ -55,7 +68,7 @@ export default function ReviewForm({
               className={`h-4 w-4 ${i < existingReview.rating ? "fill-primary text-primary" : "text-muted-foreground/30"}`}
             />
           ))}
-          <span className="ml-1.5 text-xs font-semibold text-foreground">Your review</span>
+          <span className="ml-1.5 text-xs font-semibold text-foreground">{t("yourReviewLabel")}</span>
         </div>
         {existingReview.review_text && (
           <p className="text-xs text-foreground/70 italic mt-1">"{existingReview.review_text}"</p>
@@ -83,13 +96,12 @@ export default function ReviewForm({
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (photos.length + files.length > 4) {
-      toast({ title: "Maximum 4 photos allowed", variant: "destructive" });
+      toast({ title: t("maxPhotosAllowed"), variant: "destructive" });
       return;
     }
     const newPhotos = [...photos, ...files].slice(0, 4);
     setPhotos(newPhotos);
-    const previews = newPhotos.map((f) => URL.createObjectURL(f));
-    setPhotoPreviews(previews);
+    setPhotoPreviews(newPhotos.map((f) => URL.createObjectURL(f)));
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -113,7 +125,7 @@ export default function ReviewForm({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      toast({ title: "Please select a rating", variant: "destructive" });
+      toast({ title: t("pleaseSelectRating"), variant: "destructive" });
       return;
     }
     setSubmitting(true);
@@ -133,32 +145,31 @@ export default function ReviewForm({
         photos: photoUrls.length > 0 ? photoUrls : null,
       });
       if (error) throw error;
-      toast({ title: "Review submitted! ⭐" });
+      toast({ title: t("reviewSubmittedToast") });
       onOpenChange?.(false);
       onSubmitted();
     } catch (err: any) {
-      toast({ title: "Failed to submit review", description: err.message, variant: "destructive" });
+      toast({ title: t("failedToSubmitReview"), description: err.message, variant: "destructive" });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const toggleTag = (tag: string) => {
-    setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+  const toggleTag = (dbValue: string) => {
+    setTags((prev) => (prev.includes(dbValue) ? prev.filter((t) => t !== dbValue) : [...prev, dbValue]));
   };
 
   const activeRating = hoverRating || rating;
 
   const formContent = (
     <div className="space-y-5">
-      {/* Header info */}
       {partnerName && (
         <div className="flex flex-col items-center gap-2 pt-1">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
             <Star className="h-7 w-7 text-primary" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-semibold text-foreground">How was your session with {partnerName}?</p>
+            <p className="text-sm font-semibold text-foreground">{t("howWasSessionWith")} {partnerName}?</p>
             {sessionTitle && (
               <p className="text-xs text-muted-foreground mt-0.5">{sessionTitle}</p>
             )}
@@ -166,9 +177,8 @@ export default function ReviewForm({
         </div>
       )}
 
-      {/* Star rating */}
       <div className="space-y-2">
-        <p className="text-xs font-bold text-foreground uppercase tracking-wider">Your Rating</p>
+        <p className="text-xs font-bold text-foreground uppercase tracking-wider">{t("yourRatingLabel")}</p>
         <div className="flex items-center gap-2 justify-center">
           {Array.from({ length: 5 }).map((_, i) => (
             <button
@@ -181,55 +191,51 @@ export default function ReviewForm({
             >
               <Star
                 className={`h-9 w-9 transition-colors ${
-                  i < activeRating
-                    ? "fill-primary text-primary"
-                    : "text-muted-foreground/25"
+                  i < activeRating ? "fill-primary text-primary" : "text-muted-foreground/25"
                 }`}
               />
             </button>
           ))}
         </div>
-        {rating > 0 && (
-          <p className="text-center text-sm font-bold text-primary">{rating}/5</p>
-        )}
+        {rating > 0 && <p className="text-center text-sm font-bold text-primary">{rating}/5</p>}
       </div>
 
-      {/* Tags */}
       <div className="space-y-2">
-        <p className="text-xs font-bold text-foreground uppercase tracking-wider">What stood out?</p>
+        <p className="text-xs font-bold text-foreground uppercase tracking-wider">{t("whatStoodOutLabel")}</p>
         <div className="flex flex-wrap gap-2">
-          {REVIEW_TAGS.map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => toggleTag(tag)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 ${
-                tags.includes(tag)
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-muted border border-border/50 text-foreground hover:bg-muted/80"
-              }`}
-            >
-              {tag}
-            </button>
-          ))}
+          {REVIEW_TAG_KEYS.map((key) => {
+            const dbVal = TAG_DB_VALUES[key];
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => toggleTag(dbVal)}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all active:scale-95 ${
+                  tags.includes(dbVal)
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted border border-border/50 text-foreground hover:bg-muted/80"
+                }`}
+              >
+                {t(key as any)}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Text area */}
       <div className="space-y-2">
-        <p className="text-xs font-bold text-foreground uppercase tracking-wider">Share your experience</p>
+        <p className="text-xs font-bold text-foreground uppercase tracking-wider">{t("shareExperienceLabel")}</p>
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Tell others about your experience..."
+          placeholder={t("tellOthers")}
           className="w-full rounded-xl bg-muted/50 border border-border/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all"
           rows={3}
         />
       </div>
 
-      {/* Photo upload */}
       <div className="space-y-2">
-        <p className="text-xs font-bold text-foreground uppercase tracking-wider">Add photos</p>
+        <p className="text-xs font-bold text-foreground uppercase tracking-wider">{t("addPhotosLabel")}</p>
         <div className="flex gap-2 flex-wrap">
           {photoPreviews.map((src, i) => (
             <div key={i} className="relative group">
@@ -250,7 +256,7 @@ export default function ReviewForm({
               className="flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border/60 text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
             >
               <Camera className="h-5 w-5" />
-              <span className="text-[9px] font-semibold uppercase">Upload</span>
+              <span className="text-[9px] font-semibold uppercase">{t("uploadLabel")}</span>
             </button>
           )}
           <input
@@ -264,7 +270,6 @@ export default function ReviewForm({
         </div>
       </div>
 
-      {/* Submit */}
       <button
         type="button"
         onClick={handleSubmit}
@@ -272,27 +277,25 @@ export default function ReviewForm({
         className="w-full flex items-center justify-center gap-2 rounded-full bg-primary py-3 text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98] disabled:opacity-50"
       >
         <Send className="h-4 w-4" />
-        {submitting ? "Submitting..." : "Submit Review"}
+        {submitting ? t("submittingReview") : t("submitReviewBtn")}
       </button>
     </div>
   );
 
-  // If used as a dialog (controlled open/close)
   if (typeof open === "boolean" && onOpenChange) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-md rounded-3xl p-6 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-lg font-bold text-foreground text-center">Write a Review</h2>
+          <h2 className="text-lg font-bold text-foreground text-center">{t("writeReviewTitle")}</h2>
           {formContent}
         </DialogContent>
       </Dialog>
     );
   }
 
-  // Inline form (original behavior)
   return (
     <div className="rounded-2xl bg-muted/40 border border-border/40 p-5 space-y-1">
-      <h3 className="text-sm font-bold text-foreground mb-3">Write a Review</h3>
+      <h3 className="text-sm font-bold text-foreground mb-3">{t("writeReviewTitle")}</h3>
       {formContent}
     </div>
   );

@@ -15,6 +15,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface PaymentSheetProps {
   open: boolean;
@@ -35,11 +36,11 @@ export default function PaymentSheet({
   onPaymentSuccess,
   loading: externalLoading,
 }: PaymentSheetProps) {
+  const { t } = useLanguage();
   const [method, setMethod] = useState<PaymentMethod>("card");
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Card fields (demo — accepts anything)
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvc, setCvc] = useState("");
@@ -58,15 +59,11 @@ export default function PaymentSheet({
 
   const handlePay = async () => {
     setProcessing(true);
-    // Simulate payment processing
     await new Promise((r) => setTimeout(r, 1500));
     setProcessing(false);
     setSuccess(true);
-
-    // Wait for success animation then callback
     setTimeout(() => {
       onPaymentSuccess(method);
-      // Reset state
       setSuccess(false);
       setCardNumber("");
       setExpiry("");
@@ -93,43 +90,40 @@ export default function PaymentSheet({
         className="h-auto max-h-[90vh] rounded-t-[2rem] p-0 overflow-hidden border-0"
       >
         <div className="flex flex-col bg-background">
-          {/* Success overlay */}
           {success && (
             <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background animate-in fade-in duration-300">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 mb-4">
                 <CheckCircle2 className="h-10 w-10 text-emerald-600" />
               </div>
               <h3 className="text-xl font-extrabold text-foreground">
-                Payment Successful!
+                {t("paymentSuccessful")}
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Your booking is confirmed
+                {t("bookingConfirmed")}
               </p>
             </div>
           )}
 
           <SheetHeader className="px-6 pt-6 pb-4 border-b border-border/40">
             <SheetTitle className="text-xl font-extrabold text-foreground">
-              Complete Payment
+              {t("completePayment")}
             </SheetTitle>
             <p className="text-sm text-muted-foreground mt-1">{title}</p>
           </SheetHeader>
 
           <div className="px-6 py-5 space-y-5">
-            {/* Amount */}
             <div className="flex items-center justify-between rounded-2xl bg-primary/5 p-4">
               <span className="text-sm font-semibold text-foreground">
-                Total Amount
+                {t("totalAmount")}
               </span>
               <span className="text-2xl font-extrabold text-primary">
                 {amount}₾
               </span>
             </div>
 
-            {/* Payment method tabs */}
             <div>
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                Payment Method
+                {t("paymentMethod")}
               </p>
               <div className="flex rounded-2xl border border-border bg-muted/30 p-1 gap-1">
                 <button
@@ -142,7 +136,7 @@ export default function PaymentSheet({
                   )}
                 >
                   <CreditCard className="h-3.5 w-3.5" />
-                  Card
+                  {t("cardLabel")}
                 </button>
                 <button
                   onClick={() => setMethod("apple")}
@@ -171,20 +165,17 @@ export default function PaymentSheet({
               </div>
             </div>
 
-            {/* Card form */}
             {method === "card" && (
               <div className="space-y-3 animate-in slide-in-from-bottom-2 fade-in duration-200">
                 <div>
                   <label className="mb-1.5 block text-xs font-bold text-muted-foreground">
-                    Card Number
+                    {t("cardNumber")}
                   </label>
                   <div className="relative">
                     <Input
                       placeholder="4242 4242 4242 4242"
                       value={cardNumber}
-                      onChange={(e) =>
-                        setCardNumber(formatCardNumber(e.target.value))
-                      }
+                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                       className="h-13 rounded-2xl border-0 bg-muted/60 pl-4 pr-12 text-[15px] font-medium shadow-none tracking-wider"
                     />
                     <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50" />
@@ -193,7 +184,7 @@ export default function PaymentSheet({
 
                 <div>
                   <label className="mb-1.5 block text-xs font-bold text-muted-foreground">
-                    Cardholder Name
+                    {t("cardholderName")}
                   </label>
                   <Input
                     placeholder="John Doe"
@@ -206,27 +197,23 @@ export default function PaymentSheet({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="mb-1.5 block text-xs font-bold text-muted-foreground">
-                      Expiry
+                      {t("expiry")}
                     </label>
                     <Input
                       placeholder="MM/YY"
                       value={expiry}
-                      onChange={(e) =>
-                        setExpiry(formatExpiry(e.target.value))
-                      }
+                      onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                       className="h-13 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none tracking-wider"
                     />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-bold text-muted-foreground">
-                      CVC
+                      {t("cvcLabel")}
                     </label>
                     <Input
                       placeholder="123"
                       value={cvc}
-                      onChange={(e) =>
-                        setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))
-                      }
+                      onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
                       type="password"
                       className="h-13 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none tracking-wider"
                     />
@@ -235,30 +222,27 @@ export default function PaymentSheet({
               </div>
             )}
 
-            {/* Apple/Google Pay */}
             {method !== "card" && (
               <div className="flex flex-col items-center py-6 animate-in fade-in duration-200">
                 <Smartphone className="h-12 w-12 text-primary/40 mb-3" />
                 <p className="text-sm font-medium text-muted-foreground">
-                  Tap Pay below to complete with{" "}
+                  {t("tapToPayWith")}{" "}
                   {method === "apple" ? "Apple Pay" : "Google Pay"}
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1">
-                  (Demo mode — payment will be simulated)
+                  {t("demoPaymentNote")}
                 </p>
               </div>
             )}
 
-            {/* Security note */}
             <div className="flex items-center gap-2 rounded-xl bg-muted/30 px-3 py-2">
               <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
               <p className="text-[11px] text-muted-foreground">
-                Demo mode — any details accepted. No real charges.
+                {t("demoModeNote")}
               </p>
             </div>
           </div>
 
-          {/* Pay button */}
           <div className="px-6 pb-8 pt-2">
             <Button
               disabled={!canPay || processing || externalLoading}
@@ -268,11 +252,11 @@ export default function PaymentSheet({
               {processing ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  Processing...
+                  {t("processing")}
                 </>
               ) : (
                 <>
-                  Pay {amount}₾
+                  {t("payAmount")} {amount}₾
                   <ArrowRight className="h-5 w-5" />
                 </>
               )}
