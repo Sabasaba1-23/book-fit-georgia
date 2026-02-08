@@ -62,6 +62,7 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -110,13 +111,17 @@ export default function Auth() {
       setError("Password must be at least 6 characters.");
       return;
     }
+    if (!phoneNumber.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone_number: phoneNumber.trim() },
       },
     });
     if (error) {
@@ -394,6 +399,10 @@ export default function Auth() {
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">{t("fullName")}</label>
                 <Input placeholder="Enter your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
+                <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
