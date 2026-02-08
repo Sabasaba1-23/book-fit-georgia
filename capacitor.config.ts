@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.0f39d5b9e35d4113beb4e383909c1d7f',
+  appId: 'com.bookfit.georgia',
   appName: 'book-fit-georgia',
   webDir: 'dist',
   server: {
@@ -11,3 +11,5 @@ const config: CapacitorConfig = {
 };
 
 export default config;
+
+
