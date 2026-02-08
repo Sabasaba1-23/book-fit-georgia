@@ -403,6 +403,19 @@ export default function Bookings() {
                   </div>
                 </div>
 
+                {/* Chat button for awaiting confirmation */}
+                {needsConfirmation && (
+                  <div className="flex gap-2.5 px-5 pb-3">
+                    <button
+                      onClick={() => handleChat(booking)}
+                      className="flex items-center justify-center gap-1.5 rounded-full border-2 border-primary/30 bg-transparent px-4 py-2 text-xs font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      {t("chatBtn")}
+                    </button>
+                  </div>
+                )}
+
                 {/* Confirmation card for ended sessions */}
                 {needsConfirmation && (
                   <div className="px-5 pb-3">
@@ -472,14 +485,21 @@ export default function Bookings() {
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => setTicketBooking(booking)}
-                      className="flex flex-[0.5] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                      className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
                     >
                       <Ticket className="h-3.5 w-3.5" />
                       {t("viewReceiptBtn")}
                     </button>
                     <button
+                      onClick={() => handleChat(booking)}
+                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-primary/30 bg-transparent py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      {t("chatBtn")}
+                    </button>
+                    <button
                       onClick={() => navigate("/")}
-                      className="flex flex-[0.5] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                      className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
                     >
                       {t("bookAgainBtn")}
                     </button>
