@@ -2,8 +2,16 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { initNativePlugins } from "./lib/native";
+import { Capacitor } from "@capacitor/core";
 
 // Initialize native plugins (no-op on web)
 initNativePlugins();
+
+// Unregister PWA service workers inside native shell to avoid caching conflicts
+if (Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((r) => r.unregister());
+  });
+}
 
 createRoot(document.getElementById("root")!).render(<App />);

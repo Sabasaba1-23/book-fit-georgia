@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">book-fit-georgia</string>
-    <string name="title_activity_main">book-fit-georgia</string>
+    <string name="app_name">FitBook Georgia</string>
+    <string name="title_activity_main">FitBook Georgia</string>
     <string name="package_name">com.bookfit.georgia</string>
     <string name="custom_url_scheme">com.bookfit.georgia</string>
 </resources>
