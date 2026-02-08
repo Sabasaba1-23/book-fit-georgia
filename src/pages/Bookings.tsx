@@ -85,6 +85,9 @@ export default function Bookings() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"upcoming" | "history">("upcoming");
   const [ticketBooking, setTicketBooking] = useState<BookingWithListing | null>(null);
+  const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
+  const [reviewPartnerName, setReviewPartnerName] = useState<string>("");
+  const [reviewSessionTitle, setReviewSessionTitle] = useState<string>("");
 
   useEffect(() => {
     if (!user) return;
@@ -227,7 +230,7 @@ export default function Bookings() {
     <div className="relative min-h-screen bg-background pb-24">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      <header className="relative z-40 px-5 pb-1" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top, 1.25rem))' }}>
+      <header className="relative z-40 px-5 pb-1" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -424,6 +427,11 @@ export default function Bookings() {
                       completionRequest={cr}
                       isPartner={false}
                       onUpdate={fetchAll}
+                      onConfirmed={() => {
+                        setReviewBookingId(booking.id);
+                        setReviewPartnerName(partner.display_name);
+                        setReviewSessionTitle(title);
+                      }}
                     />
                   </div>
                 )}
@@ -528,6 +536,24 @@ export default function Bookings() {
             bookedAt: ticketBooking.created_at,
             spots: ticketBooking.spots,
             bookingStatus: ticketBooking.booking_status,
+          }}
+        />
+      )}
+
+      {/* Review dialog after session confirmation */}
+      {reviewBookingId && (
+        <ReviewForm
+          bookingId={reviewBookingId}
+          role="user"
+          partnerName={reviewPartnerName}
+          sessionTitle={reviewSessionTitle}
+          onSubmitted={() => {
+            setReviewBookingId(null);
+            fetchAll();
+          }}
+          open={!!reviewBookingId}
+          onOpenChange={(open) => {
+            if (!open) setReviewBookingId(null);
           }}
         />
       )}

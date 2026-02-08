@@ -2,14 +2,29 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.bookfit.georgia',
-  appName: 'book-fit-georgia',
+  appName: 'FitBook Georgia',
   webDir: 'dist',
   ios: {
     // Exclude plugins that have compatibility issues with iOS/Swift Package Manager
     includePlugins: []
-  }
+  },
+  // For development hot-reload, uncomment the server block below:
+  // server: {
+  //   url: 'https://fitbook.my',
+  //   cleartext: true,
+  // },
+  plugins: {
+    SplashScreen: {
+      launchAutoHide: true,
+      launchFadeOutDuration: 300,
+      backgroundColor: '#FFFCFA',
+      showSpinner: false,
+    },
+    Keyboard: {
+      resize: 'body',
+      style: 'dark',
+    },
+  },
 };
 
 export default config;
-
-

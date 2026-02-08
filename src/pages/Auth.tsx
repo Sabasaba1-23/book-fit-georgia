@@ -63,6 +63,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [gender, setGender] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -121,7 +122,7 @@ export default function Auth() {
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName, phone_number: phoneNumber.trim() },
+        data: { full_name: fullName, phone_number: phoneNumber.trim(), gender: gender || undefined },
       },
     });
     if (error) {
@@ -235,7 +236,7 @@ export default function Auth() {
       {mode === "login" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -318,7 +319,7 @@ export default function Auth() {
       {/* ─── FORGOT PASSWORD ─── */}
       {mode === "forgot-password" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -351,7 +352,7 @@ export default function Auth() {
       {/* ─── REGISTER CHOICE ─── */}
       {mode === "register-choice" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -383,7 +384,7 @@ export default function Auth() {
       {/* ─── REGISTER USER ─── */}
       {mode === "register-user" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -403,6 +404,17 @@ export default function Auth() {
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
                 <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Gender</label>
+                <div className="flex gap-2">
+                  {["Male", "Female"].map((g) => (
+                    <button key={g} type="button" onClick={() => setGender(g.toLowerCase())}
+                      className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-all ${gender === g.toLowerCase() ? "bg-foreground text-background shadow-lg" : "border border-border bg-card text-muted-foreground"}`}>
+                      {g}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
@@ -440,7 +452,7 @@ export default function Auth() {
       {mode === "register-partner" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1.5rem)' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>

@@ -1,4 +1,5 @@
-import { Home, CalendarCheck, MessageSquareMore, User } from "lucide-react";
+import { memo, useCallback } from "react";
+import { Home, CalendarCheck, MessageSquareMore } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,27 +10,26 @@ const navItems = [
   { key: "home" as const, labelKey: "navExplore" as const, icon: Home, path: "/", requiresAuth: false },
   { key: "bookings" as const, labelKey: "navBookings" as const, icon: CalendarCheck, path: "/bookings", requiresAuth: true },
   { key: "messages" as const, labelKey: "navChat" as const, icon: MessageSquareMore, path: "/messages", requiresAuth: true },
-  { key: "profile" as const, labelKey: "navProfile" as const, icon: User, path: "/profile", requiresAuth: true },
 ];
 
-export default function BottomNav() {
+export default memo(function BottomNav() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleNav = (path: string, requiresAuth: boolean) => {
+  const handleNav = useCallback((path: string, requiresAuth: boolean) => {
     if (requiresAuth && !user) {
       toast({ title: t("loginRequired"), variant: "destructive" });
       navigate("/auth");
       return;
     }
     navigate(path);
-  };
+  }, [user, toast, t, navigate]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       <div className="glass-card mx-auto max-w-lg rounded-t-3xl border-t border-border/30">
         <div className="flex h-[76px] items-center justify-around px-4 pb-1">
         {navItems.map(({ key, labelKey, icon: Icon, path, requiresAuth }) => {
@@ -64,4 +64,4 @@ export default function BottomNav() {
       </div>
     </nav>
   );
-}
+});

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +10,7 @@ import BottomNav from "@/components/BottomNav";
 import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
+import UserMenuDropdown from "@/components/UserMenuDropdown";
 import { Search, Bell } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -64,50 +66,63 @@ interface PackageWithPartner {
   };
 }
 
+async function fetchHomeFeed() {
+  const [listingsRes, packagesRes] = await Promise.all([
+    supabase
+      .from("training_listings")
+      .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio, avg_rating, review_count)")
+      .eq("status", "approved")
+      .gte("scheduled_at", new Date().toISOString())
+      .order("scheduled_at", { ascending: true }),
+    supabase
+      .from("training_packages")
+      .select("*, partner_profiles(id, display_name, logo_url, partner_type, avg_rating, review_count)")
+      .eq("status", "approved")
+      .order("created_at", { ascending: false }),
+  ]);
+
+  return {
+    listings: (listingsRes.data ?? []) as unknown as ListingWithPartner[],
+    packages: (packagesRes.data ?? []) as unknown as PackageWithPartner[],
+  };
+}
+
+type FeedItem =
+  | { type: "listing"; data: ListingWithPartner }
+  | { type: "package"; data: PackageWithPartner };
+
 export default function Home() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [listings, setListings] = useState<ListingWithPartner[]>([]);
-  const [packages, setPackages] = useState<PackageWithPartner[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSport, setActiveSport] = useState("All");
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  useEffect(() => {
-    async function fetchAll() {
-      const [listingsRes, packagesRes] = await Promise.all([
-        supabase
-          .from("training_listings")
-          .select("*, partner_profiles(id, display_name, logo_url, partner_type, bio, avg_rating, review_count)")
-          .eq("status", "approved")
-          .gte("scheduled_at", new Date().toISOString())
-          .order("scheduled_at", { ascending: true }),
-        supabase
-          .from("training_packages")
-          .select("*, partner_profiles(id, display_name, logo_url, partner_type, avg_rating, review_count)")
-          .eq("status", "approved")
-          .order("created_at", { ascending: false }),
-      ]);
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ["homeFeed"],
+    queryFn: fetchHomeFeed,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-      if (!listingsRes.error && listingsRes.data) {
-        setListings(listingsRes.data as unknown as ListingWithPartner[]);
-      }
-      if (!packagesRes.error && packagesRes.data) {
-        setPackages(packagesRes.data as unknown as PackageWithPartner[]);
-      }
-      setLoading(false);
-    }
-    fetchAll();
-  }, []);
+  const listings = data?.listings ?? [];
+  const packages = data?.packages ?? [];
 
-  // Unique sports for filter chips
-  const sports = ["All", ...Array.from(new Set([...listings.map((l) => l.sport), ...packages.map((p) => p.sport)]))];
+  // Stable callbacks
+  const handleSportChange = useCallback((v: string) => setActiveSport(v), []);
+  const handleFiltersApply = useCallback((f: FilterState) => setFilters(f), []);
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value), []);
 
-  // Apply all filters
-  const filteredListings = listings.filter((l) => {
+  // Memoized sports list
+  const sports = useMemo(
+    () => ["All", ...Array.from(new Set([...listings.map((l) => l.sport), ...packages.map((p) => p.sport)]))],
+    [listings, packages]
+  );
+
+  // Memoized filtered listings
+  const filteredListings = useMemo(() => listings.filter((l) => {
     if (filters.sessionType === "package") return false;
     if (activeSport !== "All" && l.sport !== activeSport) return false;
     if (filters.activities.length > 0 && !filters.activities.includes(l.sport)) return false;
@@ -116,6 +131,11 @@ export default function Home() {
     if (filters.selectedDate) {
       const listingDate = new Date(l.scheduled_at).toISOString().split("T")[0];
       if (listingDate !== filters.selectedDate) return false;
+    }
+    if (filters.timeRange) {
+      const listingTime = new Date(l.scheduled_at);
+      const hhmm = `${listingTime.getHours().toString().padStart(2, "0")}:${listingTime.getMinutes().toString().padStart(2, "0")}`;
+      if (hhmm < filters.timeRange[0] || hhmm > filters.timeRange[1]) return false;
     }
     if (filters.city && l.location) {
       if (!l.location.toLowerCase().includes(filters.city.toLowerCase())) return false;
@@ -132,9 +152,10 @@ export default function Home() {
       if (!matchesSearch) return false;
     }
     return true;
-  });
+  }), [listings, filters, activeSport, searchQuery]);
 
-  const filteredPackages = packages.filter((p) => {
+  // Memoized filtered packages
+  const filteredPackages = useMemo(() => packages.filter((p) => {
     if (filters.sessionType === "single") return false;
     if (activeSport !== "All" && p.sport !== activeSport) return false;
     if (filters.activities.length > 0 && !filters.activities.includes(p.sport)) return false;
@@ -152,49 +173,72 @@ export default function Home() {
       if (!matchesSearch) return false;
     }
     return true;
-  });
+  }), [packages, filters, activeSport, searchQuery]);
 
-  const hasResults = filteredListings.length > 0 || filteredPackages.length > 0;
+  // Memoized feed items (interleave listings & packages)
+  const feedItems = useMemo(() => {
+    const listingItems: FeedItem[] = filteredListings.map((l) => ({ type: "listing", data: l }));
+    const packageItems: FeedItem[] = filteredPackages.map((p) => ({ type: "package", data: p }));
+    const mixed: FeedItem[] = [];
+    let pkgIdx = 0;
 
-  const userInitial = user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "?";
+    if (listingItems.length === 0) {
+      return packageItems;
+    }
+    if (packageItems.length === 0) {
+      return listingItems;
+    }
+
+    listingItems.forEach((item, i) => {
+      mixed.push(item);
+      if ((i + 1) % 2 === 0 && pkgIdx < packageItems.length) {
+        mixed.push(packageItems[pkgIdx++]);
+      }
+    });
+    while (pkgIdx < packageItems.length) {
+      mixed.push(packageItems[pkgIdx++]);
+    }
+    return mixed;
+  }, [filteredListings, filteredPackages]);
+
+  const hasResults = feedItems.length > 0;
 
   return (
-    <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none">
+    <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none mx-auto max-w-7xl">
       {/* Background blobs */}
       <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}>
+      <header className="relative z-40 px-5 md:px-8 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">{t("community")}</p>
             <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">{t("discovery")}</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {/* Desktop nav links */}
+            <nav className="hidden md:flex items-center gap-1 mr-2">
+              <button onClick={() => navigate("/bookings")} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
+                {t("navBookings")}
+              </button>
+              <button onClick={() => navigate("/messages")} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
+                {t("navChat")}
+              </button>
+            </nav>
             <button
               onClick={() => setShowNotifications(true)}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground transition-transform active:scale-95"
             >
               <Bell className="h-5 w-5 text-background" />
             </button>
-            <button
-              onClick={() => {
-                if (user) navigate("/profile");
-                else navigate("/auth");
-              }}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary p-[2px] transition-transform active:scale-95"
-            >
-              <div className="flex h-full w-full items-center justify-center rounded-full bg-background">
-                <span className="text-sm font-medium text-primary">{userInitial}</span>
-              </div>
-            </button>
+            <UserMenuDropdown />
           </div>
         </div>
       </header>
 
       {/* Search bar + filter button */}
-      <div className="relative z-30 px-5 pt-4 pb-3">
+      <div className="relative z-30 px-5 md:px-8 pt-4 pb-3">
         <div className="flex items-center gap-3">
           <div className="glass-card flex flex-1 items-center gap-3 rounded-2xl px-4 py-3.5 ios-shadow">
             <Search className="h-5 w-5 text-muted-foreground" />
@@ -202,21 +246,21 @@ export default function Home() {
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60"
             />
           </div>
-          <FilterOverlay filters={filters} onApply={setFilters} />
+          <FilterOverlay filters={filters} onApply={handleFiltersApply} />
         </div>
       </div>
 
       {/* Filter chips */}
-      <FilterChips options={sports} active={activeSport} onChange={setActiveSport} />
+      <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
       {/* Feed */}
-      <main className="relative z-10 mx-auto max-w-lg space-y-7 px-5 py-5">
+      <main className="relative z-10 px-5 md:px-8 py-5">
         {loading ? (
-          <div className="space-y-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
               <div key={i} className="overflow-hidden rounded-[1.75rem] ios-shadow">
                 <Skeleton className="h-[420px] w-full" />
@@ -231,59 +275,25 @@ export default function Home() {
             <p className="text-muted-foreground">{t("noListings")}</p>
           </div>
         ) : (
-          <div className="space-y-7">
-            {(() => {
-              type FeedItem = 
-                | { type: "listing"; data: ListingWithPartner }
-                | { type: "package"; data: PackageWithPartner };
-
-              const listingItems: FeedItem[] = filteredListings.map((l) => ({
-                type: "listing",
-                data: l,
-              }));
-              const packageItems: FeedItem[] = filteredPackages.map((p) => ({
-                type: "package",
-                data: p,
-              }));
-
-              const mixed: FeedItem[] = [];
-              let pkgIdx = 0;
-
-              if (listingItems.length === 0) {
-                mixed.push(...packageItems);
-              } else if (packageItems.length === 0) {
-                mixed.push(...listingItems);
-              } else {
-                listingItems.forEach((item, i) => {
-                  mixed.push(item);
-                  if ((i + 1) % 2 === 0 && pkgIdx < packageItems.length) {
-                    mixed.push(packageItems[pkgIdx++]);
-                  }
-                });
-                while (pkgIdx < packageItems.length) {
-                  mixed.push(packageItems[pkgIdx++]);
-                }
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {feedItems.map((item) => {
+              if (item.type === "listing") {
+                const l = item.data;
+                return (
+                  <ListingCard
+                    key={l.id}
+                    listing={{
+                      ...l,
+                      price_gel: Number(l.price_gel),
+                      partner_id: l.partner_id,
+                      partner: l.partner_profiles as any,
+                    }}
+                  />
+                );
               }
-
-              return mixed.map((item) => {
-                if (item.type === "listing") {
-                  const l = item.data;
-                  return (
-                    <ListingCard
-                      key={l.id}
-                      listing={{
-                        ...l,
-                        price_gel: Number(l.price_gel),
-                        partner_id: l.partner_id,
-                        partner: l.partner_profiles as any,
-                      }}
-                    />
-                  );
-                }
-                const p = item.data;
-                return <PackageCard key={p.id} pkg={p} />;
-              });
-            })()}
+              const p = item.data as PackageWithPartner;
+              return <PackageCard key={p.id} pkg={p} />;
+            })}
           </div>
         )}
       </main>

@@ -78,6 +78,7 @@ interface ListingCardProps {
     status: string;
     booked_spots?: number;
     partner_id?: string;
+    location?: string | null;
     partner: {
       id?: string;
       display_name: string;
@@ -247,7 +248,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
       onClick={() => setExpanded(!expanded)}
     >
       {/* Image card */}
-      <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : '420px' }}>
+      <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : 'clamp(320px, 50vw, 420px)' }}>
         {listing.background_image_url ? (
           <img
             src={listing.background_image_url}
@@ -288,7 +289,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </div>
 
         {/* Content overlay */}
-        <div className="relative flex flex-col justify-end p-5" style={{ minHeight: '420px' }}>
+        <div className="relative flex flex-col justify-end p-5" style={{ minHeight: 'clamp(320px, 50vw, 420px)' }}>
           <div className="mb-2 flex items-center gap-2.5">
             <span className="rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white">
               {listing.sport}
@@ -355,8 +356,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </div>
           </div>
 
-          {/* Info pills — more spacing */}
-          <div className="flex gap-2.5 px-6 py-4 overflow-x-auto hide-scrollbar">
+          {/* Info badges */}
+          <div className="flex gap-2 px-6 py-4 overflow-x-auto hide-scrollbar">
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <Clock className="h-4 w-4 text-primary" />
               <span className="text-[13px] font-semibold text-foreground">{listing.duration_minutes} {t("mins")}</span>
@@ -367,8 +368,19 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </div>
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{t("studio")}</span>
+              <span className="text-[13px] font-semibold text-foreground">{listing.location || t("studio")}</span>
             </div>
+            <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2.5 shrink-0">
+              <Users className="h-4 w-4 text-primary" />
+              <span className="text-[13px] font-semibold text-primary">
+                {listing.training_type === "one_on_one" ? "1-on-1" : listing.training_type === "group" ? "Group" : "Event"}
+              </span>
+            </div>
+            {listing.max_spots > 1 && (
+              <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
+                <span className="text-[13px] font-semibold text-foreground">{spotsLeft} {t("spotsLeftLabel").toLowerCase()}</span>
+              </div>
+            )}
           </div>
 
           {/* The Experience — more breathing room */}
