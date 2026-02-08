@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import MultiLangDescriptionField from "@/components/MultiLangDescriptionField";
+import ActivitySearchSelect from "@/components/listing/ActivitySearchSelect";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,9 @@ import {
   Zap,
   Instagram,
   Facebook,
+  Target,
+  RefreshCw,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SPORTS, DIFFICULTY_LEVELS } from "@/constants/sports";
@@ -74,9 +78,12 @@ export default function CreateListingSheet({
   const [descriptionRu, setDescriptionRu] = useState("");
   const [priceGel, setPriceGel] = useState("");
   const [maxSpots, setMaxSpots] = useState("");
-  const [scheduledAt, setScheduledAt] = useState("");
+  const [scheduledDate, setScheduledDateStr] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
+  const [additionalPreviews, setAdditionalPreviews] = useState<string[]>([]);
 
   // Package fields
   const [sessionsCount, setSessionsCount] = useState("8");
@@ -91,6 +98,8 @@ export default function CreateListingSheet({
   const [rentalInfoKa, setRentalInfoKa] = useState("");
   const [rentalInfoRu, setRentalInfoRu] = useState("");
   const [durationMinutes, setDurationMinutes] = useState("60");
+  const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+  const [recurring, setRecurring] = useState<"none" | "weekly" | "biweekly" | "monthly">("none");
 
   const totalSteps = 3;
 
@@ -110,9 +119,12 @@ export default function CreateListingSheet({
     setDescriptionRu("");
     setPriceGel("");
     setMaxSpots("");
-    setScheduledAt("");
+    setScheduledDateStr("");
+    setScheduledTime("");
     setImageFile(null);
     setImagePreview(null);
+    setAdditionalImages([]);
+    setAdditionalPreviews([]);
     setSessionsCount("8");
     setTotalPriceGel("");
     setDifficultyLevel("");
@@ -123,6 +135,8 @@ export default function CreateListingSheet({
     setRentalInfoKa("");
     setRentalInfoRu("");
     setDurationMinutes("60");
+    setSelectedGoals([]);
+    setRecurring("none");
   };
 
   const handleClose = () => {
@@ -140,6 +154,7 @@ export default function CreateListingSheet({
     }
   };
 
+  const scheduledAt = scheduledDate && scheduledTime ? `${scheduledDate}T${scheduledTime}` : "";
   const canContinueStep1 = title.trim() && sport && location.trim();
   const canContinueStep2 = serviceType === "package"
     ? (totalPriceGel && parseFloat(totalPriceGel) > 0)
@@ -184,6 +199,7 @@ export default function CreateListingSheet({
       equipment_notes_ka: equipmentNotesKa.trim() || null,
       rental_info_en: rentalInfo.trim() || null,
       rental_info_ka: rentalInfoKa.trim() || null,
+      goals: selectedGoals.length > 0 ? selectedGoals : null,
       status: "pending" as const,
     };
 
@@ -223,7 +239,6 @@ export default function CreateListingSheet({
     setLoading(false);
   };
 
-  const scheduledDate = scheduledAt ? new Date(scheduledAt) : null;
   const stepLabels = ["Basics", "Details & Pricing", "Additional Info"];
 
   return (
@@ -281,11 +296,13 @@ export default function CreateListingSheet({
                 descriptionRu={descriptionRu} setDescriptionRu={setDescriptionRu}
                 priceGel={priceGel} setPriceGel={setPriceGel}
                 maxSpots={maxSpots} setMaxSpots={setMaxSpots}
-                scheduledAt={scheduledAt} setScheduledAt={setScheduledAt}
-                scheduledDate={scheduledDate}
+                scheduledDate={scheduledDate} setScheduledDate={setScheduledDateStr}
+                scheduledTime={scheduledTime} setScheduledTime={setScheduledTime}
                 durationMinutes={durationMinutes} setDurationMinutes={setDurationMinutes}
                 sessionsCount={sessionsCount} setSessionsCount={setSessionsCount}
                 totalPriceGel={totalPriceGel} setTotalPriceGel={setTotalPriceGel}
+                additionalImages={additionalImages} setAdditionalImages={setAdditionalImages}
+                additionalPreviews={additionalPreviews} setAdditionalPreviews={setAdditionalPreviews}
               />
             )}
             {step === 3 && (
@@ -297,6 +314,8 @@ export default function CreateListingSheet({
                 rentalInfo={rentalInfo} setRentalInfo={setRentalInfo}
                 rentalInfoKa={rentalInfoKa} setRentalInfoKa={setRentalInfoKa}
                 rentalInfoRu={rentalInfoRu} setRentalInfoRu={setRentalInfoRu}
+                selectedGoals={selectedGoals} setSelectedGoals={setSelectedGoals}
+                recurring={recurring} setRecurring={setRecurring}
               />
             )}
           </div>
@@ -386,16 +405,7 @@ function StepBasics({
       {/* Activity */}
       <div>
         <label className="mb-2 block text-base font-bold text-foreground">Activity</label>
-        <Select value={sport} onValueChange={setSport}>
-          <SelectTrigger className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none">
-            <SelectValue placeholder="Select Sport / Activity" />
-          </SelectTrigger>
-          <SelectContent className="max-h-64">
-            {SPORTS.map((s) => (
-              <SelectItem key={s} value={s}>{s}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <ActivitySearchSelect value={sport} onChange={setSport} />
       </div>
 
       {/* Service Type */}
@@ -557,11 +567,13 @@ function StepDetails({
   descriptionRu, setDescriptionRu,
   priceGel, setPriceGel,
   maxSpots, setMaxSpots,
-  scheduledAt, setScheduledAt,
-  scheduledDate,
+  scheduledDate, setScheduledDate,
+  scheduledTime, setScheduledTime,
   durationMinutes, setDurationMinutes,
   sessionsCount, setSessionsCount,
   totalPriceGel, setTotalPriceGel,
+  additionalImages, setAdditionalImages,
+  additionalPreviews, setAdditionalPreviews,
 }: {
   serviceType: ServiceType;
   imagePreview: string | null;
@@ -571,11 +583,13 @@ function StepDetails({
   descriptionRu: string; setDescriptionRu: (v: string) => void;
   priceGel: string; setPriceGel: (v: string) => void;
   maxSpots: string; setMaxSpots: (v: string) => void;
-  scheduledAt: string; setScheduledAt: (v: string) => void;
-  scheduledDate: Date | null;
+  scheduledDate: string; setScheduledDate: (v: string) => void;
+  scheduledTime: string; setScheduledTime: (v: string) => void;
   durationMinutes: string; setDurationMinutes: (v: string) => void;
   sessionsCount: string; setSessionsCount: (v: string) => void;
   totalPriceGel: string; setTotalPriceGel: (v: string) => void;
+  additionalImages: File[]; setAdditionalImages: (v: File[]) => void;
+  additionalPreviews: string[]; setAdditionalPreviews: (v: string[]) => void;
 }) {
   const sessions = parseInt(sessionsCount) || 0;
   const total = parseFloat(totalPriceGel) || 0;
@@ -724,19 +738,71 @@ function StepDetails({
             </div>
           </div>
 
-          {/* Date & Time */}
+          {/* Date */}
           <div>
-            <label className="mb-2 block text-base font-bold text-foreground">Date & Time</label>
+            <label className="mb-2 block text-base font-bold text-foreground">Date</label>
             <Input
-              type="datetime-local"
-              value={scheduledAt}
-              onChange={(e) => setScheduledAt(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
+              type="date"
+              value={scheduledDate}
+              onChange={(e) => setScheduledDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+            />
+          </div>
+
+          {/* Time */}
+          <div>
+            <label className="mb-2 block text-base font-bold text-foreground">Time</label>
+            <Input
+              type="time"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
               className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
             />
           </div>
         </>
       )}
+
+      {/* Additional Photos */}
+      <div>
+        <label className="mb-1 block text-base font-bold text-foreground">Additional Photos / Videos</label>
+        <p className="mb-3 text-[13px] text-muted-foreground">Add more media to showcase your training (optional).</p>
+        <div className="flex gap-2 flex-wrap">
+          {additionalPreviews.map((src, i) => (
+            <div key={i} className="relative group">
+              <img src={src} alt="" className="h-20 w-20 rounded-xl object-cover border border-border/50" />
+              <button
+                type="button"
+                onClick={() => {
+                  setAdditionalImages(additionalImages.filter((_, idx) => idx !== i));
+                  setAdditionalPreviews(additionalPreviews.filter((_, idx) => idx !== i));
+                }}
+                className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+          {additionalImages.length < 6 && (
+            <label className="flex h-20 w-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-border/60 text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors">
+              <Camera className="h-5 w-5" />
+              <span className="text-[9px] font-semibold uppercase">Add</span>
+              <input
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  const newFiles = [...additionalImages, ...files].slice(0, 6);
+                  setAdditionalImages(newFiles);
+                  setAdditionalPreviews(newFiles.map((f) => URL.createObjectURL(f)));
+                }}
+              />
+            </label>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -751,6 +817,8 @@ function StepExtras({
   rentalInfo, setRentalInfo,
   rentalInfoKa, setRentalInfoKa,
   rentalInfoRu, setRentalInfoRu,
+  selectedGoals, setSelectedGoals,
+  recurring, setRecurring,
 }: {
   difficultyLevel: string; setDifficultyLevel: (v: string) => void;
   equipmentNotes: string; setEquipmentNotes: (v: string) => void;
@@ -759,7 +827,23 @@ function StepExtras({
   rentalInfo: string; setRentalInfo: (v: string) => void;
   rentalInfoKa: string; setRentalInfoKa: (v: string) => void;
   rentalInfoRu: string; setRentalInfoRu: (v: string) => void;
+  selectedGoals: string[]; setSelectedGoals: (v: string[]) => void;
+  recurring: string; setRecurring: (v: "none" | "weekly" | "biweekly" | "monthly") => void;
 }) {
+  const GOALS_OPTIONS = ["Muscle Gain", "Weight Loss", "Speed & Performance", "General Health", "Mobility / Recovery"];
+  const RECURRING_OPTIONS = [
+    { key: "none" as const, label: "One-time" },
+    { key: "weekly" as const, label: "Weekly" },
+    { key: "biweekly" as const, label: "Bi-weekly" },
+    { key: "monthly" as const, label: "Monthly" },
+  ];
+
+  const toggleGoal = (g: string) => {
+    setSelectedGoals(
+      selectedGoals.includes(g) ? selectedGoals.filter((x) => x !== g) : [...selectedGoals, g]
+    );
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -767,6 +851,31 @@ function StepExtras({
         <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
           All fields below are optional but help users find the right session.
         </p>
+      </div>
+
+      {/* Goals */}
+      <div>
+        <label className="mb-2 flex items-center gap-1.5 text-base font-bold text-foreground">
+          <Target className="h-4 w-4 text-primary" />
+          Training Goals
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {GOALS_OPTIONS.map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => toggleGoal(g)}
+              className={cn(
+                "shrink-0 rounded-full px-4 py-2.5 text-sm font-semibold transition-all active:scale-95",
+                selectedGoals.includes(g)
+                  ? "bg-foreground text-background shadow-lg"
+                  : "border border-border bg-card text-muted-foreground hover:border-primary/30"
+              )}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Difficulty Level */}
@@ -792,6 +901,34 @@ function StepExtras({
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Recurring */}
+      <div>
+        <label className="mb-2 flex items-center gap-1.5 text-base font-bold text-foreground">
+          <RefreshCw className="h-4 w-4 text-primary" />
+          Recurring Schedule
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {RECURRING_OPTIONS.map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setRecurring(opt.key)}
+              className={cn(
+                "shrink-0 rounded-full px-4 py-2.5 text-sm font-semibold transition-all active:scale-95",
+                recurring === opt.key
+                  ? "bg-foreground text-background shadow-lg"
+                  : "border border-border bg-card text-muted-foreground hover:border-primary/30"
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-2 text-[12px] text-muted-foreground">
+          Recurring listings automatically repeat at the same day and time.
+        </p>
       </div>
 
       {/* What to Bring - multi-language */}

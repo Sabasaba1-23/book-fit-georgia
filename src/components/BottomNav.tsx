@@ -1,4 +1,4 @@
-import { Home, CalendarCheck, MessageSquareMore, User } from "lucide-react";
+import { Home, CalendarCheck, MessageSquareMore } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,7 +9,6 @@ const navItems = [
   { key: "home" as const, labelKey: "navExplore" as const, icon: Home, path: "/", requiresAuth: false },
   { key: "bookings" as const, labelKey: "navBookings" as const, icon: CalendarCheck, path: "/bookings", requiresAuth: true },
   { key: "messages" as const, labelKey: "navChat" as const, icon: MessageSquareMore, path: "/messages", requiresAuth: true },
-  { key: "profile" as const, labelKey: "navProfile" as const, icon: User, path: "/profile", requiresAuth: true },
 ];
 
 export default function BottomNav() {
