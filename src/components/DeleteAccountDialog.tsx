@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [checked, setChecked] = useState(false);
@@ -46,7 +48,7 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       if (!token) {
-        toast({ title: "Session expired. Please log in again.", variant: "destructive" });
+        toast({ title: t("sessionExpired"), variant: "destructive" });
         setDeleting(false);
         return;
       }
@@ -67,21 +69,17 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
       const result = await res.json();
 
       if (!res.ok) {
-        toast({
-          title: result.error || "Failed to delete account",
-          variant: "destructive",
-        });
+        toast({ title: result.error || t("failedToConfirm"), variant: "destructive" });
         setDeleting(false);
         return;
       }
 
-      // Sign out locally
       await signOut();
       handleClose();
       navigate("/auth", { replace: true });
-      toast({ title: "Account deleted successfully" });
+      toast({ title: t("accountDeleted") });
     } catch {
-      toast({ title: "Something went wrong. Please try again.", variant: "destructive" });
+      toast({ title: t("failedToConfirm"), variant: "destructive" });
       setDeleting(false);
     }
   }
@@ -93,11 +91,9 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 mb-2">
             <AlertTriangle className="h-6 w-6 text-destructive" />
           </div>
-          <DialogTitle className="text-center text-lg">Delete Account</DialogTitle>
+          <DialogTitle className="text-center text-lg">{t("deleteAccountTitle")}</DialogTitle>
           <DialogDescription className="text-center">
-            {step === 1
-              ? "This will permanently delete your account, all your data, bookings, messages, and uploaded files. This cannot be undone."
-              : "Type DELETE below to confirm permanent account deletion."}
+            {step === 1 ? t("deleteAccountDesc1") : t("deleteAccountDesc2")}
           </DialogDescription>
         </DialogHeader>
 
@@ -111,7 +107,7 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
                 className="mt-0.5 h-5 w-5 rounded border-border accent-destructive"
               />
               <span className="text-sm text-foreground leading-snug">
-                I understand this is permanent and all my data will be deleted forever.
+                {t("understandPermanent")}
               </span>
             </label>
 
@@ -120,14 +116,14 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
                 onClick={handleClose}
                 className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
               >
-                Cancel
+                {t("cancel")}
               </button>
               <button
                 disabled={!canProceedStep1}
                 onClick={() => setStep(2)}
                 className="flex-1 rounded-xl bg-destructive py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
               >
-                Continue
+                {t("continueLabel")}
               </button>
             </div>
           </div>
@@ -139,7 +135,7 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
               type="text"
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value.toUpperCase())}
-              placeholder='Type "DELETE" to confirm'
+              placeholder={t("typeDeleteConfirm")}
               className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-center text-sm font-mono tracking-widest text-foreground outline-none focus:border-destructive"
               autoFocus
               disabled={deleting}
@@ -151,7 +147,7 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
                 disabled={deleting}
                 className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-40"
               >
-                Back
+                {t("backLabel")}
               </button>
               <button
                 disabled={!canDelete || deleting}
@@ -161,10 +157,10 @@ export default function DeleteAccountDialog({ open, onOpenChange }: DeleteAccoun
                 {deleting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Deleting…
+                    {t("deletingAccount")}
                   </>
                 ) : (
-                  "Permanently Delete"
+                  t("permanentlyDelete")
                 )}
               </button>
             </div>
