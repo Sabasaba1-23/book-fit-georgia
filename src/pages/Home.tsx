@@ -168,8 +168,8 @@ export default function Home() {
       <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">Community</p>
-            <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">Discovery</h1>
+            <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">{t("community")}</p>
+            <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">{t("discovery")}</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -200,7 +200,7 @@ export default function Home() {
             <Search className="h-5 w-5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search trainers, gyms or yoga..."
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60"
@@ -294,16 +294,16 @@ export default function Home() {
             onClick={() => navigate("/privacy")}
             className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
           >
-            Privacy Policy
+            {t("privacyPolicyLabel")}
           </button>
           <button
             onClick={() => navigate("/terms")}
             className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
           >
-            Terms & Conditions
+            {t("termsAndConditionsLabel")}
           </button>
         </div>
-        <p className="text-[11px] text-muted-foreground/60">© 2026 Fitbook Georgia. All rights reserved.</p>
+        <p className="text-[11px] text-muted-foreground/60">{t("allRightsReserved")}</p>
       </footer>
 
       <BottomNav />

@@ -283,10 +283,10 @@ export default function Profile() {
               onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
             />
             <button onClick={handleSaveName} className="text-xs font-bold text-primary">
-              Save
+              {t("saveBtnLabel")}
             </button>
             <button onClick={() => setEditingName(false)} className="text-xs text-muted-foreground">
-              Cancel
+              {t("cancelLabel")}
             </button>
           </div>
         ) : (
@@ -298,7 +298,7 @@ export default function Profile() {
             <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
         )}
-        <p className="text-sm text-muted-foreground">Member since {memberSince}</p>
+        <p className="text-sm text-muted-foreground">{t("memberSince")} {memberSince}</p>
       </div>
 
       {/* Stats card */}
@@ -306,15 +306,15 @@ export default function Profile() {
           <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
           <div className="flex-1 py-4 text-center">
             <p className="text-2xl font-bold text-primary">{stats.sessions}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sessions</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsSessions")}</p>
           </div>
           <div className="flex-1 py-4 text-center">
             <p className="text-2xl font-bold text-foreground">{stats.studios}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Studios</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsStudios")}</p>
           </div>
           <div className="flex-1 py-4 text-center">
             <p className="text-2xl font-bold text-primary">{stats.hours}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Hours</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsHours")}</p>
           </div>
         </div>
       </div>
@@ -322,14 +322,14 @@ export default function Profile() {
       {/* Bookmarked */}
       <div className="relative z-10 px-5 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-foreground">Bookmarked</h2>
+          <h2 className="text-lg font-bold text-foreground">{t("bookmarkedSection")}</h2>
           {bookmarks.length > 4 && (
-            <button className="text-sm font-bold text-primary">View all</button>
+            <button className="text-sm font-bold text-primary">{t("viewAllLabel")}</button>
           )}
         </div>
         {bookmarks.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No bookmarked trainers or gyms yet. Bookmark them from their profiles!
+            {t("noBookmarkedTrainers")}
           </p>
         ) : (
           <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-1 px-1 pb-1">
@@ -360,7 +360,7 @@ export default function Profile() {
 
       {/* Fitness Interests */}
       <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">Fitness Interests</h2>
+        <h2 className="text-lg font-bold text-foreground mb-3">{t("fitnessInterests")}</h2>
         <div className="flex flex-wrap gap-2">
           {interests.map((tag) => (
             <button
@@ -401,30 +401,30 @@ export default function Profile() {
 
       {/* Account Settings */}
       <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">Account Settings</h2>
+        <h2 className="text-lg font-bold text-foreground mb-3">{t("accountSettings")}</h2>
         <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border">
           <SettingsRow
             icon={<CreditCard className="h-5 w-5" />}
             iconBg="bg-primary/10 text-primary"
-            label="Payment Methods"
+            label={t("paymentMethods")}
             onClick={() => setShowPayment(true)}
           />
           <SettingsRow
             icon={<Bell className="h-5 w-5" />}
             iconBg="bg-blue-500/10 text-blue-500"
-            label="Notifications"
+            label={t("notifications")}
             onClick={() => setShowNotifications(true)}
           />
           <SettingsRow
             icon={<HelpCircle className="h-5 w-5" />}
             iconBg="bg-emerald-500/10 text-emerald-500"
-            label="Help & Support"
+            label={t("helpSupport")}
             onClick={() => setShowHelp(true)}
           />
           <SettingsRow
             icon={<Trash2 className="h-5 w-5" />}
             iconBg="bg-destructive/10 text-destructive"
-            label="Delete Account"
+            label={t("deleteAccount")}
             onClick={() => setShowDeleteAccount(true)}
           />
         </div>
