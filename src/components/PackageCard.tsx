@@ -232,7 +232,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
           <div className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2">
             <Package className="h-4 w-4 text-accent-foreground" />
             <span className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
-              {pkg.sessions_count} Sessions
+              {pkg.sessions_count} {t("sessionsLabel")}
             </span>
           </div>
         </div>
@@ -255,17 +255,17 @@ export default function PackageCard({ pkg }: PackageCardProps) {
           <div className="mb-4 flex items-center gap-4 text-[13px] text-white/90">
             <span className="flex items-center gap-1.5">
               <Layers className="h-4 w-4 text-secondary" />
-              {pkg.sessions_count} sessions
+              {pkg.sessions_count} {t("sessionsLabel")}
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="h-4 w-4 text-accent" />
-              {pkg.duration_minutes} min each
+              {pkg.duration_minutes} {t("minEach")}
             </span>
           </div>
 
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">Package Price</p>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">{t("packagePrice")}</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-[34px] font-semibold text-white leading-none">{pkg.total_price_gel}₾</p>
                 {savings > 0 && (
@@ -280,7 +280,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
               }}
               className="rounded-full bg-primary px-6 py-3 text-[13px] font-semibold uppercase tracking-wider text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:scale-95 shadow-lg"
             >
-              Book Package
+              {t("bookPackage")}
             </button>
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
               <div>
                 <p className="text-3xl font-extrabold text-foreground">{pkg.total_price_gel}₾</p>
                 <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  {pkg.sessions_count} Sessions • {pkg.price_per_session_gel}₾ each
+                  {pkg.sessions_count} {t("sessionsLabel")} • {pkg.price_per_session_gel}₾ {t("eachLabel")}
                 </p>
               </div>
               <button
@@ -314,7 +314,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
           <div className="flex gap-2.5 px-6 py-4 overflow-x-auto hide-scrollbar">
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <Clock className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{pkg.duration_minutes} mins/session</span>
+              <span className="text-[13px] font-semibold text-foreground">{pkg.duration_minutes} {t("minsPerSession")}</span>
             </div>
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <BarChart3 className="h-4 w-4 text-primary" />
@@ -322,7 +322,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
             </div>
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <Layers className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{pkg.sessions_count} Sessions</span>
+              <span className="text-[13px] font-semibold text-foreground">{pkg.sessions_count} {t("sessionsCount")}</span>
             </div>
             {pkg.location && (
               <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
@@ -339,15 +339,15 @@ export default function PackageCard({ pkg }: PackageCardProps) {
                 <Package className="h-5 w-5 text-accent-foreground" />
               </div>
               <div>
-                <p className="text-[13px] font-bold text-foreground">You save {savings}₾ ({savingsPercent}%)</p>
-                <p className="text-[11px] text-muted-foreground">Compared to booking {pkg.sessions_count} individual sessions</p>
+                <p className="text-[13px] font-bold text-foreground">{t("youSave")} {savings}₾ ({savingsPercent}%)</p>
+                <p className="text-[11px] text-muted-foreground">{t("comparedToIndividual").replace("{count}", String(pkg.sessions_count))}</p>
               </div>
             </div>
           )}
 
           {/* The Experience */}
           <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">The Experience</h4>
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("theExperienceLabel")}</h4>
             <p className="text-[15px] leading-[1.7] text-foreground/80">{description}</p>
           </div>
 
@@ -388,7 +388,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
 
           {/* What to bring */}
           <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">What to bring</h4>
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("whatToBringLabel")}</h4>
             <div className="flex flex-wrap gap-2.5">
               {equipment.map((item) => (
                 <div key={item} className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5">
@@ -412,14 +412,14 @@ export default function PackageCard({ pkg }: PackageCardProps) {
               className="flex flex-[0.3] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
             >
               <MessageCircle className="h-4 w-4 text-primary" />
-              Ask
+              {t("askBtn")}
             </button>
             <button
               onClick={handleBookClick}
               className="relative flex flex-[0.5] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
             >
               <Package className="h-4 w-4" />
-              {booking ? "Booking..." : `${t("book")} Package`}
+              {booking ? t("booking") : t("bookPackage")}
               <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl" />
             </button>
           </div>
