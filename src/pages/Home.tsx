@@ -197,7 +197,7 @@ export default function Home() {
   const firstName = user?.user_metadata?.full_name?.split(" ")[0] || null;
 
   return (
-    <div className="relative min-h-screen bg-background pb-20 overflow-x-hidden overscroll-none mx-auto max-w-7xl">
+    <div className="relative min-h-screen bg-background overflow-x-hidden overscroll-none mx-auto max-w-7xl">
 
       {/* Header */}
       <header className="relative z-40 px-4 md:px-6 pt-4 pb-3">
@@ -304,23 +304,7 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="relative z-10 py-4 pb-2 flex flex-col items-center gap-2">
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={() => navigate("/privacy")}
-            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
-          >
-            {t("privacyPolicyLabel")}
-          </button>
-          <button
-            onClick={() => navigate("/terms")}
-            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
-          >
-            {t("termsAndConditionsLabel")}
-          </button>
-        </div>
-        <p className="text-[11px] text-muted-foreground/60">{t("allRightsReserved")}</p>
-      </footer>
+      <div className="h-16" />
 
       <BottomNav />
       <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
