@@ -332,50 +332,86 @@ export type Database = {
         Row: {
           address: string | null
           admin_notes: string | null
+          biz_status: string | null
+          business_type: string | null
+          country_city: string | null
           created_at: string
           date_of_birth: string | null
+          full_name: string | null
           id: string
           partner_id: string
           personal_id_number: string | null
+          professional_description: string | null
+          rep_status: string | null
+          representative_role: string | null
           reviewed_at: string | null
           social_facebook: string | null
           social_instagram: string | null
           social_tiktok: string | null
+          specializations: string[] | null
           submitted_at: string | null
+          trainer_type: string | null
           updated_at: string
+          verification_step: number | null
+          website_social: string | null
           whatsapp: string | null
+          years_experience: string | null
         }
         Insert: {
           address?: string | null
           admin_notes?: string | null
+          biz_status?: string | null
+          business_type?: string | null
+          country_city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          full_name?: string | null
           id?: string
           partner_id: string
           personal_id_number?: string | null
+          professional_description?: string | null
+          rep_status?: string | null
+          representative_role?: string | null
           reviewed_at?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_tiktok?: string | null
+          specializations?: string[] | null
           submitted_at?: string | null
+          trainer_type?: string | null
           updated_at?: string
+          verification_step?: number | null
+          website_social?: string | null
           whatsapp?: string | null
+          years_experience?: string | null
         }
         Update: {
           address?: string | null
           admin_notes?: string | null
+          biz_status?: string | null
+          business_type?: string | null
+          country_city?: string | null
           created_at?: string
           date_of_birth?: string | null
+          full_name?: string | null
           id?: string
           partner_id?: string
           personal_id_number?: string | null
+          professional_description?: string | null
+          rep_status?: string | null
+          representative_role?: string | null
           reviewed_at?: string | null
           social_facebook?: string | null
           social_instagram?: string | null
           social_tiktok?: string | null
+          specializations?: string[] | null
           submitted_at?: string | null
+          trainer_type?: string | null
           updated_at?: string
+          verification_step?: number | null
+          website_social?: string | null
           whatsapp?: string | null
+          years_experience?: string | null
         }
         Relationships: [
           {
