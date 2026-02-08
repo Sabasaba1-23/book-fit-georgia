@@ -11,7 +11,7 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import UserMenuDropdown from "@/components/UserMenuDropdown";
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, SlidersHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ListingWithPartner {
@@ -110,18 +110,15 @@ export default function Home() {
   const listings = data?.listings ?? [];
   const packages = data?.packages ?? [];
 
-  // Stable callbacks
   const handleSportChange = useCallback((v: string) => setActiveSport(v), []);
   const handleFiltersApply = useCallback((f: FilterState) => setFilters(f), []);
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value), []);
 
-  // Memoized sports list
   const sports = useMemo(
     () => ["All", ...Array.from(new Set([...listings.map((l) => l.sport), ...packages.map((p) => p.sport)]))],
     [listings, packages]
   );
 
-  // Memoized filtered listings
   const filteredListings = useMemo(() => listings.filter((l) => {
     if (filters.sessionType === "package") return false;
     if (activeSport !== "All" && l.sport !== activeSport) return false;
@@ -154,7 +151,6 @@ export default function Home() {
     return true;
   }), [listings, filters, activeSport, searchQuery]);
 
-  // Memoized filtered packages
   const filteredPackages = useMemo(() => packages.filter((p) => {
     if (filters.sessionType === "single") return false;
     if (activeSport !== "All" && p.sport !== activeSport) return false;
@@ -175,19 +171,14 @@ export default function Home() {
     return true;
   }), [packages, filters, activeSport, searchQuery]);
 
-  // Memoized feed items (interleave listings & packages)
   const feedItems = useMemo(() => {
     const listingItems: FeedItem[] = filteredListings.map((l) => ({ type: "listing", data: l }));
     const packageItems: FeedItem[] = filteredPackages.map((p) => ({ type: "package", data: p }));
     const mixed: FeedItem[] = [];
     let pkgIdx = 0;
 
-    if (listingItems.length === 0) {
-      return packageItems;
-    }
-    if (packageItems.length === 0) {
-      return listingItems;
-    }
+    if (listingItems.length === 0) return packageItems;
+    if (packageItems.length === 0) return listingItems;
 
     listingItems.forEach((item, i) => {
       mixed.push(item);
@@ -203,79 +194,94 @@ export default function Home() {
 
   const hasResults = feedItems.length > 0;
 
+  const firstName = user?.user_metadata?.full_name?.split(" ")[0] || null;
+
   return (
     <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none mx-auto max-w-7xl">
-      {/* Background blobs */}
-      <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
-      <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 md:px-8 pb-2 pt-4">
+      <header className="relative z-40 px-4 md:px-6 pt-4 pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">{t("community")}</p>
-            <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">{t("discovery")}</h1>
+            {firstName && (
+              <p className="text-[13px] font-medium text-muted-foreground mb-0.5">
+                {t("greeting") || "Good morning"}, {firstName}
+              </p>
+            )}
+            <h1 className="text-[26px] font-bold tracking-tight text-foreground leading-none">
+              {t("discovery")}
+            </h1>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Desktop nav links */}
+          <div className="flex items-center gap-2">
+            {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-1 mr-2">
-              <button onClick={() => navigate("/bookings")} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
+              <button onClick={() => navigate("/bookings")} className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
                 {t("navBookings")}
               </button>
-              <button onClick={() => navigate("/messages")} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
+              <button onClick={() => navigate("/messages")} className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
                 {t("navChat")}
               </button>
             </nav>
             <button
               onClick={() => setShowNotifications(true)}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-foreground transition-transform active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60 text-foreground transition-colors hover:bg-muted active:scale-95"
             >
-              <Bell className="h-5 w-5 text-background" />
+              <Bell className="h-5 w-5" />
             </button>
             <UserMenuDropdown />
           </div>
         </div>
       </header>
 
-      {/* Search bar + filter button */}
-      <div className="relative z-30 px-5 md:px-8 pt-4 pb-3">
-        <div className="flex items-center gap-3">
-          <div className="glass-card flex flex-1 items-center gap-3 rounded-2xl px-4 py-3.5 ios-shadow">
-            <Search className="h-5 w-5 text-muted-foreground" />
+      {/* Search bar */}
+      <div className="relative z-30 px-4 md:px-6 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="flex flex-1 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5">
+            <Search className="h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60"
+              className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/50"
             />
           </div>
           <FilterOverlay filters={filters} onApply={handleFiltersApply} />
         </div>
       </div>
 
-      {/* Filter chips */}
+      {/* Category chips */}
       <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
+      {/* Section header */}
+      <div className="px-4 md:px-6 pt-4 pb-2 flex items-center justify-between">
+        <h2 className="text-lg font-semibold text-foreground">{t("recommended") || "Recommended"}</h2>
+      </div>
+
       {/* Feed */}
-      <main className="relative z-10 px-5 md:px-8 py-5">
+      <main className="relative z-10 px-4 md:px-6">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="overflow-hidden rounded-[1.75rem] ios-shadow">
-                <Skeleton className="h-[420px] w-full" />
+              <div key={i} className="overflow-hidden rounded-2xl border border-border/60">
+                <Skeleton className="h-[200px] w-full" />
+                <div className="p-4 space-y-3">
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
               </div>
             ))}
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-16">
-            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-              <Search className="h-7 w-7 text-muted-foreground" />
+            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
+              <Search className="h-6 w-6 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">{t("noListings")}</p>
+            <p className="text-muted-foreground text-sm">{t("noListings")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {feedItems.map((item) => {
               if (item.type === "listing") {
                 const l = item.data;

@@ -4,39 +4,40 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calendar, Clock, Users, CheckCircle2, MessageCircle, Star, MapPin, BarChart3, ChevronUp, Bookmark } from "lucide-react";
+import {
+  Calendar, Clock, Users, CheckCircle2, MessageCircle, Star,
+  MapPin, BarChart3, ChevronUp, Bookmark, ChevronDown,
+} from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import PaymentSheet from "@/components/PaymentSheet";
 import BookingTicket from "@/components/BookingTicket";
 
-// Generate a consistent pseudo-random description based on listing data
 function generateDescription(sport: string, trainingType: string, durationMinutes: number): string {
   const descriptions: Record<string, string[]> = {
     Yoga: [
       "A mindful session focusing on breath control, flexibility, and inner balance. Perfect for all levels looking to strengthen body and mind through guided flow sequences.",
-      "Experience a rejuvenating practice combining traditional poses with modern movement science. Focus on mindfulness and breathing techniques to start your day balanced.",
+      "Experience a rejuvenating practice combining traditional poses with modern movement science.",
     ],
     HIIT: [
-      "A high-intensity interval training session designed to boost your metabolism and build functional strength using minimal equipment. Push your limits in a supportive environment.",
-      "Explosive cardio and strength circuits that maximize calorie burn in minimal time. Suitable for those ready to challenge themselves with dynamic, full-body movements.",
+      "A high-intensity interval training session designed to boost your metabolism and build functional strength.",
+      "Explosive cardio and strength circuits that maximize calorie burn in minimal time.",
     ],
     Boxing: [
-      "Master the fundamentals of boxing including footwork, combinations, and defensive techniques. Build confidence, coordination, and cardiovascular endurance.",
-      "An intense striking session blending technical skill work with high-energy pad drills. Develop power, speed, and mental toughness under expert guidance.",
+      "Master the fundamentals of boxing including footwork, combinations, and defensive techniques.",
+      "An intense striking session blending technical skill work with high-energy pad drills.",
     ],
     Tennis: [
-      "Improve your serve, volley, and baseline game with focused drills and match-play scenarios. Designed to sharpen technique and court awareness.",
-      "A dynamic session covering stroke mechanics, movement patterns, and tactical play. Perfect for players looking to elevate their competitive edge.",
+      "Improve your serve, volley, and baseline game with focused drills and match-play scenarios.",
+      "A dynamic session covering stroke mechanics, movement patterns, and tactical play.",
     ],
   };
   const fallback = [
-    `A ${durationMinutes}-minute ${trainingType.replace("_", " ")} session designed to challenge and inspire. Expect expert coaching, structured drills, and a supportive atmosphere.`,
-    `Join this focused ${sport.toLowerCase()} training to build skills, endurance, and confidence. Tailored programming ensures progress at every level.`,
+    `A ${durationMinutes}-minute ${trainingType.replace("_", " ")} session designed to challenge and inspire.`,
+    `Join this focused ${sport.toLowerCase()} training to build skills, endurance, and confidence.`,
   ];
   const pool = descriptions[sport] || fallback;
-  const index = (sport.length + durationMinutes) % pool.length;
-  return pool[index];
+  return pool[(sport.length + durationMinutes) % pool.length];
 }
 
 function getEquipmentForSport(sport: string, equipmentNotes: string | null): string[] {
@@ -52,12 +53,31 @@ function getEquipmentForSport(sport: string, equipmentNotes: string | null): str
 
 function getLevelLabel(trainingType: string): string {
   switch (trainingType) {
-    case "one_on_one": return "All Levels";
-    case "group": return "Intermediate";
-    case "event": return "Advanced";
+    case "one_on_one": return "Private";
+    case "group": return "Group";
+    case "event": return "Event";
     default: return "All Levels";
   }
 }
+
+function getTrainingTypeLabel(trainingType: string): string {
+  switch (trainingType) {
+    case "one_on_one": return "Private";
+    case "group": return "Small Group";
+    case "event": return "Event";
+    default: return trainingType;
+  }
+}
+
+const SPORT_FALLBACK_IMAGES: Record<string, string> = {
+  Yoga: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+  HIIT: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
+  Boxing: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&q=80",
+  Tennis: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&q=80",
+  Pilates: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80",
+  CrossFit: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&q=80",
+  Swimming: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80",
+};
 
 interface ListingCardProps {
   listing: {
@@ -103,13 +123,15 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
 
-  // Guard against null partner data (e.g. deleted partner or missing join)
   if (!listing.partner) return null;
 
   const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
   const spotsLeft = listing.max_spots - (listing.booked_spots || 0);
   const date = new Date(listing.scheduled_at);
   const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
+  const imageUrl = listing.background_image_url || SPORT_FALLBACK_IMAGES[listing.sport] || SPORT_FALLBACK_IMAGES.HIIT;
+
+  const hasRating = listing.partner.avg_rating && listing.partner.review_count && listing.partner.review_count > 0;
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -134,8 +156,8 @@ export default function ListingCard({ listing }: ListingCardProps) {
         stripe_payment_id: `demo_${method}_${Date.now()}`,
       }).select("id").single();
       if (error) {
-        const msg = error.code === "23505" 
-          ? "You've already booked this session." 
+        const msg = error.code === "23505"
+          ? "You've already booked this session."
           : "Booking failed. Please try again.";
         toast({ title: msg, variant: "destructive" });
       } else {
@@ -168,7 +190,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
       if (error && error.code !== "23505") {
         toast({ title: "Bookmark failed", variant: "destructive" });
       } else {
-        toast({ title: "Bookmarked! 🔖", description: "You'll get notified when the session is coming up." });
+        toast({ title: "Bookmarked! 🔖" });
       }
     }
     setBookmarking(false);
@@ -181,28 +203,21 @@ export default function ListingCard({ listing }: ListingCardProps) {
       navigate("/auth");
       return;
     }
-
-    // Find or create a chat thread with this partner
     const partnerId = listing.partner_id || listing.partner?.id;
     if (!partnerId) return;
-
     const { data: partner } = await supabase
       .from("partner_profiles")
       .select("user_id")
       .eq("id", partnerId)
       .maybeSingle();
-
     if (!partner) {
       toast({ title: "Could not find trainer", variant: "destructive" });
       return;
     }
-
-    // Check for existing thread between user and partner for this listing
     const { data: myParticipations } = await supabase
       .from("conversation_participants")
       .select("thread_id")
       .eq("user_id", user.id);
-
     if (myParticipations && myParticipations.length > 0) {
       const threadIds = myParticipations.map((p) => p.thread_id);
       const { data: partnerInThreads } = await supabase
@@ -210,257 +225,193 @@ export default function ListingCard({ listing }: ListingCardProps) {
         .select("thread_id")
         .eq("user_id", partner.user_id)
         .in("thread_id", threadIds);
-
       if (partnerInThreads && partnerInThreads.length > 0) {
-        // Found shared thread — navigate to messages
         navigate("/messages");
         return;
       }
     }
-
-    // Create new thread
     const { data: thread, error: threadError } = await supabase
       .from("conversation_threads")
       .insert({ listing_id: listing.id })
       .select("id")
       .single();
-
     if (threadError || !thread) {
       toast({ title: "Failed to create chat", variant: "destructive" });
       return;
     }
-
     await supabase.from("conversation_participants").insert([
       { thread_id: thread.id, user_id: user.id },
       { thread_id: thread.id, user_id: partner.user_id },
     ]);
-
     navigate("/messages");
   };
 
   const description = listing.description_en || generateDescription(listing.sport, listing.training_type, listing.duration_minutes);
   const equipment = getEquipmentForSport(listing.sport, equipmentKey);
-  const level = getLevelLabel(listing.training_type);
 
   return (
-    <div
-      className="group overflow-hidden rounded-[1.75rem] ios-shadow cursor-pointer transition-all duration-300"
-      onClick={() => setExpanded(!expanded)}
-    >
-      {/* Image card */}
-      <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : 'clamp(320px, 50vw, 420px)' }}>
-        {listing.background_image_url ? (
-          <img
-            src={listing.background_image_url}
-            alt={title}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/30 to-secondary/40">
-            <span className="text-5xl font-bold text-primary/30">{listing.sport}</span>
-          </div>
-        )}
+    <div className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm transition-shadow hover:shadow-md">
+      {/* Image — top of card, no overlay */}
+      <div
+        className="relative w-full cursor-pointer overflow-hidden"
+        style={{ height: 200 }}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <img
+          src={imageUrl}
+          alt={title}
+          className="h-full w-full object-cover"
+          loading="lazy"
+        />
+        {/* Sport chip on image */}
+        <span className="absolute left-3 top-3 rounded-lg bg-card/90 px-2.5 py-1 text-[11px] font-semibold text-foreground backdrop-blur-sm">
+          {listing.sport}
+        </span>
+      </div>
 
-        <div className="absolute inset-0 card-gradient-overlay" />
-
-        {/* Top badges */}
-        <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
-          <div
-            className="flex items-center gap-2.5 rounded-full bg-foreground/70 py-2 pl-2 pr-4 backdrop-blur-sm cursor-pointer transition-transform hover:scale-105 active:scale-95"
+      {/* Content — below image */}
+      <div className="p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+        {/* Partner row */}
+        <div className="mb-2 flex items-center gap-2">
+          <Avatar
+            className="h-7 w-7 cursor-pointer"
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              const pid = listing.partner_id || listing.partner?.id;
+              if (pid) navigate(`/partner/${pid}`);
+            }}
+          >
+            {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
+            <AvatarFallback className="bg-primary/10 text-[10px] font-semibold text-primary">
+              {listing.partner.display_name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span
+            className="text-[13px] font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               const pid = listing.partner_id || listing.partner?.id;
               if (pid) navigate(`/partner/${pid}`);
             }}
           >
-            <Avatar className="h-8 w-8 border border-white/20">
-              {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
-              <AvatarFallback className="bg-white/20 text-[10px] font-semibold text-white">
-                {listing.partner.display_name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-[13px] font-medium text-white">{listing.partner.display_name}</span>
-          </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-primary px-3.5 py-2">
-            <CheckCircle2 className="h-4 w-4 text-white" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-white">{t("verified")}</span>
-          </div>
+            {listing.partner.display_name}
+          </span>
+          {hasRating && (
+            <div className="ml-auto flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+              <span className="text-[12px] font-semibold text-foreground">
+                {Number(listing.partner.avg_rating).toFixed(1)}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Content overlay */}
-        <div className="relative flex flex-col justify-end p-5" style={{ minHeight: 'clamp(320px, 50vw, 420px)' }}>
-          <div className="mb-2 flex items-center gap-2.5">
-            <span className="rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white">
-              {listing.sport}
-            </span>
-            {listing.max_spots > 1 && (
-              <span className="text-[12px] font-medium text-white/80">
-                • {spotsLeft} {t("spotsLeftLabel")}
-              </span>
-            )}
-          </div>
+        {/* Title */}
+        <h3 className="text-base font-semibold text-foreground leading-snug mb-2">{title}</h3>
 
-          <h3 className="mb-3 text-[24px] font-semibold leading-tight text-white drop-shadow-lg">
-            {title}
-          </h3>
-
-          <div className="mb-4 flex items-center gap-4 text-[13px] text-white/90">
-            <span className="flex items-center gap-1.5">
-              <Calendar className="h-4 w-4 text-secondary" />
-              {format(date, "EEE, MMM d")}
+        {/* Meta row */}
+        <div className="flex items-center gap-3 text-[12px] text-muted-foreground mb-3">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            {listing.duration_minutes} min
+          </span>
+          <span className="flex items-center gap-1">
+            <Calendar className="h-3.5 w-3.5" />
+            {format(date, "MMM d")}
+          </span>
+          {listing.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              <span className="truncate max-w-[100px]">{listing.location}</span>
             </span>
-            <span className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-accent" />
-              {format(date, "hh:mm a")}
-            </span>
-          </div>
+          )}
+        </div>
 
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">{t("startingAtLabel")}</p>
-              <p className="text-[34px] font-semibold text-white leading-none">{listing.price_gel}₾</p>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded(true);
-              }}
-              className="rounded-full bg-primary px-6 py-3 text-[13px] font-semibold uppercase tracking-wider text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:scale-95 shadow-lg"
-            >
-              {t("bookNowBtn")}
-            </button>
-          </div>
+        {/* Spots left — only if relevant, muted */}
+        {listing.max_spots > 1 && spotsLeft <= 5 && spotsLeft > 0 && (
+          <p className="text-[11px] text-muted-foreground mb-3">
+            {spotsLeft} {t("spotsLeftLabel")} · {getTrainingTypeLabel(listing.training_type)}
+          </p>
+        )}
+
+        {/* Price + Book row */}
+        <div className="flex items-center justify-between">
+          <p className="text-lg font-semibold text-foreground">
+            {listing.price_gel}₾
+            <span className="text-[12px] font-normal text-muted-foreground ml-1">/ session</span>
+          </p>
+          <button
+            onClick={handleBookClick}
+            className="rounded-xl bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
+          >
+            {t("bookNowBtn")}
+          </button>
         </div>
       </div>
 
       {/* ─── EXPANDED DETAIL PANEL ─── */}
       {expanded && (
-        <div className="bg-card animate-in slide-in-from-top-2 fade-in duration-300">
-          {/* Price header — larger and more spacious */}
-          <div className="px-6 pt-5 pb-4 border-b border-border/40">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-3xl font-extrabold text-foreground">{listing.price_gel}₾</p>
-                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{t("perClassLabel")}</p>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpanded(false);
-                }}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 transition-colors hover:bg-muted"
-              >
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              </button>
+        <div className="border-t border-border/60 animate-in slide-in-from-top-2 fade-in duration-300">
+          {/* Info pills */}
+          <div className="flex gap-2 px-4 py-3 overflow-x-auto hide-scrollbar">
+            <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+              <Clock className="h-3.5 w-3.5 text-primary" />
+              <span className="text-[12px] font-medium text-foreground">{listing.duration_minutes} min</span>
             </div>
-          </div>
-
-          {/* Info badges */}
-          <div className="flex gap-2 px-6 py-4 overflow-x-auto hide-scrollbar">
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-              <Clock className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{listing.duration_minutes} {t("mins")}</span>
+            <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+              <Users className="h-3.5 w-3.5 text-primary" />
+              <span className="text-[12px] font-medium text-foreground">{getTrainingTypeLabel(listing.training_type)}</span>
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-              <BarChart3 className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{level}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-              <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{listing.location || t("studio")}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2.5 shrink-0">
-              <Users className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-primary">
-                {listing.training_type === "one_on_one" ? "1-on-1" : listing.training_type === "group" ? "Group" : "Event"}
-              </span>
-            </div>
-            {listing.max_spots > 1 && (
-              <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-                <span className="text-[13px] font-semibold text-foreground">{spotsLeft} {t("spotsLeftLabel").toLowerCase()}</span>
+            {listing.location && (
+              <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+                <MapPin className="h-3.5 w-3.5 text-primary" />
+                <span className="text-[12px] font-medium text-foreground">{listing.location}</span>
               </div>
             )}
           </div>
 
-          {/* The Experience — more breathing room */}
-          <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("theExperienceLabel")}</h4>
-            <p className="text-[15px] leading-[1.7] text-foreground/80">{description}</p>
+          {/* Description */}
+          <div className="px-4 pb-3">
+            <p className="text-[13px] leading-relaxed text-muted-foreground">{description}</p>
           </div>
 
-          {/* Trainer card — larger and more spacious */}
-          <div className="mx-6 rounded-2xl bg-muted/40 p-5 mb-5">
-            <div className="flex items-center gap-3.5 mb-3">
-              <Avatar className="h-12 w-12 border-2 border-primary/20">
-                {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
-                <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">
-                  {listing.partner.display_name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 cursor-pointer" onClick={(e) => {
-                  e.stopPropagation();
-                  const pid = listing.partner_id || listing.partner?.id;
-                  if (pid) navigate(`/partner/${pid}`);
-                }}>
-                <p className="text-[15px] font-bold text-foreground hover:text-primary transition-colors">{listing.partner.display_name}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                  <span className="text-[12px] font-semibold text-foreground">
-                    {listing.partner.avg_rating ? Number(listing.partner.avg_rating).toFixed(1) : "New"}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    ({listing.partner.review_count || 0} reviews)
-                  </span>
-                </div>
-              </div>
-            </div>
-            {listing.partner.bio && (
-              <p className="text-[13px] italic leading-relaxed text-foreground/70">"{listing.partner.bio}"</p>
-            )}
-          </div>
-
-          {/* What to bring — better spacing */}
-          <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("whatToBringLabel")}</h4>
-            <div className="flex flex-wrap gap-2.5">
+          {/* What to bring */}
+          <div className="px-4 pb-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">{t("whatToBringLabel")}</p>
+            <div className="flex flex-wrap gap-1.5">
               {equipment.map((item) => (
-                <div key={item} className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span className="text-[13px] font-semibold text-foreground">{item}</span>
-                </div>
+                <span key={item} className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-medium text-foreground">
+                  {item}
+                </span>
               ))}
             </div>
           </div>
 
-          {/* Action buttons — larger touch targets */}
-          <div className="flex gap-3 px-6 pb-6">
+          {/* Action buttons */}
+          <div className="flex gap-2 px-4 pb-4">
             <button
               onClick={handleBookmark}
-              className="flex flex-[0.2] items-center justify-center rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors active:scale-95"
             >
-              <Bookmark className="h-4 w-4 text-primary" />
+              <Bookmark className="h-4 w-4" />
             </button>
             <button
               onClick={handleAsk}
-              className="flex flex-[0.3] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-border px-4 h-10 text-[12px] font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors active:scale-95"
             >
-              <MessageCircle className="h-4 w-4 text-primary" />
+              <MessageCircle className="h-3.5 w-3.5" />
               {t("askBtn")}
             </button>
             <button
               onClick={handleBookClick}
-              className="relative flex flex-[0.5] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary h-10 text-[13px] font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.97] transition-colors"
             >
-              <Calendar className="h-4 w-4" />
               {booking ? t("booking") : `${t("book")} Now`}
-              <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl" />
             </button>
           </div>
         </div>
       )}
 
-      {/* Payment Sheet */}
       <PaymentSheet
         open={showPayment}
         onOpenChange={setShowPayment}
@@ -469,8 +420,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
         onPaymentSuccess={handlePaymentSuccess}
         loading={booking}
       />
-
-      {/* Booking Ticket */}
       <BookingTicket
         open={showTicket}
         onClose={() => {

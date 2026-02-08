@@ -6,50 +6,29 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Package, Clock, Users, CheckCircle2, MessageCircle, Star, MapPin,
-  BarChart3, ChevronUp, Bookmark, Calendar, Layers,
+  Layers, Bookmark,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PaymentSheet from "@/components/PaymentSheet";
 import BookingTicket from "@/components/BookingTicket";
 
 const SPORT_IMAGES: Record<string, string> = {
-  "Personal Trainer": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
-  Yoga: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80",
-  HIIT: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&q=80",
-  Pilates: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80",
-  Boxing: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&q=80",
-  CrossFit: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=800&q=80",
-  Tennis: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=80",
-  Swimming: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80",
-  MMA: "https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80",
-  Weightlifting: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&q=80",
+  "Personal Trainer": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80",
+  Yoga: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+  HIIT: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
+  Pilates: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80",
+  Boxing: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&q=80",
+  CrossFit: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&q=80",
+  Tennis: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&q=80",
+  Swimming: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80",
 };
 
 function generatePackageDescription(sport: string, sessions: number, duration: number): string {
-  const descriptions: Record<string, string[]> = {
-    Yoga: [
-      `A ${sessions}-session yoga journey designed to deepen your practice. Each ${duration}-minute class builds on the previous, progressing from foundational poses to advanced flows with personalized attention.`,
-      `Commit to transformation with this comprehensive yoga package. Over ${sessions} guided sessions, develop flexibility, strength, and mindfulness through a structured progression tailored to your goals.`,
-    ],
-    HIIT: [
-      `${sessions} high-intensity sessions engineered to revolutionize your fitness. Each ${duration}-minute workout combines explosive cardio with strength training for maximum results in minimum time.`,
-      `Push beyond your limits with this structured HIIT program. ${sessions} progressive sessions that systematically increase intensity, building endurance and lean muscle with expert coaching.`,
-    ],
-    Boxing: [
-      `Master the sweet science over ${sessions} focused sessions. From fundamentals to advanced combinations, each ${duration}-minute class builds technique, power, and ring intelligence.`,
-      `A complete boxing development package spanning ${sessions} sessions. Learn footwork, defense, and offensive skills while building exceptional cardiovascular fitness and mental toughness.`,
-    ],
-    Tennis: [
-      `Elevate your game with ${sessions} expert-led tennis sessions. Each ${duration}-minute lesson targets specific aspects of your play — serve, volley, baseline, and match strategy.`,
-      `A structured tennis improvement program over ${sessions} sessions. Develop consistent strokes, court movement, and tactical awareness with personalized coaching and video analysis.`,
-    ],
-  };
   const fallback = [
-    `A comprehensive ${sessions}-session training package with ${duration}-minute sessions designed for progressive improvement. Expert coaching, structured programming, and measurable results.`,
-    `Commit to ${sessions} focused sessions of ${sport.toLowerCase()} training. Each ${duration}-minute class is designed to build on the last, ensuring consistent progress toward your goals.`,
+    `A comprehensive ${sessions}-session training package with ${duration}-minute sessions designed for progressive improvement.`,
+    `Commit to ${sessions} focused sessions of ${sport.toLowerCase()} training. Each ${duration}-minute class builds on the last.`,
   ];
-  const pool = descriptions[sport] || fallback;
-  return pool[(sport.length + sessions) % pool.length];
+  return fallback[(sport.length + sessions) % fallback.length];
 }
 
 function getEquipmentForSport(sport: string): string[] {
@@ -58,22 +37,8 @@ function getEquipmentForSport(sport: string): string[] {
     HIIT: ["Training Shoes", "Water", "Towel"],
     Boxing: ["Boxing Gloves", "Hand Wraps", "Water"],
     Tennis: ["Racket", "Tennis Shoes", "Water"],
-    CrossFit: ["Training Shoes", "Wrist Wraps", "Water"],
-    Swimming: ["Swimsuit", "Goggles", "Towel"],
-    Pilates: ["Pilates Mat", "Water", "Grip Socks"],
-    MMA: ["MMA Gloves", "Mouthguard", "Shin Guards"],
-    Weightlifting: ["Lifting Shoes", "Belt", "Chalk"],
   };
   return defaults[sport] || ["Comfortable Clothing", "Water"];
-}
-
-function getLevelLabel(trainingType: string): string {
-  switch (trainingType) {
-    case "one_on_one": return "All Levels";
-    case "group": return "Intermediate";
-    case "event": return "Advanced";
-    default: return "All Levels";
-  }
 }
 
 interface PackageCardProps {
@@ -110,18 +75,18 @@ export default function PackageCard({ pkg }: PackageCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
+  const [booking, setBooking] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [bookmarking, setBookmarking] = useState(false);
+  const [showTicket, setShowTicket] = useState(false);
+  const [confirmedBookingId, setConfirmedBookingId] = useState("");
 
   const title = lang === "ka" && pkg.title_ka ? pkg.title_ka : pkg.title_en;
   const fullPrice = pkg.price_per_session_gel * pkg.sessions_count;
   const savings = fullPrice - pkg.total_price_gel;
   const savingsPercent = Math.round((savings / fullPrice) * 100);
   const imageUrl = pkg.background_image_url || SPORT_IMAGES[pkg.sport] || SPORT_IMAGES["Personal Trainer"];
-
-  const [booking, setBooking] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
-  const [bookmarking, setBookmarking] = useState(false);
-  const [showTicket, setShowTicket] = useState(false);
-  const [confirmedBookingId, setConfirmedBookingId] = useState("");
+  const hasRating = pkg.partner_profiles.avg_rating && pkg.partner_profiles.review_count && pkg.partner_profiles.review_count > 0;
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -146,8 +111,8 @@ export default function PackageCard({ pkg }: PackageCardProps) {
         stripe_payment_id: `demo_${method}_pkg_${Date.now()}`,
       }).select("id").single();
       if (error) {
-        const msg = error.code === "23505" 
-          ? "You've already booked this package." 
+        const msg = error.code === "23505"
+          ? "You've already booked this package."
           : "Booking failed. Please try again.";
         toast({ title: msg, variant: "destructive" });
       } else {
@@ -178,7 +143,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
     if (error && error.code !== "23505") {
       toast({ title: "Bookmark failed", variant: "destructive" });
     } else {
-      toast({ title: "Bookmarked! 🔖", description: "You'll get notified when sessions are coming up." });
+      toast({ title: "Bookmarked! 🔖" });
     }
     setBookmarking(false);
   };
@@ -195,238 +160,153 @@ export default function PackageCard({ pkg }: PackageCardProps) {
 
   const description = pkg.description_en || generatePackageDescription(pkg.sport, pkg.sessions_count, pkg.duration_minutes);
   const equipment = getEquipmentForSport(pkg.sport);
-  const level = getLevelLabel(pkg.training_type);
 
   return (
-    <div
-      className="group overflow-hidden rounded-[1.75rem] ios-shadow cursor-pointer transition-all duration-300"
-      onClick={() => setExpanded(!expanded)}
-    >
-      {/* Image card */}
-      <div className="relative w-full overflow-hidden" style={{ minHeight: expanded ? undefined : "clamp(320px, 50vw, 420px)" }}>
+    <div className="overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm transition-shadow hover:shadow-md">
+      {/* Image — top of card */}
+      <div
+        className="relative w-full cursor-pointer overflow-hidden"
+        style={{ height: 200 }}
+        onClick={() => setExpanded(!expanded)}
+      >
         <img
           src={imageUrl}
           alt={title}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover"
           loading="lazy"
         />
-        <div className="absolute inset-0 card-gradient-overlay" />
+        {/* Package badge */}
+        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-lg bg-card/90 px-2.5 py-1 backdrop-blur-sm">
+          <Package className="h-3 w-3 text-primary" />
+          <span className="text-[11px] font-semibold text-foreground">{pkg.sessions_count} sessions</span>
+        </div>
+        {savingsPercent > 0 && (
+          <span className="absolute right-3 top-3 rounded-lg bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground">
+            Save {savingsPercent}%
+          </span>
+        )}
+      </div>
 
-        {/* Top badges */}
-        <div className="absolute left-4 right-4 top-4 flex items-center justify-between">
-          <div
-            className="flex items-center gap-2.5 rounded-full bg-foreground/70 py-2 pl-2 pr-4 backdrop-blur-sm cursor-pointer transition-transform hover:scale-105 active:scale-95"
+      {/* Content below image */}
+      <div className="p-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
+        {/* Partner row */}
+        <div className="mb-2 flex items-center gap-2">
+          <Avatar
+            className="h-7 w-7 cursor-pointer"
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              navigate(`/partner/${pkg.partner_profiles.id}`);
+            }}
+          >
+            {pkg.partner_profiles.logo_url ? <AvatarImage src={pkg.partner_profiles.logo_url} /> : null}
+            <AvatarFallback className="bg-primary/10 text-[10px] font-semibold text-primary">
+              {pkg.partner_profiles.display_name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <span
+            className="text-[13px] font-medium text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               navigate(`/partner/${pkg.partner_profiles.id}`);
             }}
           >
-            <Avatar className="h-8 w-8 border border-white/20">
-              {pkg.partner_profiles.logo_url ? <AvatarImage src={pkg.partner_profiles.logo_url} /> : null}
-              <AvatarFallback className="bg-white/20 text-[10px] font-semibold text-white">
-                {pkg.partner_profiles.display_name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-[13px] font-medium text-white">{pkg.partner_profiles.display_name}</span>
-          </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-accent px-3.5 py-2">
-            <Package className="h-4 w-4 text-accent-foreground" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
-              {pkg.sessions_count} {t("sessionsLabel")}
-            </span>
-          </div>
+            {pkg.partner_profiles.display_name}
+          </span>
+          {hasRating && (
+            <div className="ml-auto flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 fill-primary text-primary" />
+              <span className="text-[12px] font-semibold text-foreground">
+                {Number(pkg.partner_profiles.avg_rating).toFixed(1)}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Content overlay */}
-        <div className="relative flex flex-col justify-end p-5" style={{ minHeight: "clamp(320px, 50vw, 420px)" }}>
-          <div className="mb-2 flex items-center gap-2.5">
-            <span className="rounded-full bg-primary px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white">
-              {pkg.sport}
-            </span>
-            {savingsPercent > 0 && (
-              <span className="rounded-full bg-accent px-3.5 py-1.5 text-[11px] font-semibold uppercase text-accent-foreground">
-                Save {savingsPercent}%
-              </span>
-            )}
-          </div>
+        {/* Title */}
+        <h3 className="text-base font-semibold text-foreground leading-snug mb-2">{title}</h3>
 
-          <h3 className="mb-3 text-[24px] font-semibold leading-tight text-white drop-shadow-lg">{title}</h3>
-
-          <div className="mb-4 flex items-center gap-4 text-[13px] text-white/90">
-            <span className="flex items-center gap-1.5">
-              <Layers className="h-4 w-4 text-secondary" />
-              {pkg.sessions_count} {t("sessionsLabel")}
+        {/* Meta row */}
+        <div className="flex items-center gap-3 text-[12px] text-muted-foreground mb-3">
+          <span className="flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            {pkg.duration_minutes} min each
+          </span>
+          <span className="flex items-center gap-1">
+            <Layers className="h-3.5 w-3.5" />
+            {pkg.sessions_count} sessions
+          </span>
+          {pkg.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              <span className="truncate max-w-[100px]">{pkg.location}</span>
             </span>
-            <span className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-accent" />
-              {pkg.duration_minutes} {t("minEach")}
-            </span>
-          </div>
+          )}
+        </div>
 
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">{t("packagePrice")}</p>
-              <div className="flex items-baseline gap-2">
-                <p className="text-[34px] font-semibold text-white leading-none">{pkg.total_price_gel}₾</p>
-                {savings > 0 && (
-                  <p className="text-sm text-white/50 line-through">{fullPrice}₾</p>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded(true);
-              }}
-              className="rounded-full bg-primary px-6 py-3 text-[13px] font-semibold uppercase tracking-wider text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:scale-95 shadow-lg"
-            >
-              {t("bookPackage")}
-            </button>
+        {/* Price + Book row */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-lg font-semibold text-foreground">
+              {pkg.total_price_gel}₾
+              {savings > 0 && (
+                <span className="text-[12px] font-normal text-muted-foreground line-through ml-1.5">{fullPrice}₾</span>
+              )}
+            </p>
+            <p className="text-[11px] text-muted-foreground">{pkg.price_per_session_gel}₾ / session</p>
           </div>
+          <button
+            onClick={handleBookClick}
+            className="rounded-xl bg-primary px-5 py-2 text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
+          >
+            {t("bookPackage")}
+          </button>
         </div>
       </div>
 
-      {/* ─── EXPANDED DETAIL PANEL ─── */}
+      {/* ─── EXPANDED DETAIL ─── */}
       {expanded && (
-        <div className="bg-card animate-in slide-in-from-top-2 fade-in duration-300">
-          {/* Price header */}
-          <div className="px-6 pt-5 pb-4 border-b border-border/40">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-3xl font-extrabold text-foreground">{pkg.total_price_gel}₾</p>
-                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  {pkg.sessions_count} {t("sessionsLabel")} • {pkg.price_per_session_gel}₾ {t("eachLabel")}
-                </p>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setExpanded(false);
-                }}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/60 transition-colors hover:bg-muted"
-              >
-                <ChevronUp className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
-
-          {/* Info pills */}
-          <div className="flex gap-2.5 px-6 py-4 overflow-x-auto hide-scrollbar">
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-              <Clock className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{pkg.duration_minutes} {t("minsPerSession")}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-              <BarChart3 className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{level}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-              <Layers className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{pkg.sessions_count} {t("sessionsCount")}</span>
-            </div>
-            {pkg.location && (
-              <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
-                <MapPin className="h-4 w-4 text-primary" />
-                <span className="text-[13px] font-semibold text-foreground">{pkg.location}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Savings highlight */}
-          {savingsPercent > 0 && (
-            <div className="mx-6 mb-4 rounded-2xl bg-accent/20 p-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent">
-                <Package className="h-5 w-5 text-accent-foreground" />
-              </div>
-              <div>
-                <p className="text-[13px] font-bold text-foreground">{t("youSave")} {savings}₾ ({savingsPercent}%)</p>
-                <p className="text-[11px] text-muted-foreground">{t("comparedToIndividual").replace("{count}", String(pkg.sessions_count))}</p>
-              </div>
-            </div>
-          )}
-
-          {/* The Experience */}
-          <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("theExperienceLabel")}</h4>
-            <p className="text-[15px] leading-[1.7] text-foreground/80">{description}</p>
-          </div>
-
-          {/* Trainer card */}
-          <div className="mx-6 rounded-2xl bg-muted/40 p-5 mb-5">
-            <div className="flex items-center gap-3.5 mb-3">
-              <Avatar className="h-12 w-12 border-2 border-primary/20">
-                {pkg.partner_profiles.logo_url ? <AvatarImage src={pkg.partner_profiles.logo_url} /> : null}
-                <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">
-                  {pkg.partner_profiles.display_name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div
-                className="flex-1 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/partner/${pkg.partner_profiles.id}`);
-                }}
-              >
-                <p className="text-[15px] font-bold text-foreground hover:text-primary transition-colors">
-                  {pkg.partner_profiles.display_name}
-                </p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                  <span className="text-[12px] font-semibold text-foreground">
-                    {pkg.partner_profiles.avg_rating ? Number(pkg.partner_profiles.avg_rating).toFixed(1) : "New"}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">
-                    ({pkg.partner_profiles.review_count || 0} reviews)
-                  </span>
-                </div>
-              </div>
-            </div>
-            {pkg.partner_profiles.bio && (
-              <p className="text-[13px] italic leading-relaxed text-foreground/70">"{pkg.partner_profiles.bio}"</p>
-            )}
+        <div className="border-t border-border/60 animate-in slide-in-from-top-2 fade-in duration-300">
+          <div className="px-4 py-3">
+            <p className="text-[13px] leading-relaxed text-muted-foreground">{description}</p>
           </div>
 
           {/* What to bring */}
-          <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("whatToBringLabel")}</h4>
-            <div className="flex flex-wrap gap-2.5">
+          <div className="px-4 pb-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">{t("whatToBringLabel")}</p>
+            <div className="flex flex-wrap gap-1.5">
               {equipment.map((item) => (
-                <div key={item} className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span className="text-[13px] font-semibold text-foreground">{item}</span>
-                </div>
+                <span key={item} className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-medium text-foreground">
+                  {item}
+                </span>
               ))}
             </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-3 px-6 pb-6">
+          {/* Actions */}
+          <div className="flex gap-2 px-4 pb-4">
             <button
               onClick={handleBookmark}
-              className="flex flex-[0.2] items-center justify-center rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors active:scale-95"
             >
-              <Bookmark className="h-4 w-4 text-primary" />
+              <Bookmark className="h-4 w-4" />
             </button>
             <button
               onClick={handleAsk}
-              className="flex flex-[0.3] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-border px-4 h-10 text-[12px] font-medium text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors active:scale-95"
             >
-              <MessageCircle className="h-4 w-4 text-primary" />
-              {t("askBtn")}
+              <MessageCircle className="h-3.5 w-3.5" />
+              Ask
             </button>
             <button
               onClick={handleBookClick}
-              className="relative flex flex-[0.5] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary h-10 text-[13px] font-semibold text-primary-foreground hover:bg-primary/90 active:scale-[0.97] transition-colors"
             >
-              <Package className="h-4 w-4" />
               {booking ? t("booking") : t("bookPackage")}
-              <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl" />
             </button>
           </div>
         </div>
       )}
 
-      {/* Payment Sheet */}
       <PaymentSheet
         open={showPayment}
         onOpenChange={setShowPayment}
@@ -435,8 +315,6 @@ export default function PackageCard({ pkg }: PackageCardProps) {
         onPaymentSuccess={handlePaymentSuccess}
         loading={booking}
       />
-
-      {/* Booking Ticket */}
       <BookingTicket
         open={showTicket}
         onClose={() => {
