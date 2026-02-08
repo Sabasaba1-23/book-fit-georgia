@@ -558,9 +558,13 @@ export type Database = {
           duration_minutes: number
           equipment_notes_en: string | null
           equipment_notes_ka: string | null
+          gym_facebook: string | null
+          gym_instagram: string | null
+          gym_name: string | null
           id: string
           language: string
           location: string | null
+          location_type: string | null
           max_spots: number
           partner_id: string
           price_gel: number
@@ -584,9 +588,13 @@ export type Database = {
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
+          gym_facebook?: string | null
+          gym_instagram?: string | null
+          gym_name?: string | null
           id?: string
           language?: string
           location?: string | null
+          location_type?: string | null
           max_spots?: number
           partner_id: string
           price_gel: number
@@ -610,9 +618,13 @@ export type Database = {
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
+          gym_facebook?: string | null
+          gym_instagram?: string | null
+          gym_name?: string | null
           id?: string
           language?: string
           location?: string | null
+          location_type?: string | null
           max_spots?: number
           partner_id?: string
           price_gel?: number
@@ -644,8 +656,12 @@ export type Database = {
           description_ka: string | null
           difficulty_level: string | null
           duration_minutes: number
+          gym_facebook: string | null
+          gym_instagram: string | null
+          gym_name: string | null
           id: string
           location: string | null
+          location_type: string | null
           max_spots: number
           partner_id: string
           price_per_session_gel: number
@@ -667,8 +683,12 @@ export type Database = {
           description_ka?: string | null
           difficulty_level?: string | null
           duration_minutes?: number
+          gym_facebook?: string | null
+          gym_instagram?: string | null
+          gym_name?: string | null
           id?: string
           location?: string | null
+          location_type?: string | null
           max_spots?: number
           partner_id: string
           price_per_session_gel: number
@@ -690,8 +710,12 @@ export type Database = {
           description_ka?: string | null
           difficulty_level?: string | null
           duration_minutes?: number
+          gym_facebook?: string | null
+          gym_instagram?: string | null
+          gym_name?: string | null
           id?: string
           location?: string | null
+          location_type?: string | null
           max_spots?: number
           partner_id?: string
           price_per_session_gel?: number
