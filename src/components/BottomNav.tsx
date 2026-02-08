@@ -29,7 +29,7 @@ export default memo(function BottomNav() {
   }, [user, toast, t, navigate]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-xl border-t border-border/50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-xl border-t border-border/50 pb-[var(--sab)]">
       <div className="mx-auto max-w-lg">
         <div className="flex h-[60px] items-center justify-around px-4">
         {navItems.map(({ key, labelKey, icon: Icon, path, requiresAuth }) => {
