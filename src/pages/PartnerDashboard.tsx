@@ -4,13 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePartnerProfile } from "@/hooks/usePartnerProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, Settings } from "lucide-react";
+import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, Settings, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
 import PartnerVerificationForm from "@/components/PartnerVerificationForm";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import PartnerScheduleTab from "@/components/PartnerScheduleTab";
+import PartnerMessagesTab from "@/components/PartnerMessagesTab";
 
 interface PartnerListing {
   id: string;
@@ -43,7 +45,7 @@ const SPORT_COLORS: Record<string, string> = {
   "Rock Climbing": "bg-stone-100", Gymnastics: "bg-sky-100",
 };
 
-type Tab = "dashboard" | "schedule" | "insights" | "settings";
+type Tab = "dashboard" | "schedule" | "messages" | "insights" | "settings";
 
 export default function PartnerDashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -146,8 +148,9 @@ export default function PartnerDashboard() {
   const displayListings = showAll ? listings : listings.slice(0, 5);
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { key: "dashboard", label: "Home", icon: <LayoutDashboard className="h-5 w-5" /> },
     { key: "schedule", label: "Schedule", icon: <CalendarDays className="h-5 w-5" /> },
+    { key: "messages", label: "Messages", icon: <MessageCircle className="h-5 w-5" /> },
     { key: "insights", label: "Insights", icon: <BarChart3 className="h-5 w-5" /> },
     { key: "settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
   ];
@@ -292,28 +295,14 @@ export default function PartnerDashboard() {
       {activeTab === "schedule" && (
         <div className="relative z-10 px-5 pt-4">
           <h2 className="text-lg font-bold text-foreground mb-4">Schedule</h2>
-          {listings.filter((l) => l.status === "approved").length === 0 ? (
-            <div className="rounded-2xl bg-muted/40 py-10 text-center">
-              <p className="text-sm text-muted-foreground">No approved sessions yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {listings
-                .filter((l) => l.status === "approved")
-                .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
-                .map((l) => (
-                  <div key={l.id} className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card p-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-foreground">{l.title_en}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {format(new Date(l.scheduled_at), "EEE, MMM d · hh:mm a")}
-                      </p>
-                    </div>
-                    <span className="text-sm font-bold text-primary">{Number(l.price_gel)}₾</span>
-                  </div>
-                ))}
-            </div>
-          )}
+          <PartnerScheduleTab partnerId={profile.id} />
+        </div>
+      )}
+
+      {activeTab === "messages" && (
+        <div className="relative z-10 px-5 pt-4">
+          <h2 className="text-lg font-bold text-foreground mb-4">Messages</h2>
+          <PartnerMessagesTab partnerUserId={user!.id} />
         </div>
       )}
 
