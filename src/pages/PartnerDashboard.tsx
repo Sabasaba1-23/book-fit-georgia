@@ -33,16 +33,14 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }>
 };
 
 const SPORT_COLORS: Record<string, string> = {
-  Yoga: "bg-purple-100",
-  HIIT: "bg-orange-100",
-  Boxing: "bg-red-100",
-  Tennis: "bg-green-100",
-  Pilates: "bg-pink-100",
-  Swimming: "bg-blue-100",
-  CrossFit: "bg-amber-100",
-  MMA: "bg-rose-100",
-  Weightlifting: "bg-teal-100",
-  "Personal Trainer": "bg-indigo-100",
+  Yoga: "bg-purple-100", HIIT: "bg-orange-100", Boxing: "bg-red-100",
+  Tennis: "bg-green-100", Pilates: "bg-pink-100", Swimming: "bg-blue-100",
+  CrossFit: "bg-amber-100", MMA: "bg-rose-100", Weightlifting: "bg-teal-100",
+  "Personal Trainer": "bg-indigo-100", Running: "bg-lime-100",
+  Cycling: "bg-cyan-100", Football: "bg-emerald-100", Basketball: "bg-orange-100",
+  Kickboxing: "bg-red-100", "Brazilian Jiu-Jitsu": "bg-violet-100",
+  Zumba: "bg-fuchsia-100", "Dance Fitness": "bg-pink-100",
+  "Rock Climbing": "bg-stone-100", Gymnastics: "bg-sky-100",
 };
 
 type Tab = "dashboard" | "schedule" | "insights" | "settings";

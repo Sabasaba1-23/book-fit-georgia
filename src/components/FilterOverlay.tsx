@@ -4,8 +4,9 @@ import { Slider } from "@/components/ui/slider";
 import { X, Search, SlidersHorizontal, User, Users, CalendarDays, ArrowRight, MapPin, Package, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addDays, format } from "date-fns";
+import { SPORTS } from "@/constants/sports";
 
-const ACTIVITIES = ["Yoga", "HIIT", "Tennis", "Boxing", "Pilates", "Swimming", "CrossFit", "MMA", "Weightlifting", "Personal Trainer"];
+const ACTIVITIES = [...SPORTS];
 
 const CITIES: Record<string, string[]> = {
   Tbilisi: ["Vake", "Saburtalo", "Old Town", "Vera", "Didube", "Gldani", "Isani", "Nadzaladevi", "Ortachala"],
