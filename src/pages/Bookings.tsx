@@ -187,21 +187,17 @@ export default function Bookings() {
       }
     }
 
-    const { data: thread, error: threadError } = await supabase
-      .from("conversation_threads")
-      .insert({ listing_id: listing.id })
-      .select("id")
-      .single();
+    const { data: threadId, error: threadError } = await supabase
+      .rpc("create_thread_with_participants", {
+        p_listing_id: listing.id,
+        p_user_id: user.id,
+        p_other_user_id: partner.user_id,
+      });
 
-    if (threadError || !thread) {
-      toast({ title: "Failed to create chat", variant: "destructive" });
+    if (threadError || !threadId) {
+      toast({ title: "Failed to create chat", description: threadError?.message, variant: "destructive" });
       return;
     }
-
-    await supabase.from("conversation_participants").insert([
-      { thread_id: thread.id, user_id: user.id },
-      { thread_id: thread.id, user_id: partner.user_id },
-    ]);
 
     navigate("/messages");
   }
