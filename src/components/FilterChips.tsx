@@ -12,19 +12,19 @@ interface FilterChipsProps {
 export default memo(function FilterChips({ options, active, onChange }: FilterChipsProps) {
   const { lang } = useLanguage();
   return (
-    <div className="hide-scrollbar relative z-30 flex gap-2.5 overflow-x-auto px-5 pb-2">
+    <div className="hide-scrollbar relative z-30 flex gap-2 overflow-x-auto px-4 md:px-6 pb-1">
       {options.map((option) => (
         <button
           key={option}
           onClick={() => onChange(option)}
           className={cn(
-            "shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-all duration-200 active:scale-95",
+            "shrink-0 rounded-lg px-4 py-1.5 text-[13px] font-medium transition-all duration-150 active:scale-95",
             active === option
-              ? "bg-foreground text-background shadow-lg"
-              : "border border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >
-          {translateSport(option, lang).toUpperCase()}
+          {translateSport(option, lang)}
         </button>
       ))}
     </div>
