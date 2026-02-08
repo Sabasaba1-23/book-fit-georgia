@@ -171,13 +171,67 @@ export default function ListingCard({ listing }: ListingCardProps) {
     setBookmarking(false);
   };
 
-  const handleAsk = (e: React.MouseEvent) => {
+  const handleAsk = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
       toast({ title: t("loginToChat"), variant: "destructive" });
       navigate("/auth");
       return;
     }
+
+    // Find or create a chat thread with this partner
+    const partnerId = listing.partner_id || listing.partner?.id;
+    if (!partnerId) return;
+
+    const { data: partner } = await supabase
+      .from("partner_profiles")
+      .select("user_id")
+      .eq("id", partnerId)
+      .maybeSingle();
+
+    if (!partner) {
+      toast({ title: "Could not find trainer", variant: "destructive" });
+      return;
+    }
+
+    // Check for existing thread between user and partner for this listing
+    const { data: myParticipations } = await supabase
+      .from("conversation_participants")
+      .select("thread_id")
+      .eq("user_id", user.id);
+
+    if (myParticipations && myParticipations.length > 0) {
+      const threadIds = myParticipations.map((p) => p.thread_id);
+      const { data: partnerInThreads } = await supabase
+        .from("conversation_participants")
+        .select("thread_id")
+        .eq("user_id", partner.user_id)
+        .in("thread_id", threadIds);
+
+      if (partnerInThreads && partnerInThreads.length > 0) {
+        // Found shared thread — navigate to messages
+        navigate("/messages");
+        return;
+      }
+    }
+
+    // Create new thread
+    const { data: thread, error: threadError } = await supabase
+      .from("conversation_threads")
+      .insert({ listing_id: listing.id })
+      .select("id")
+      .single();
+
+    if (threadError || !thread) {
+      toast({ title: "Failed to create chat", variant: "destructive" });
+      return;
+    }
+
+    await supabase.from("conversation_participants").insert([
+      { thread_id: thread.id, user_id: user.id },
+      { thread_id: thread.id, user_id: partner.user_id },
+    ]);
+
     navigate("/messages");
   };
 

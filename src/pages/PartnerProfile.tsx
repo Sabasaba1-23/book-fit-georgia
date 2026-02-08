@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/BottomNav";
 import {
@@ -23,6 +24,9 @@ import {
   Award,
   Target,
   Flame,
+  Phone,
+  Lock,
+  MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -113,6 +117,7 @@ function pickN<T>(arr: T[], n: number, rand: () => number): T[] {
 
 interface PartnerData {
   id: string;
+  user_id: string;
   display_name: string;
   logo_url: string | null;
   partner_type: string;
@@ -124,6 +129,7 @@ interface PartnerData {
   review_count: number | null;
   completion_rate: number | null;
   dispute_rate: number | null;
+  phone_number: string | null;
 }
 
 interface ListingData {
@@ -143,9 +149,11 @@ export default function PartnerProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
+  const { user } = useAuth();
   const [partner, setPartner] = useState<PartnerData | null>(null);
   const [listings, setListings] = useState<ListingData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasBooking, setHasBooking] = useState(false);
 
   const seed = id ? [...id].reduce((a, c) => a + c.charCodeAt(0), 0) : 0;
   const rand = seededRandom(seed);
@@ -166,9 +174,22 @@ export default function PartnerProfile() {
       if (partnerRes.data) setPartner(partnerRes.data as unknown as PartnerData);
       if (listingsRes.data) setListings(listingsRes.data as unknown as ListingData[]);
       setLoading(false);
+
+      // Check if current user has a confirmed booking with this partner
+      if (user && partnerRes.data) {
+        const { data: bookings } = await supabase
+          .from("bookings")
+          .select("id, training_listings!inner(partner_id)")
+          .eq("user_id", user.id)
+          .in("booking_status", ["confirmed", "completed"])
+          .eq("payment_status", "paid");
+
+        const booked = (bookings || []).some((b: any) => b.training_listings?.partner_id === id);
+        setHasBooking(booked);
+      }
     }
     load();
-  }, [id]);
+  }, [id, user]);
 
   if (loading) {
     return (
@@ -302,6 +323,34 @@ export default function PartnerProfile() {
           </button>
         </div>
 
+        {/* Contact Info — hidden until booking confirmed */}
+        <div className="mb-6 rounded-2xl bg-muted/40 p-4">
+          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2.5">Contact</h3>
+          {hasBooking ? (
+            <div className="space-y-2.5">
+              {partner.phone_number && (
+                <div className="flex items-center gap-2.5">
+                  <Phone className="h-4 w-4 text-primary" />
+                  <a href={`tel:${partner.phone_number}`} className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
+                    {partner.phone_number}
+                  </a>
+                </div>
+              )}
+              <div className="flex items-center gap-2.5">
+                <MessageCircle className="h-4 w-4 text-primary" />
+                <span className="text-sm font-semibold text-primary">Chat unlocked</span>
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2.5">
+              <Lock className="h-4 w-4 text-muted-foreground" />
+              <p className="text-[13px] text-muted-foreground">
+                Book a session to unlock contact details
+              </p>
+            </div>
+          )}
+        </div>
         {/* About */}
         <div className="mb-6">
           <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">About</h3>
