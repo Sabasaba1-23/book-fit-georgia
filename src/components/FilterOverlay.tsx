@@ -4,8 +4,11 @@ import { Slider } from "@/components/ui/slider";
 import { X, Search, SlidersHorizontal, User, Users, CalendarDays, ArrowRight, MapPin, Package, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addDays, format } from "date-fns";
+import { SPORTS } from "@/constants/sports";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { translateSport, translateCity, translateLanguageName } from "@/i18n/sportTranslations";
 
-const ACTIVITIES = ["Yoga", "HIIT", "Tennis", "Boxing", "Pilates", "Swimming", "CrossFit", "MMA", "Weightlifting", "Personal Trainer"];
+const ACTIVITIES = [...SPORTS];
 
 const CITIES: Record<string, string[]> = {
   Tbilisi: ["Vake", "Saburtalo", "Old Town", "Vera", "Didube", "Gldani", "Isani", "Nadzaladevi", "Ortachala"],
@@ -44,6 +47,7 @@ interface FilterOverlayProps {
 }
 
 export default function FilterOverlay({ filters, onApply, children }: FilterOverlayProps) {
+  const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [local, setLocal] = useState<FilterState>(filters);
 
@@ -114,28 +118,28 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
               <X className="h-5 w-5 text-foreground" />
             </button>
             <SheetHeader className="flex-1 text-center">
-              <SheetTitle className="text-xl font-extrabold text-foreground">Find Your Move</SheetTitle>
+              <SheetTitle className="text-xl font-extrabold text-foreground">{t("findYourMoveTitle")}</SheetTitle>
             </SheetHeader>
             <button onClick={clearAll} className="text-sm font-semibold text-primary">
-              Clear all
+              {t("clearAllBtn")}
             </button>
           </div>
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-5 pb-28 space-y-6">
             {/* Activity */}
-            <Section title="Activity" icon={<Search className="h-4 w-4 text-primary" />}>
+            <Section title={t("activityLabel")} icon={<Search className="h-4 w-4 text-primary" />}>
               <div className="flex flex-wrap gap-2">
                 {ACTIVITIES.map((a) => (
                   <ChipButton key={a} active={local.activities.includes(a)} onClick={() => toggleActivity(a)}>
-                    {a}
+                    {translateSport(a, lang)}
                   </ChipButton>
                 ))}
               </div>
             </Section>
 
             {/* Location */}
-            <Section title="Location" icon={<MapPin className="h-4 w-4 text-primary" />}>
+            <Section title={t("locationLabel")} icon={<MapPin className="h-4 w-4 text-primary" />}>
               <div className="flex flex-wrap gap-2 mb-3">
                 {Object.keys(CITIES).map((city) => (
                   <ChipButton
@@ -143,7 +147,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                     active={local.city === city}
                     onClick={() => setLocal((p) => ({ ...p, city: p.city === city ? null : city, district: null }))}
                   >
-                    {city}
+                    {translateCity(city, lang)}
                   </ChipButton>
                 ))}
               </div>
@@ -156,7 +160,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                       onClick={() => setLocal((p) => ({ ...p, district: p.district === d ? null : d }))}
                       variant="outline"
                     >
-                      {d}
+                      {translateCity(d, lang)}
                     </ChipButton>
                   ))}
                 </div>
@@ -164,10 +168,10 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
             </Section>
 
             {/* Date & Time */}
-            <Section title="Date & Time" icon={<CalendarDays className="h-4 w-4 text-primary" />}>
+            <Section title={t("dateTimeLabel")} icon={<CalendarDays className="h-4 w-4 text-primary" />}>
               <div className="hide-scrollbar flex gap-2 overflow-x-auto">
                 <ChipButton active={local.selectedDate === null} onClick={() => setLocal((p) => ({ ...p, selectedDate: null }))}>
-                  Anytime
+                  {t("anytimeLabel")}
                 </ChipButton>
                 {dates.map((d) => (
                   <button
@@ -188,7 +192,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
             </Section>
 
             {/* Budget */}
-            <Section title="Budget">
+            <Section title={t("budgetLabel")}>
               <div className="px-1">
                 <div className="mb-3 flex justify-between text-sm font-bold text-foreground">
                   <span>{local.budgetRange[0]}₾</span>
@@ -205,36 +209,36 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
             </Section>
 
             {/* Training Type */}
-            <Section title="Training Type">
+            <Section title={t("trainingTypeLabel")}>
               <div className="flex gap-2">
                 {[
-                  { key: "one_on_one", label: "Individual", icon: <User className="h-4 w-4" /> },
-                  { key: "group", label: "Group", icon: <Users className="h-4 w-4" /> },
-                  { key: "event", label: "Event", icon: <CalendarDays className="h-4 w-4" /> },
-                ].map((t) => (
+                  { key: "one_on_one", label: t("individualLabel"), icon: <User className="h-4 w-4" /> },
+                  { key: "group", label: t("groupLabel"), icon: <Users className="h-4 w-4" /> },
+                  { key: "event", label: t("eventLabel"), icon: <CalendarDays className="h-4 w-4" /> },
+                ].map((tt) => (
                   <button
-                    key={t.key}
-                    onClick={() => setLocal((p) => ({ ...p, trainingType: p.trainingType === t.key ? null : t.key }))}
+                    key={tt.key}
+                    onClick={() => setLocal((p) => ({ ...p, trainingType: p.trainingType === tt.key ? null : tt.key }))}
                     className={cn(
                       "flex flex-1 flex-col items-center gap-1.5 rounded-2xl py-3 transition-all active:scale-95",
-                      local.trainingType === t.key
+                      local.trainingType === tt.key
                         ? "bg-foreground text-background shadow-lg"
                         : "border border-border bg-card text-muted-foreground"
                     )}
                   >
-                    {t.icon}
-                    <span className="text-xs font-semibold">{t.label}</span>
+                    {tt.icon}
+                    <span className="text-xs font-semibold">{tt.label}</span>
                   </button>
                 ))}
               </div>
             </Section>
 
             {/* Session Type */}
-            <Section title="Session Type">
+            <Section title={t("sessionTypeLabel")}>
               <div className="flex gap-2">
                 {[
-                  { key: "single", label: "Single Session", icon: <Zap className="h-4 w-4" /> },
-                  { key: "package", label: "Package Deal", icon: <Package className="h-4 w-4" /> },
+                  { key: "single", label: t("singleSessionLabel"), icon: <Zap className="h-4 w-4" /> },
+                  { key: "package", label: t("packageDealLabel"), icon: <Package className="h-4 w-4" /> },
                 ].map((s) => (
                   <button
                     key={s.key}
@@ -254,11 +258,11 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
             </Section>
 
             {/* Language */}
-            <Section title="Language">
+            <Section title={t("languageFilterLabel")}>
               <div className="flex flex-wrap gap-2">
                 {LANGUAGES_LIST.map((l) => (
                   <ChipButton key={l} active={local.languages.includes(l)} onClick={() => toggleLanguage(l)}>
-                    {l}
+                    {translateLanguageName(l, lang)}
                   </ChipButton>
                 ))}
               </div>
@@ -271,7 +275,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
               onClick={apply}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-foreground py-4 text-sm font-bold uppercase tracking-wider text-background transition-all active:scale-[0.98] ios-shadow"
             >
-              Apply Filters
+              {t("applyFiltersBtn")}
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>

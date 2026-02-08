@@ -221,6 +221,50 @@ export type Database = {
           },
         ]
       }
+      partner_documents: {
+        Row: {
+          admin_notes: string | null
+          document_type: string
+          document_url: string
+          file_name: string | null
+          id: string
+          partner_id: string
+          reviewed_at: string | null
+          status: string
+          uploaded_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          document_type: string
+          document_url: string
+          file_name?: string | null
+          id?: string
+          partner_id: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          document_type?: string
+          document_url?: string
+          file_name?: string | null
+          id?: string
+          partner_id?: string
+          reviewed_at?: string | null
+          status?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_documents_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_profiles: {
         Row: {
           approved: boolean
@@ -235,10 +279,12 @@ export type Database = {
           location: string | null
           logo_url: string | null
           partner_type: Database["public"]["Enums"]["partner_type"]
+          phone_number: string | null
           review_count: number | null
           sports: string[] | null
           updated_at: string
           user_id: string
+          verification_status: string
         }
         Insert: {
           approved?: boolean
@@ -253,10 +299,12 @@ export type Database = {
           location?: string | null
           logo_url?: string | null
           partner_type: Database["public"]["Enums"]["partner_type"]
+          phone_number?: string | null
           review_count?: number | null
           sports?: string[] | null
           updated_at?: string
           user_id: string
+          verification_status?: string
         }
         Update: {
           approved?: boolean
@@ -271,12 +319,109 @@ export type Database = {
           location?: string | null
           logo_url?: string | null
           partner_type?: Database["public"]["Enums"]["partner_type"]
+          phone_number?: string | null
           review_count?: number | null
           sports?: string[] | null
           updated_at?: string
           user_id?: string
+          verification_status?: string
         }
         Relationships: []
+      }
+      partner_verifications: {
+        Row: {
+          address: string | null
+          admin_notes: string | null
+          biz_status: string | null
+          business_type: string | null
+          country_city: string | null
+          created_at: string
+          date_of_birth: string | null
+          full_name: string | null
+          id: string
+          partner_id: string
+          personal_id_number: string | null
+          professional_description: string | null
+          rep_status: string | null
+          representative_role: string | null
+          reviewed_at: string | null
+          social_facebook: string | null
+          social_instagram: string | null
+          social_tiktok: string | null
+          specializations: string[] | null
+          submitted_at: string | null
+          trainer_type: string | null
+          updated_at: string
+          verification_step: number | null
+          website_social: string | null
+          whatsapp: string | null
+          years_experience: string | null
+        }
+        Insert: {
+          address?: string | null
+          admin_notes?: string | null
+          biz_status?: string | null
+          business_type?: string | null
+          country_city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string | null
+          id?: string
+          partner_id: string
+          personal_id_number?: string | null
+          professional_description?: string | null
+          rep_status?: string | null
+          representative_role?: string | null
+          reviewed_at?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_tiktok?: string | null
+          specializations?: string[] | null
+          submitted_at?: string | null
+          trainer_type?: string | null
+          updated_at?: string
+          verification_step?: number | null
+          website_social?: string | null
+          whatsapp?: string | null
+          years_experience?: string | null
+        }
+        Update: {
+          address?: string | null
+          admin_notes?: string | null
+          biz_status?: string | null
+          business_type?: string | null
+          country_city?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          full_name?: string | null
+          id?: string
+          partner_id?: string
+          personal_id_number?: string | null
+          professional_description?: string | null
+          rep_status?: string | null
+          representative_role?: string | null
+          reviewed_at?: string | null
+          social_facebook?: string | null
+          social_instagram?: string | null
+          social_tiktok?: string | null
+          specializations?: string[] | null
+          submitted_at?: string | null
+          trainer_type?: string | null
+          updated_at?: string
+          verification_step?: number | null
+          website_social?: string | null
+          whatsapp?: string | null
+          years_experience?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_verifications_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: true
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -313,6 +458,7 @@ export type Database = {
           booking_id: string
           created_at: string
           id: string
+          photos: string[] | null
           rating: number
           review_text: string | null
           reviewer_id: string
@@ -323,6 +469,7 @@ export type Database = {
           booking_id: string
           created_at?: string
           id?: string
+          photos?: string[] | null
           rating: number
           review_text?: string | null
           reviewer_id: string
@@ -333,6 +480,7 @@ export type Database = {
           booking_id?: string
           created_at?: string
           id?: string
+          photos?: string[] | null
           rating?: number
           review_text?: string | null
           reviewer_id?: string
@@ -406,6 +554,7 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_ka: string | null
+          difficulty_level: string | null
           duration_minutes: number
           equipment_notes_en: string | null
           equipment_notes_ka: string | null
@@ -415,6 +564,8 @@ export type Database = {
           max_spots: number
           partner_id: string
           price_gel: number
+          rental_info_en: string | null
+          rental_info_ka: string | null
           scheduled_at: string
           sport: string
           status: Database["public"]["Enums"]["listing_status"]
@@ -429,6 +580,7 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
@@ -438,6 +590,8 @@ export type Database = {
           max_spots?: number
           partner_id: string
           price_gel: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           scheduled_at: string
           sport: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -452,6 +606,7 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
@@ -461,6 +616,8 @@ export type Database = {
           max_spots?: number
           partner_id?: string
           price_gel?: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           scheduled_at?: string
           sport?: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -485,12 +642,15 @@ export type Database = {
           created_at: string
           description_en: string | null
           description_ka: string | null
+          difficulty_level: string | null
           duration_minutes: number
           id: string
           location: string | null
           max_spots: number
           partner_id: string
           price_per_session_gel: number
+          rental_info_en: string | null
+          rental_info_ka: string | null
           sessions_count: number
           sport: string
           status: Database["public"]["Enums"]["listing_status"]
@@ -505,12 +665,15 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           id?: string
           location?: string | null
           max_spots?: number
           partner_id: string
           price_per_session_gel: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           sessions_count?: number
           sport: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -525,12 +688,15 @@ export type Database = {
           created_at?: string
           description_en?: string | null
           description_ka?: string | null
+          difficulty_level?: string | null
           duration_minutes?: number
           id?: string
           location?: string | null
           max_spots?: number
           partner_id?: string
           price_per_session_gel?: number
+          rental_info_en?: string | null
+          rental_info_ka?: string | null
           sessions_count?: number
           sport?: string
           status?: Database["public"]["Enums"]["listing_status"]

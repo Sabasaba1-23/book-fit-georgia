@@ -18,6 +18,10 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminListings from "./pages/admin/AdminListings";
 import AdminPartners from "./pages/admin/AdminPartners";
 import AdminBookings from "./pages/admin/AdminBookings";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminSettings from "./pages/admin/AdminSettings";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
 
 const queryClient = new QueryClient();
 
@@ -51,8 +55,12 @@ const App = () => (
                 <Route path="listings" element={<AdminListings />} />
                 <Route path="partners" element={<AdminPartners />} />
                 <Route path="bookings" element={<AdminBookings />} />
+                <Route path="reports" element={<AdminReports />} />
+                <Route path="settings" element={<AdminSettings />} />
               </Route>
 
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsConditions />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

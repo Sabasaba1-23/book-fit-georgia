@@ -10,6 +10,7 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import { Search, Bell } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ListingWithPartner {
   id: string;
@@ -167,8 +168,8 @@ export default function Home() {
       <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">Community</p>
-            <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">Discovery</h1>
+            <p className="text-[10px] font-medium tracking-[0.25em] uppercase text-primary">{t("community")}</p>
+            <h1 className="text-[28px] font-semibold tracking-tight text-foreground leading-none mt-0.5">{t("discovery")}</h1>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -199,7 +200,7 @@ export default function Home() {
             <Search className="h-5 w-5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search trainers, gyms or yoga..."
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/60"
@@ -215,11 +216,12 @@ export default function Home() {
       {/* Feed */}
       <main className="relative z-10 mx-auto max-w-lg space-y-7 px-5 py-5">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="flex flex-col items-center gap-2">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-sm text-muted-foreground">{t("loading")}</p>
-            </div>
+          <div className="space-y-7">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="overflow-hidden rounded-[1.75rem] ios-shadow">
+                <Skeleton className="h-[420px] w-full" />
+              </div>
+            ))}
           </div>
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-16">
@@ -285,6 +287,24 @@ export default function Home() {
           </div>
         )}
       </main>
+
+      <footer className="relative z-10 py-6 pb-28 flex flex-col items-center gap-2">
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={() => navigate("/privacy")}
+            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+          >
+            {t("privacyPolicyLabel")}
+          </button>
+          <button
+            onClick={() => navigate("/terms")}
+            className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground transition-colors"
+          >
+            {t("termsAndConditionsLabel")}
+          </button>
+        </div>
+        <p className="text-[11px] text-muted-foreground/60">{t("allRightsReserved")}</p>
+      </footer>
 
       <BottomNav />
       <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />

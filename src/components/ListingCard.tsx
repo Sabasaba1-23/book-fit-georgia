@@ -96,17 +96,19 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
-
-  const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
-  const spotsLeft = listing.max_spots - (listing.booked_spots || 0);
-  const date = new Date(listing.scheduled_at);
-  const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
-
   const [booking, setBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
+
+  // Guard against null partner data (e.g. deleted partner or missing join)
+  if (!listing.partner) return null;
+
+  const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
+  const spotsLeft = listing.max_spots - (listing.booked_spots || 0);
+  const date = new Date(listing.scheduled_at);
+  const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -131,7 +133,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
         stripe_payment_id: `demo_${method}_${Date.now()}`,
       }).select("id").single();
       if (error) {
-        toast({ title: "Booking failed", description: error.message, variant: "destructive" });
+        const msg = error.code === "23505" 
+          ? "You've already booked this session." 
+          : "Booking failed. Please try again.";
+        toast({ title: msg, variant: "destructive" });
       } else {
         setShowPayment(false);
         setConfirmedBookingId(data.id);
@@ -168,13 +173,67 @@ export default function ListingCard({ listing }: ListingCardProps) {
     setBookmarking(false);
   };
 
-  const handleAsk = (e: React.MouseEvent) => {
+  const handleAsk = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
       toast({ title: t("loginToChat"), variant: "destructive" });
       navigate("/auth");
       return;
     }
+
+    // Find or create a chat thread with this partner
+    const partnerId = listing.partner_id || listing.partner?.id;
+    if (!partnerId) return;
+
+    const { data: partner } = await supabase
+      .from("partner_profiles")
+      .select("user_id")
+      .eq("id", partnerId)
+      .maybeSingle();
+
+    if (!partner) {
+      toast({ title: "Could not find trainer", variant: "destructive" });
+      return;
+    }
+
+    // Check for existing thread between user and partner for this listing
+    const { data: myParticipations } = await supabase
+      .from("conversation_participants")
+      .select("thread_id")
+      .eq("user_id", user.id);
+
+    if (myParticipations && myParticipations.length > 0) {
+      const threadIds = myParticipations.map((p) => p.thread_id);
+      const { data: partnerInThreads } = await supabase
+        .from("conversation_participants")
+        .select("thread_id")
+        .eq("user_id", partner.user_id)
+        .in("thread_id", threadIds);
+
+      if (partnerInThreads && partnerInThreads.length > 0) {
+        // Found shared thread — navigate to messages
+        navigate("/messages");
+        return;
+      }
+    }
+
+    // Create new thread
+    const { data: thread, error: threadError } = await supabase
+      .from("conversation_threads")
+      .insert({ listing_id: listing.id })
+      .select("id")
+      .single();
+
+    if (threadError || !thread) {
+      toast({ title: "Failed to create chat", variant: "destructive" });
+      return;
+    }
+
+    await supabase.from("conversation_participants").insert([
+      { thread_id: thread.id, user_id: user.id },
+      { thread_id: thread.id, user_id: partner.user_id },
+    ]);
+
     navigate("/messages");
   };
 
@@ -236,7 +295,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </span>
             {listing.max_spots > 1 && (
               <span className="text-[12px] font-medium text-white/80">
-                • {spotsLeft} SPOTS LEFT
+                • {spotsLeft} {t("spotsLeftLabel")}
               </span>
             )}
           </div>
@@ -258,7 +317,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
           <div className="flex items-end justify-between">
             <div>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">Starting at</p>
+              <p className="text-[10px] font-medium uppercase tracking-widest text-white/60">{t("startingAtLabel")}</p>
               <p className="text-[34px] font-semibold text-white leading-none">{listing.price_gel}₾</p>
             </div>
             <button
@@ -268,7 +327,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
               }}
               className="rounded-full bg-primary px-6 py-3 text-[13px] font-semibold uppercase tracking-wider text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:scale-95 shadow-lg"
             >
-              Book Now
+              {t("bookNowBtn")}
             </button>
           </div>
         </div>
@@ -282,7 +341,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-3xl font-extrabold text-foreground">{listing.price_gel}₾</p>
-                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">Per Class</p>
+                <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">{t("perClassLabel")}</p>
               </div>
               <button
                 onClick={(e) => {
@@ -300,7 +359,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <div className="flex gap-2.5 px-6 py-4 overflow-x-auto hide-scrollbar">
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <Clock className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">{listing.duration_minutes} mins</span>
+              <span className="text-[13px] font-semibold text-foreground">{listing.duration_minutes} {t("mins")}</span>
             </div>
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <BarChart3 className="h-4 w-4 text-primary" />
@@ -308,13 +367,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </div>
             <div className="flex items-center gap-2 rounded-full bg-muted/50 px-4 py-2.5 shrink-0">
               <MapPin className="h-4 w-4 text-primary" />
-              <span className="text-[13px] font-semibold text-foreground">Studio</span>
+              <span className="text-[13px] font-semibold text-foreground">{t("studio")}</span>
             </div>
           </div>
 
           {/* The Experience — more breathing room */}
           <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">The Experience</h4>
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("theExperienceLabel")}</h4>
             <p className="text-[15px] leading-[1.7] text-foreground/80">{description}</p>
           </div>
 
@@ -351,7 +410,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
           {/* What to bring — better spacing */}
           <div className="px-6 pb-5">
-            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">What to bring</h4>
+            <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("whatToBringLabel")}</h4>
             <div className="flex flex-wrap gap-2.5">
               {equipment.map((item) => (
                 <div key={item} className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5">
@@ -375,14 +434,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
               className="flex flex-[0.3] items-center justify-center gap-2 rounded-full border-2 border-foreground/15 bg-transparent py-3.5 text-[13px] font-bold text-foreground transition-all hover:border-foreground/30 active:scale-95"
             >
               <MessageCircle className="h-4 w-4 text-primary" />
-              Ask
+              {t("askBtn")}
             </button>
             <button
               onClick={handleBookClick}
               className="relative flex flex-[0.5] items-center justify-center gap-2 rounded-full bg-primary py-3.5 text-[13px] font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
             >
               <Calendar className="h-4 w-4" />
-              {booking ? "Booking..." : `${t("book")} Now`}
+              {booking ? t("booking") : `${t("book")} Now`}
               <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl" />
             </button>
           </div>

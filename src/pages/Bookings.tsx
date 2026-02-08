@@ -8,7 +8,8 @@ import BookingTicket from "@/components/BookingTicket";
 import SessionConfirmationCard from "@/components/SessionConfirmationCard";
 import ReviewForm from "@/components/ReviewForm";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
 import { format, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
@@ -55,6 +56,7 @@ interface ReviewData {
   rating: number;
   review_text: string | null;
   tags: string[] | null;
+  photos: string[] | null;
 }
 
 function getTimeLabel(scheduledAt: string): { text: string; urgent: boolean } {
@@ -109,7 +111,7 @@ export default function Bookings() {
         .select("id, booking_id, user_status, partner_status"),
       supabase
         .from("reviews")
-        .select("booking_id, reviewer_role, rating, review_text, tags")
+        .select("booking_id, reviewer_role, rating, review_text, tags, photos")
         .eq("reviewer_id", user!.id),
     ]);
 
@@ -119,17 +121,22 @@ export default function Bookings() {
     setLoading(false);
   }
 
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
   async function handleCancel(bookingId: string) {
+    if (!window.confirm(t("confirmCancelBooking"))) return;
+    setCancellingId(bookingId);
     const { error } = await supabase
       .from("bookings")
       .update({ booking_status: "cancelled" })
       .eq("id", bookingId);
     if (error) {
-      toast({ title: "Failed to cancel booking", variant: "destructive" });
+      toast({ title: t("failedToCancel"), description: "Please try again later.", variant: "destructive" });
     } else {
-      toast({ title: "Booking cancelled" });
+      toast({ title: t("bookingCancelled") });
       fetchAll();
     }
+    setCancellingId(null);
   }
 
   async function handleChat(booking: BookingWithListing) {
@@ -220,9 +227,17 @@ export default function Bookings() {
     <div className="relative min-h-screen bg-background pb-24">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      <header className="relative z-40 px-5 pt-5 pb-1">
+      <header className="relative z-40 px-5 pb-1" style={{ paddingTop: 'max(1.25rem, env(safe-area-inset-top, 1.25rem))' }}>
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-extrabold text-foreground">My Bookings</h1>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/")}
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95"
+            >
+              <ArrowLeft className="h-5 w-5 text-foreground" />
+            </button>
+            <h1 className="text-2xl font-extrabold text-foreground">{t("myBookings")}</h1>
+          </div>
           <button className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95">
             <Bell className="h-5 w-5 text-foreground" />
           </button>
@@ -237,7 +252,7 @@ export default function Bookings() {
               tab === "upcoming" ? "bg-card text-primary ios-shadow" : "text-muted-foreground"
             }`}
           >
-            Upcoming
+            {t("upcoming")}
             {upcoming.length > 0 && (
               <span className="ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
                 {upcoming.length}
@@ -250,18 +265,29 @@ export default function Bookings() {
               tab === "history" ? "bg-card text-foreground ios-shadow" : "text-muted-foreground"
             }`}
           >
-            History
+            {t("history")}
           </button>
         </div>
       </div>
 
       <main className="relative z-10 mx-auto max-w-lg space-y-4 px-5 py-2">
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="flex flex-col items-center gap-2">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              <p className="text-sm text-muted-foreground">{t("loading")}</p>
-            </div>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-[1.5rem] bg-card ios-shadow p-5">
+                <div className="flex items-start gap-3 mb-3">
+                  <Skeleton className="h-12 w-12 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-4 w-28" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : displayBookings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
@@ -269,14 +295,14 @@ export default function Bookings() {
               <Calendar className="h-7 w-7 text-muted-foreground" />
             </div>
             <p className="text-muted-foreground font-medium">
-              {tab === "upcoming" ? "No upcoming bookings" : "No past bookings"}
+              {tab === "upcoming" ? t("noUpcomingBookings") : t("noPastBookings")}
             </p>
             {tab === "upcoming" && (
               <button
                 onClick={() => navigate("/")}
                 className="mt-3 rounded-full bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-all hover:bg-primary/90 active:scale-95"
               >
-                Explore Trainings
+                {t("exploreTrainingsBtn")}
               </button>
             )}
           </div>
@@ -322,13 +348,13 @@ export default function Bookings() {
                     }`}
                   >
                     {isCancelled
-                      ? "Cancelled"
+                      ? t("cancelled")
                       : isDisputed
-                        ? "Disputed"
+                        ? t("disputed")
                         : isCompleted
-                          ? "✓ Completed"
+                          ? `✓ ${t("completed")}`
                           : sessionEnded
-                            ? "Awaiting Confirmation"
+                            ? t("awaitingConfirmation")
                             : (
                               <>
                                 {urgent && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
@@ -377,6 +403,19 @@ export default function Bookings() {
                   </div>
                 </div>
 
+                {/* Chat button for awaiting confirmation */}
+                {needsConfirmation && (
+                  <div className="flex gap-2.5 px-5 pb-3">
+                    <button
+                      onClick={() => handleChat(booking)}
+                      className="flex items-center justify-center gap-1.5 rounded-full border-2 border-primary/30 bg-transparent px-4 py-2 text-xs font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      {t("chatBtn")}
+                    </button>
+                  </div>
+                )}
+
                 {/* Confirmation card for ended sessions */}
                 {needsConfirmation && (
                   <div className="px-5 pb-3">
@@ -395,6 +434,8 @@ export default function Bookings() {
                     <ReviewForm
                       bookingId={booking.id}
                       role="user"
+                      partnerName={partner.display_name}
+                      sessionTitle={title}
                       onSubmitted={fetchAll}
                     />
                   </div>
@@ -417,23 +458,24 @@ export default function Bookings() {
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => handleCancel(booking.id)}
-                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-destructive hover:text-destructive active:scale-95"
+                      disabled={cancellingId === booking.id}
+                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-destructive hover:text-destructive active:scale-95 disabled:opacity-50"
                     >
-                      Cancel
+                      {cancellingId === booking.id ? "..." : t("cancelBtn")}
                     </button>
                     <button
                       onClick={() => handleChat(booking)}
                       className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full border-2 border-primary/30 bg-transparent py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
                     >
                       <MessageCircle className="h-3.5 w-3.5" />
-                      Chat
+                      {t("chatBtn")}
                     </button>
                     <button
                       onClick={() => setTicketBooking(booking)}
                       className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full bg-primary py-2.5 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
                     >
                       <Ticket className="h-3.5 w-3.5" />
-                      Ticket
+                      {t("ticketBtn")}
                     </button>
                   </div>
                 )}
@@ -443,16 +485,23 @@ export default function Bookings() {
                   <div className="flex gap-2.5 px-5 pb-4">
                     <button
                       onClick={() => setTicketBooking(booking)}
-                      className="flex flex-[0.5] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                      className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
                     >
                       <Ticket className="h-3.5 w-3.5" />
-                      View Receipt
+                      {t("viewReceiptBtn")}
+                    </button>
+                    <button
+                      onClick={() => handleChat(booking)}
+                      className="flex flex-[0.3] items-center justify-center gap-1.5 rounded-full border-2 border-primary/30 bg-transparent py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/5 active:scale-95"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      {t("chatBtn")}
                     </button>
                     <button
                       onClick={() => navigate("/")}
-                      className="flex flex-[0.5] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                      className="flex flex-[0.35] items-center justify-center gap-1.5 rounded-full border-2 border-border bg-transparent py-2.5 text-xs font-bold text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
                     >
-                      Book Again
+                      {t("bookAgainBtn")}
                     </button>
                   </div>
                 )}

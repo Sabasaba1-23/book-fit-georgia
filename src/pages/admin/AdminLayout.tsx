@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useAuth } from "@/contexts/AuthContext";
+import AdminLogin from "./AdminLogin";
 import {
   LayoutDashboard,
   Users,
@@ -12,6 +13,7 @@ import {
   Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 const bottomTabs = [
   { label: "Queue", icon: LayoutDashboard, to: "/admin" },
@@ -23,11 +25,12 @@ const bottomTabs = [
 
 export default function AdminLayout() {
   const { isAdmin, loading } = useAdminCheck();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
-  if (loading) {
+  if (loading && !justLoggedIn) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -35,8 +38,12 @@ export default function AdminLayout() {
     );
   }
 
-  if (!isAdmin) {
-    return <Navigate to="/" replace />;
+  if (!user || (!isAdmin && !justLoggedIn)) {
+    return <AdminLogin onSuccess={() => setJustLoggedIn(true)} />;
+  }
+
+  if (!isAdmin && !loading) {
+    return <AdminLogin onSuccess={() => setJustLoggedIn(true)} />;
   }
 
   const isListingDetail = location.pathname.includes("/admin/listings/");

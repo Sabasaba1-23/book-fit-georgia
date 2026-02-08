@@ -13,6 +13,8 @@ interface PartnerProfile {
   sports: string[] | null;
   location: string | null;
   languages: string[] | null;
+  phone_number: string | null;
+  verification_status: string;
 }
 
 export function usePartnerProfile() {

@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import BottomNav from "@/components/BottomNav";
 import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
+import DeleteAccountDialog from "@/components/DeleteAccountDialog";
 import {
   Pencil,
   CreditCard,
@@ -18,6 +20,7 @@ import {
   Plus,
   X,
   Camera,
+  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -69,6 +72,7 @@ export default function Profile() {
   const [showPayment, setShowPayment] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -214,8 +218,23 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="relative min-h-screen bg-background pb-24">
+        <div className="flex flex-col items-center pt-10 pb-4">
+          <Skeleton className="h-28 w-28 rounded-full" />
+          <Skeleton className="mt-3 h-6 w-32" />
+          <Skeleton className="mt-2 h-4 w-24" />
+        </div>
+        <div className="mx-5 mb-6">
+          <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex-1 py-4 flex flex-col items-center gap-2">
+                <Skeleton className="h-6 w-10" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <BottomNav />
       </div>
     );
   }
@@ -226,7 +245,7 @@ export default function Profile() {
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-secondary/[0.06]" />
 
       {/* Avatar section */}
-      <div className="relative z-10 flex flex-col items-center pt-10 pb-4">
+      <div className="relative z-10 flex flex-col items-center pb-4" style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top, 2.5rem))' }}>
         <div className="relative">
           <div className="rounded-full p-[3px] bg-gradient-to-br from-primary to-secondary">
             <Avatar className="h-28 w-28 border-4 border-background">
@@ -264,10 +283,10 @@ export default function Profile() {
               onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
             />
             <button onClick={handleSaveName} className="text-xs font-bold text-primary">
-              Save
+              {t("saveBtnLabel")}
             </button>
             <button onClick={() => setEditingName(false)} className="text-xs text-muted-foreground">
-              Cancel
+              {t("cancelLabel")}
             </button>
           </div>
         ) : (
@@ -275,27 +294,27 @@ export default function Profile() {
             onClick={() => setEditingName(true)}
             className="mt-3 flex items-center gap-1.5 group"
           >
-            <h1 className="text-2xl font-extrabold text-foreground">{displayName}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
             <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
         )}
-        <p className="text-sm text-muted-foreground">Member since {memberSince}</p>
+        <p className="text-sm text-muted-foreground">{t("memberSince")} {memberSince}</p>
       </div>
 
       {/* Stats card */}
       <div className="relative z-10 mx-5 mb-6">
-        <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
+          <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
           <div className="flex-1 py-4 text-center">
-            <p className="text-2xl font-extrabold text-primary">{stats.sessions}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Sessions</p>
+            <p className="text-2xl font-bold text-primary">{stats.sessions}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsSessions")}</p>
           </div>
           <div className="flex-1 py-4 text-center">
-            <p className="text-2xl font-extrabold text-foreground">{stats.studios}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Studios</p>
+            <p className="text-2xl font-bold text-foreground">{stats.studios}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsStudios")}</p>
           </div>
           <div className="flex-1 py-4 text-center">
-            <p className="text-2xl font-extrabold text-primary">{stats.hours}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Hours</p>
+            <p className="text-2xl font-bold text-primary">{stats.hours}</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsHours")}</p>
           </div>
         </div>
       </div>
@@ -303,14 +322,14 @@ export default function Profile() {
       {/* Bookmarked */}
       <div className="relative z-10 px-5 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-foreground">Bookmarked</h2>
+          <h2 className="text-lg font-bold text-foreground">{t("bookmarkedSection")}</h2>
           {bookmarks.length > 4 && (
-            <button className="text-sm font-bold text-primary">View all</button>
+            <button className="text-sm font-bold text-primary">{t("viewAllLabel")}</button>
           )}
         </div>
         {bookmarks.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No bookmarked trainers or gyms yet. Bookmark them from their profiles!
+            {t("noBookmarkedTrainers")}
           </p>
         ) : (
           <div className="flex gap-4 overflow-x-auto hide-scrollbar -mx-1 px-1 pb-1">
@@ -341,7 +360,7 @@ export default function Profile() {
 
       {/* Fitness Interests */}
       <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">Fitness Interests</h2>
+        <h2 className="text-lg font-bold text-foreground mb-3">{t("fitnessInterests")}</h2>
         <div className="flex flex-wrap gap-2">
           {interests.map((tag) => (
             <button
@@ -382,25 +401,31 @@ export default function Profile() {
 
       {/* Account Settings */}
       <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">Account Settings</h2>
+        <h2 className="text-lg font-bold text-foreground mb-3">{t("accountSettings")}</h2>
         <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border">
           <SettingsRow
             icon={<CreditCard className="h-5 w-5" />}
             iconBg="bg-primary/10 text-primary"
-            label="Payment Methods"
+            label={t("paymentMethods")}
             onClick={() => setShowPayment(true)}
           />
           <SettingsRow
             icon={<Bell className="h-5 w-5" />}
             iconBg="bg-blue-500/10 text-blue-500"
-            label="Notifications"
+            label={t("notifications")}
             onClick={() => setShowNotifications(true)}
           />
           <SettingsRow
             icon={<HelpCircle className="h-5 w-5" />}
             iconBg="bg-emerald-500/10 text-emerald-500"
-            label="Help & Support"
+            label={t("helpSupport")}
             onClick={() => setShowHelp(true)}
+          />
+          <SettingsRow
+            icon={<Trash2 className="h-5 w-5" />}
+            iconBg="bg-destructive/10 text-destructive"
+            label={t("deleteAccount")}
+            onClick={() => setShowDeleteAccount(true)}
           />
         </div>
       </div>
@@ -409,6 +434,7 @@ export default function Profile() {
       <PaymentMethodsPanel open={showPayment} onOpenChange={setShowPayment} />
       <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
       <HelpSupportPanel open={showHelp} onOpenChange={setShowHelp} />
+      <DeleteAccountDialog open={showDeleteAccount} onOpenChange={setShowDeleteAccount} />
 
       {/* Language + Log out */}
       <div className="relative z-10 px-5 mb-6 space-y-3">
@@ -428,6 +454,14 @@ export default function Profile() {
             }`}
           >
             ქართული
+          </button>
+          <button
+            onClick={() => setLang("ru")}
+            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
+              lang === "ru" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+            }`}
+          >
+            Русский
           </button>
         </div>
 

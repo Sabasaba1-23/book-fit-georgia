@@ -1,15 +1,57 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronLeft, Eye, EyeOff, Handshake, ArrowRight, User, Building2, Mail, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ChevronLeft, Eye, EyeOff, Handshake, ArrowRight, User, Building2, Mail, BadgeCheck, ShieldCheck, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type AuthMode = "login" | "register-choice" | "register-user" | "register-partner" | "forgot-password";
+
+function ContactPopover() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div className="relative inline-block" ref={ref}>
+      <button type="button" onClick={() => setOpen(!open)} className="underline text-primary">
+        Contact Us
+      </button>
+      {open && (
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-48 rounded-2xl bg-card border border-border shadow-lg p-3 space-y-2 animate-in fade-in zoom-in-95 duration-150">
+          <a
+            href="mailto:support@fitbook.my"
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <Mail className="h-3.5 w-3.5 text-primary" />
+            Email Us
+          </a>
+          <a
+            href="https://wa.me/995511102916"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
+          >
+            <MessageCircle className="h-3.5 w-3.5 text-green-500" />
+            WhatsApp
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Auth() {
   const { t } = useLanguage();
@@ -20,6 +62,7 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,9 +71,20 @@ export default function Auth() {
   const [partnerType, setPartnerType] = useState<"individual" | "gym">("individual");
   const [partnerName, setPartnerName] = useState("");
   const [partnerEmail, setPartnerEmail] = useState("");
+  const [partnerPhone, setPartnerPhone] = useState("");
 
   useEffect(() => {
-    if (user) navigate("/", { replace: true });
+    if (!user) return;
+    // Check if user is a partner and redirect accordingly
+    supabase
+      .rpc("has_role", { _user_id: user.id, _role: "partner" as any })
+      .then(({ data: isPartner }) => {
+        if (isPartner) {
+          navigate("/partner/dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      });
   }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -38,24 +92,45 @@ export default function Auth() {
     setError("");
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
+    if (error) {
+      if (error.message === "Invalid login credentials") {
+        setError("Incorrect email or password. Please try again.");
+      } else if (error.message.includes("Email not confirmed")) {
+        setError("Please check your email and confirm your account first.");
+      } else {
+        setError(error.message);
+      }
+    }
     setLoading(false);
   };
 
   const handleRegisterUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    if (!phoneNumber.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName },
+        data: { full_name: fullName, phone_number: phoneNumber.trim() },
       },
     });
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      if (error.message.includes("already registered")) {
+        setError("This email is already registered. Try logging in instead.");
+      } else {
+        setError(error.message);
+      }
+    } else {
       toast({
         title: "Check your email",
         description: "We sent you a confirmation link to verify your account.",
@@ -76,19 +151,29 @@ export default function Auth() {
       setError("Please enter your professional email.");
       return;
     }
+    if (!partnerPhone.trim()) {
+      setError("Please enter your phone number.");
+      return;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
 
     setLoading(true);
 
     // Sign up the user with partner metadata
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    // Sign up - the handle_new_user trigger will create partner profile & role
+    const { error: signUpError } = await supabase.auth.signUp({
       email: partnerEmail,
-      password: password || undefined as any, // will be set below
+      password,
       options: {
         emailRedirectTo: window.location.origin,
         data: {
-          full_name: partnerName,
+          full_name: partnerName.trim(),
           is_partner: true,
           partner_type: partnerType,
+          phone_number: partnerPhone.trim(),
         },
       },
     });
@@ -97,31 +182,6 @@ export default function Auth() {
       setError(signUpError.message);
       setLoading(false);
       return;
-    }
-
-    // If signup succeeded and we have a user, create partner profile
-    if (signUpData.user) {
-      const { error: profileError } = await supabase.from("partner_profiles").insert({
-        user_id: signUpData.user.id,
-        display_name: partnerName.trim(),
-        partner_type: partnerType,
-        approved: false,
-      });
-
-      if (profileError) {
-        // Profile creation might fail if trigger already created it or RLS
-        console.warn("Partner profile creation note:", profileError.message);
-      }
-
-      // Add partner role
-      const { error: roleError } = await supabase.from("user_roles").insert({
-        user_id: signUpData.user.id,
-        role: "partner" as any,
-      });
-
-      if (roleError) {
-        console.warn("Role assignment note:", roleError.message);
-      }
     }
 
     toast({
@@ -175,7 +235,7 @@ export default function Auth() {
       {mode === "login" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -226,24 +286,31 @@ export default function Auth() {
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <div className="flex justify-center gap-4">
-              <button onClick={handleGoogleSignIn} className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card shadow-sm">
-                <svg className="h-5 w-5" viewBox="0 0 24 24">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-              </button>
-              <button className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card shadow-sm">
-                <span className="text-sm font-bold text-foreground">iOS</span>
-              </button>
+            <button onClick={handleGoogleSignIn} className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-border bg-card text-base font-semibold text-foreground shadow-sm transition-colors hover:bg-accent">
+              <svg className="h-5 w-5" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="mt-4 flex items-center justify-center gap-1.5 flex-wrap text-[11px] text-muted-foreground">
+              <span>By continuing, you agree to our</span>
+              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms</button>
+              <span>&</span>
+              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy</button>
+              <span>·</span>
+              <ContactPopover />
             </div>
 
-            <p className="mt-6 pb-8 text-center text-sm text-muted-foreground">
+            <p className="mt-4 text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
               <button type="button" onClick={() => setMode("register-choice")} className="font-semibold text-primary">{t("signUp")}</button>
             </p>
+
+            <p className="mt-4 pb-8 text-center text-[11px] text-muted-foreground/60">© 2026 Fitbook Georgia. All rights reserved.</p>
           </div>
         </div>
       )}
@@ -251,7 +318,7 @@ export default function Auth() {
       {/* ─── FORGOT PASSWORD ─── */}
       {mode === "forgot-password" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -284,7 +351,7 @@ export default function Auth() {
       {/* ─── REGISTER CHOICE ─── */}
       {mode === "register-choice" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -316,7 +383,7 @@ export default function Auth() {
       {/* ─── REGISTER USER ─── */}
       {mode === "register-user" && (
         <div className="relative z-10 flex flex-1 flex-col">
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -334,6 +401,10 @@ export default function Auth() {
                 <Input placeholder="Enter your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
+                <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+              </div>
+              <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
                 <Input placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
@@ -347,6 +418,12 @@ export default function Auth() {
                 </div>
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
+              <p className="text-xs text-muted-foreground text-center">
+                By signing up, you agree to our{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
+                {" "}and{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+              </p>
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
                 {loading ? t("loading") : t("signUp")}
               </Button>
@@ -363,7 +440,7 @@ export default function Auth() {
       {mode === "register-partner" && (
         <div className="relative z-10 flex flex-1 flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 pt-14 pb-2">
+          <div className="flex items-center justify-between px-5 pb-2" style={{ paddingTop: 'max(3.5rem, env(safe-area-inset-top, 3.5rem))' }}>
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
@@ -454,6 +531,23 @@ export default function Auth() {
                 </div>
               </div>
 
+              {/* Phone Number */}
+              <div>
+                <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
+                  Phone Number <span className="text-destructive">*</span>
+                </label>
+                <div className="relative">
+                  <Input
+                    placeholder="+995 5XX XXX XXX"
+                    type="tel"
+                    value={partnerPhone}
+                    onChange={(e) => setPartnerPhone(e.target.value)}
+                    required
+                    className="h-14 rounded-2xl border-0 bg-muted/60 px-4 pr-12 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/50"
+                  />
+                </div>
+              </div>
+
               {/* Password */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
@@ -489,6 +583,13 @@ export default function Auth() {
               </div>
 
               {error && <p className="text-sm text-destructive">{error}</p>}
+
+              <p className="text-xs text-muted-foreground text-center">
+                By creating a partner account, you agree to our{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
+                {" "}and{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+              </p>
 
               {/* Submit */}
               <Button

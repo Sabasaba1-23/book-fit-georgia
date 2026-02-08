@@ -4,12 +4,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePartnerProfile } from "@/hooks/usePartnerProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, Settings } from "lucide-react";
+import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle, Camera, LogOut, ExternalLink, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
+import VerificationStatusCard from "@/components/verification/VerificationStatusCard";
+import VerificationSheet from "@/components/verification/VerificationSheet";
+import VerificationNudgeDialog from "@/components/verification/VerificationNudgeDialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import PartnerScheduleTab from "@/components/PartnerScheduleTab";
+import PartnerMessagesTab from "@/components/PartnerMessagesTab";
+import PartnerProfileTab from "@/components/PartnerProfileTab";
 
 interface PartnerListing {
   id: string;
@@ -32,22 +38,20 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }>
 };
 
 const SPORT_COLORS: Record<string, string> = {
-  Yoga: "bg-purple-100",
-  HIIT: "bg-orange-100",
-  Boxing: "bg-red-100",
-  Tennis: "bg-green-100",
-  Pilates: "bg-pink-100",
-  Swimming: "bg-blue-100",
-  CrossFit: "bg-amber-100",
-  MMA: "bg-rose-100",
-  Weightlifting: "bg-teal-100",
-  "Personal Trainer": "bg-indigo-100",
+  Yoga: "bg-purple-100", HIIT: "bg-orange-100", Boxing: "bg-red-100",
+  Tennis: "bg-green-100", Pilates: "bg-pink-100", Swimming: "bg-blue-100",
+  CrossFit: "bg-amber-100", MMA: "bg-rose-100", Weightlifting: "bg-teal-100",
+  "Personal Trainer": "bg-indigo-100", Running: "bg-lime-100",
+  Cycling: "bg-cyan-100", Football: "bg-emerald-100", Basketball: "bg-orange-100",
+  Kickboxing: "bg-red-100", "Brazilian Jiu-Jitsu": "bg-violet-100",
+  Zumba: "bg-fuchsia-100", "Dance Fitness": "bg-pink-100",
+  "Rock Climbing": "bg-stone-100", Gymnastics: "bg-sky-100",
 };
 
-type Tab = "dashboard" | "schedule" | "insights" | "settings";
+type Tab = "dashboard" | "schedule" | "messages" | "insights" | "profile";
 
 export default function PartnerDashboard() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading, refetch: refetchProfile } = usePartnerProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -55,6 +59,7 @@ export default function PartnerDashboard() {
   const [listings, setListings] = useState<PartnerListing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [showVerification, setShowVerification] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [showAll, setShowAll] = useState(false);
 
@@ -147,10 +152,11 @@ export default function PartnerDashboard() {
   const displayListings = showAll ? listings : listings.slice(0, 5);
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+    { key: "dashboard", label: "Home", icon: <LayoutDashboard className="h-5 w-5" /> },
     { key: "schedule", label: "Schedule", icon: <CalendarDays className="h-5 w-5" /> },
+    { key: "messages", label: "Messages", icon: <MessageCircle className="h-5 w-5" /> },
     { key: "insights", label: "Insights", icon: <BarChart3 className="h-5 w-5" /> },
-    { key: "settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
+    { key: "profile", label: "Profile", icon: <User className="h-5 w-5" /> },
   ];
 
   return (
@@ -160,7 +166,7 @@ export default function PartnerDashboard() {
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 pt-6 pb-2">
+      <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}>
         <div className="flex items-center gap-3">
           <Avatar className="h-14 w-14 border-2 border-primary/20">
             {profile.logo_url ? <AvatarImage src={profile.logo_url} /> : null}
@@ -180,6 +186,13 @@ export default function PartnerDashboard() {
 
       {activeTab === "dashboard" && (
         <div className="relative z-10 px-5 pt-4 space-y-6">
+          {/* Verification Status Card */}
+          <VerificationStatusCard
+            verificationStatus={profile.verification_status || "unverified"}
+            partnerType={profile.partner_type as "individual" | "gym"}
+            onGetVerified={() => setShowVerification(true)}
+          />
+
           {/* Create New Listing button */}
           <button
             onClick={() => setShowCreate(true)}
@@ -293,28 +306,14 @@ export default function PartnerDashboard() {
       {activeTab === "schedule" && (
         <div className="relative z-10 px-5 pt-4">
           <h2 className="text-lg font-bold text-foreground mb-4">Schedule</h2>
-          {listings.filter((l) => l.status === "approved").length === 0 ? (
-            <div className="rounded-2xl bg-muted/40 py-10 text-center">
-              <p className="text-sm text-muted-foreground">No approved sessions yet.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {listings
-                .filter((l) => l.status === "approved")
-                .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
-                .map((l) => (
-                  <div key={l.id} className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card p-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-foreground">{l.title_en}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {format(new Date(l.scheduled_at), "EEE, MMM d · hh:mm a")}
-                      </p>
-                    </div>
-                    <span className="text-sm font-bold text-primary">{Number(l.price_gel)}₾</span>
-                  </div>
-                ))}
-            </div>
-          )}
+          <PartnerScheduleTab partnerId={profile.id} />
+        </div>
+      )}
+
+      {activeTab === "messages" && (
+        <div className="relative z-10 px-5 pt-4">
+          <h2 className="text-lg font-bold text-foreground mb-4">Messages</h2>
+          <PartnerMessagesTab partnerUserId={user!.id} />
         </div>
       )}
 
@@ -337,32 +336,16 @@ export default function PartnerDashboard() {
         </div>
       )}
 
-      {activeTab === "settings" && (
-        <div className="relative z-10 px-5 pt-4">
-          <h2 className="text-lg font-bold text-foreground mb-4">Settings</h2>
-          <div className="space-y-3">
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Display Name</p>
-              <p className="text-sm text-muted-foreground">{profile.display_name}</p>
-            </div>
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Partner Type</p>
-              <p className="text-sm text-muted-foreground capitalize">{profile.partner_type}</p>
-            </div>
-            <div className="rounded-2xl bg-card border border-border/50 p-4">
-              <p className="text-sm font-bold text-foreground">Account Status</p>
-              <p className={cn("text-sm font-semibold", profile.approved ? "text-emerald-600" : "text-amber-600")}>
-                {profile.approved ? "Approved" : "Pending Approval"}
-              </p>
-            </div>
-            {profile.location && (
-              <div className="rounded-2xl bg-card border border-border/50 p-4">
-                <p className="text-sm font-bold text-foreground">Location</p>
-                <p className="text-sm text-muted-foreground">{profile.location}</p>
-              </div>
-            )}
-          </div>
-        </div>
+      {activeTab === "profile" && (
+        <PartnerProfileTab
+          profile={profile}
+          user={user!}
+          onRefetch={refetchProfile}
+          onSignOut={async () => {
+            await signOut();
+            navigate("/auth", { replace: true });
+          }}
+        />
       )}
 
       {/* Create Listing Sheet */}
@@ -371,6 +354,23 @@ export default function PartnerDashboard() {
         onOpenChange={setShowCreate}
         partnerId={profile.id}
         onCreated={fetchListings}
+      />
+
+      {/* Verification Sheet */}
+      <VerificationSheet
+        open={showVerification}
+        onOpenChange={setShowVerification}
+        partnerId={profile.id}
+        partnerType={profile.partner_type as "individual" | "gym"}
+        displayName={profile.display_name}
+        existingBio={profile.bio}
+        onComplete={() => refetchProfile()}
+      />
+
+      {/* Soft Nudge Dialog */}
+      <VerificationNudgeDialog
+        verificationStatus={profile.verification_status || "unverified"}
+        onGetVerified={() => setShowVerification(true)}
       />
 
       {/* Bottom Nav */}

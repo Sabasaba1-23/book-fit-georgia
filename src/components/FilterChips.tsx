@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { translateSport } from "@/i18n/sportTranslations";
 
 interface FilterChipsProps {
   options: string[];
@@ -7,6 +9,7 @@ interface FilterChipsProps {
 }
 
 export default function FilterChips({ options, active, onChange }: FilterChipsProps) {
+  const { lang } = useLanguage();
   return (
     <div className="hide-scrollbar relative z-30 flex gap-2.5 overflow-x-auto px-5 pb-2">
       {options.map((option) => (
@@ -20,7 +23,7 @@ export default function FilterChips({ options, active, onChange }: FilterChipsPr
               : "border border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground"
           )}
         >
-          {option.toUpperCase()}
+          {translateSport(option, lang).toUpperCase()}
         </button>
       ))}
     </div>

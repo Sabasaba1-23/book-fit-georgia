@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
-  { key: "home" as const, label: "EXPLORE", icon: Home, path: "/", requiresAuth: false },
-  { key: "bookings" as const, label: "BOOKINGS", icon: CalendarCheck, path: "/bookings", requiresAuth: true },
-  { key: "messages" as const, label: "CHAT", icon: MessageSquareMore, path: "/messages", requiresAuth: true },
-  { key: "profile" as const, label: "PROFILE", icon: User, path: "/profile", requiresAuth: true },
+  { key: "home" as const, labelKey: "navExplore" as const, icon: Home, path: "/", requiresAuth: false },
+  { key: "bookings" as const, labelKey: "navBookings" as const, icon: CalendarCheck, path: "/bookings", requiresAuth: true },
+  { key: "messages" as const, labelKey: "navChat" as const, icon: MessageSquareMore, path: "/messages", requiresAuth: true },
+  { key: "profile" as const, labelKey: "navProfile" as const, icon: User, path: "/profile", requiresAuth: true },
 ];
 
 export default function BottomNav() {
@@ -32,7 +32,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       <div className="glass-card mx-auto max-w-lg rounded-t-3xl border-t border-border/30">
         <div className="flex h-[76px] items-center justify-around px-4 pb-1">
-          {navItems.map(({ key, label, icon: Icon, path, requiresAuth }) => {
+        {navItems.map(({ key, labelKey, icon: Icon, path, requiresAuth }) => {
             const active = location.pathname === path;
             return (
               <button
@@ -55,7 +55,7 @@ export default function BottomNav() {
                     active ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  {label}
+                  {t(labelKey)}
                 </span>
               </button>
             );
