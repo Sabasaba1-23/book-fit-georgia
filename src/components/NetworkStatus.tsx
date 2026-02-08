@@ -36,7 +36,7 @@ export default function NetworkStatus() {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] flex items-center justify-center gap-2 bg-destructive px-4 py-2 text-destructive-foreground text-sm font-medium"
-      style={{ paddingTop: `calc(var(--safe-top, 0px) + 8px)` }}>
+      style={{ paddingTop: '8px' }}>
       <WifiOff className="h-4 w-4" />
       No internet connection
     </div>

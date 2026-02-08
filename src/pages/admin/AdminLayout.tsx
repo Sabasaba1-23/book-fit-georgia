@@ -61,7 +61,7 @@ export default function AdminLayout() {
 
       {/* Bottom Nav */}
       {!isListingDetail && (
-        <nav className="fixed inset-x-0 bottom-0 z-50 flex items-end justify-around border-t border-border/50 bg-background/90 backdrop-blur-xl px-2 pb-6 pt-2">
+        <nav className="fixed inset-x-0 bottom-0 z-50 flex items-end justify-around border-t border-border/50 bg-background/90 backdrop-blur-xl px-2 pt-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}>
           {bottomTabs.map((tab) => {
             const isActive =
               tab.to === "/admin"
