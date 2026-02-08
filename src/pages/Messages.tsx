@@ -295,7 +295,7 @@ export default function Messages() {
       <div className="flex h-screen flex-col bg-background">
         <header
           className="flex items-center gap-3 border-b border-border/50 px-4 py-3 bg-background/90 backdrop-blur-xl"
-          style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+          style={{ paddingTop: 'calc(var(--safe-top, 0px) + 0.75rem)' }}
         >
           <button
             onClick={() => { setActiveThread(null); setMessages([]); }}
@@ -463,7 +463,7 @@ export default function Messages() {
 
       <header
         className="relative z-40 px-5 pb-2"
-        style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top, 1.5rem))' }}
+        style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}
       >
         <h1 className="text-2xl font-extrabold text-foreground">{t("messages")}</h1>
       </header>
