@@ -29,7 +29,7 @@ export default function VerificationSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[95vh] rounded-t-3xl p-0">
+      <SheetContent side="bottom" className="h-[95vh] rounded-t-3xl p-0 [&>button[class*='absolute']]:hidden">
         {partnerType === "individual" ? (
           <TrainerVerificationFlow
             partnerId={partnerId}

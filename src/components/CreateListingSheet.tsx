@@ -159,7 +159,7 @@ export default function CreateListingSheet({
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
-      <SheetContent side="bottom" className="h-[95vh] rounded-t-[2rem] p-0 overflow-hidden border-0">
+      <SheetContent side="bottom" className="h-[95vh] rounded-t-[2rem] p-0 overflow-hidden border-0 [&>button[class*='absolute']]:hidden">
         <div className="flex h-full flex-col bg-background">
           {/* Header */}
           <header className="flex items-center justify-between px-5 pt-5 pb-2">
