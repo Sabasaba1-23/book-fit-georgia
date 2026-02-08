@@ -114,6 +114,7 @@
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
+    -webkit-overscroll-behavior: none;
     height: 100%;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
@@ -124,6 +125,7 @@
     overflow-x: hidden;
     /* Global safe-area top padding so nothing ever renders under the Dynamic Island / notch */
     padding-top: env(safe-area-inset-top, 0px);
+    background: hsl(var(--background));
   }
 
   /* Prevent zoom on input focus (iOS) */
