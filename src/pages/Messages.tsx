@@ -7,10 +7,16 @@ import BottomNav from "@/components/BottomNav";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useChatBookingStatus } from "@/hooks/useChatBookingStatus";
+import { containsContactInfo, getContactWarning } from "@/lib/contactDetection";
 import {
   ArrowLeft,
   Send,
   MessageCircle,
+  Shield,
+  CheckCircle2,
+  Info,
+  X,
 } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 
@@ -32,6 +38,8 @@ interface Message {
   sent_at: string;
 }
 
+const PRE_BOOKING_MSG_SOFT_LIMIT = 15;
+
 export default function Messages() {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -43,7 +51,13 @@ export default function Messages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [contactWarningVisible, setContactWarningVisible] = useState(false);
+  const [preBookingBannerDismissed, setPreBookingBannerDismissed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { hasConfirmedBooking, loading: bookingLoading } = useChatBookingStatus(
+    activeThread?.id || null
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -195,6 +209,8 @@ export default function Messages() {
   useEffect(() => {
     if (!activeThread) return;
     fetchMessages(activeThread.id);
+    setPreBookingBannerDismissed(false);
+    setContactWarningVisible(false);
 
     const channel = supabase
       .channel(`messages-${activeThread.id}`)
@@ -232,6 +248,13 @@ export default function Messages() {
 
   async function handleSend() {
     if (!newMessage.trim() || !activeThread || !user || sending) return;
+
+    // Check for contact info and show gentle warning (don't block)
+    if (!hasConfirmedBooking && containsContactInfo(newMessage)) {
+      setContactWarningVisible(true);
+      // Still allow sending — just show the warning
+    }
+
     setSending(true);
     const content = newMessage.trim();
     setNewMessage("");
@@ -261,6 +284,11 @@ export default function Messages() {
     return format(date, "MMM d");
   }
 
+  // Count messages from current user in this thread (for soft limit)
+  const myMessageCount = messages.filter((m) => m.sender_id === user?.id).length;
+  const isNearSoftLimit = !hasConfirmedBooking && myMessageCount >= PRE_BOOKING_MSG_SOFT_LIMIT;
+  const showPreBookingBanner = !hasConfirmedBooking && !bookingLoading && !preBookingBannerDismissed;
+
   // ─── Chat View ──────────────────────────────────
   if (activeThread) {
     return (
@@ -284,22 +312,75 @@ export default function Messages() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate">
-              {activeThread.otherUser?.display_name || "Chat"}
-            </p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-bold text-foreground truncate">
+                {activeThread.otherUser?.display_name || "Chat"}
+              </p>
+              {hasConfirmedBooking && (
+                <CheckCircle2 className="h-3.5 w-3.5 fill-primary text-primary-foreground shrink-0" />
+              )}
+            </div>
             {activeThread.listingTitle && (
               <p className="text-[11px] text-muted-foreground truncate">
                 {activeThread.listingTitle}
               </p>
             )}
           </div>
+          {hasConfirmedBooking && (
+            <div className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1">
+              <Shield className="h-3 w-3 text-primary" />
+              <span className="text-[9px] font-bold uppercase tracking-wider text-primary">Booked</span>
+            </div>
+          )}
         </header>
+
+        {/* Pre-booking info banner */}
+        {showPreBookingBanner && (
+          <div className="flex items-start gap-2.5 border-b border-border/30 bg-muted/40 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <Shield className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] font-semibold text-foreground leading-tight">
+                Ask questions before you book! 💬
+              </p>
+              <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                For your safety and support, bookings are recommended in-app. In-app bookings include verified trainers, reviews, and payment protection.
+              </p>
+            </div>
+            <button
+              onClick={() => setPreBookingBannerDismissed(true)}
+              className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted transition-colors shrink-0"
+            >
+              <X className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
+
+        {/* Contact info warning tooltip */}
+        {contactWarningVisible && !hasConfirmedBooking && (
+          <div className="flex items-start gap-2.5 border-b border-primary/20 bg-primary/5 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+            <p className="flex-1 text-[11px] text-foreground/80 leading-snug">
+              {getContactWarning()}
+            </p>
+            <button
+              onClick={() => setContactWarningVisible(false)}
+              className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-muted transition-colors shrink-0"
+            >
+              <X className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30 mb-3" />
               <p className="text-sm text-muted-foreground">Start the conversation!</p>
+              {!hasConfirmedBooking && (
+                <p className="text-xs text-muted-foreground/70 mt-1 max-w-xs">
+                  Feel free to ask about the session, schedule, or anything you need before booking.
+                </p>
+              )}
             </div>
           )}
           {messages.map((msg) => {
@@ -324,13 +405,39 @@ export default function Messages() {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Soft limit nudge */}
+        {isNearSoftLimit && (
+          <div className="flex items-center gap-2 border-t border-border/30 bg-muted/30 px-4 py-2.5">
+            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
+            <p className="text-[11px] text-muted-foreground leading-snug flex-1">
+              Ready to book? In-app bookings unlock full chat, reviews, and verified sessions. 🎯
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="shrink-0 rounded-full bg-primary px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground transition-all active:scale-95"
+            >
+              Browse
+            </button>
+          </div>
+        )}
+
+        {/* Post-booking unlocked badge */}
+        {hasConfirmedBooking && messages.length > 0 && messages.length <= 1 && (
+          <div className="flex items-center justify-center gap-1.5 border-t border-border/20 bg-primary/5 px-4 py-2">
+            <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+            <p className="text-[11px] font-semibold text-primary">
+              Full chat unlocked — you're booked! Share any details you need.
+            </p>
+          </div>
+        )}
+
         <div
           className="border-t border-border/50 bg-background/90 backdrop-blur-xl px-4 py-3"
           style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}
         >
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Type a message..."
+              placeholder={hasConfirmedBooking ? "Type a message..." : "Ask about the session..."}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
@@ -378,7 +485,7 @@ export default function Messages() {
           <div className="flex flex-col items-center justify-center py-16">
             <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-3" />
             <p className="text-sm font-medium text-muted-foreground">No messages yet</p>
-            <p className="mt-1 text-xs text-muted-foreground">Book a training to chat with your trainer</p>
+            <p className="mt-1 text-xs text-muted-foreground">Book a training or ask a question to start chatting</p>
           </div>
         ) : (
           threads.map((thread) => (
