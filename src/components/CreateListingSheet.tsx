@@ -210,8 +210,11 @@ export default function CreateListingSheet({
       const total = parseFloat(totalPriceGel) || 0;
       const perSession = sessions > 0 ? Math.round((total / sessions) * 100) / 100 : 0;
 
+      // training_packages doesn't have equipment_notes or rental_info columns
+      const { equipment_notes_en, equipment_notes_ka, rental_info_en, rental_info_ka, ...packageFields } = commonFields;
+
       const { error: pkgError } = await supabase.from("training_packages").insert({
-        ...commonFields,
+        ...packageFields,
         sessions_count: sessions,
         total_price_gel: total,
         price_per_session_gel: perSession,
