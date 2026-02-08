@@ -241,80 +241,80 @@ export default function Profile() {
 
   return (
     <div className="relative min-h-screen bg-background pb-24">
-      {/* Subtle gradient */}
-      <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.04] via-transparent to-secondary/[0.06]" />
+      {/* Hero gradient header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent pb-20 pt-6">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(168_76%_50%/0.3),transparent_60%)]" />
 
-      {/* Avatar section */}
-      <div className="relative z-10 flex flex-col items-center pb-4 pt-6">
-        <div className="relative">
-          <div className="rounded-full p-[3px] bg-gradient-to-br from-primary to-secondary">
-            <Avatar className="h-28 w-28 border-4 border-background">
+        {/* Avatar section */}
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="relative">
+            <Avatar className="h-24 w-24 border-[3px] border-primary-foreground/30 shadow-xl">
               {profile?.avatar_url ? (
                 <AvatarImage src={profile.avatar_url} />
               ) : null}
-              <AvatarFallback className="bg-primary/10 text-3xl font-bold text-primary">
+              <AvatarFallback className="bg-primary-foreground/20 text-3xl font-bold text-primary-foreground">
                 {displayName.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-          </div>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-1 right-1 flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform active:scale-90"
-          >
-            <Camera className="h-4 w-4" />
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleAvatarUpload}
-            className="hidden"
-          />
-        </div>
-
-        {/* Name */}
-        {editingName ? (
-          <div className="mt-3 flex items-center gap-2">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg transition-transform active:scale-90"
+            >
+              <Camera className="h-3.5 w-3.5" />
+            </button>
             <input
-              value={nameInput}
-              onChange={(e) => setNameInput(e.target.value)}
-              className="rounded-xl border border-border bg-card px-3 py-1.5 text-center text-lg font-bold text-foreground outline-none focus:border-primary"
-              autoFocus
-              onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarUpload}
+              className="hidden"
             />
-            <button onClick={handleSaveName} className="text-xs font-bold text-primary">
-              {t("saveBtnLabel")}
-            </button>
-            <button onClick={() => setEditingName(false)} className="text-xs text-muted-foreground">
-              {t("cancelLabel")}
-            </button>
           </div>
-        ) : (
-          <button
-            onClick={() => setEditingName(true)}
-            className="mt-3 flex items-center gap-1.5 group"
-          >
-            <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
-            <Pencil className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-          </button>
-        )}
-        <p className="text-sm text-muted-foreground">{t("memberSince")} {memberSince}</p>
+
+          {/* Name */}
+          {editingName ? (
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                className="rounded-xl border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1.5 text-center text-lg font-bold text-primary-foreground outline-none placeholder:text-primary-foreground/50"
+                autoFocus
+                onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+              />
+              <button onClick={handleSaveName} className="text-xs font-bold text-primary-foreground">
+                {t("saveBtnLabel")}
+              </button>
+              <button onClick={() => setEditingName(false)} className="text-xs text-primary-foreground/60">
+                {t("cancelLabel")}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setEditingName(true)}
+              className="mt-3 flex items-center gap-1.5 group"
+            >
+              <h1 className="text-2xl font-bold text-primary-foreground">{displayName}</h1>
+              <Pencil className="h-3.5 w-3.5 text-primary-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          )}
+          <p className="text-sm text-primary-foreground/70">{t("memberSince")} {memberSince}</p>
+        </div>
       </div>
 
-      {/* Stats card */}
-      <div className="relative z-10 mx-5 mb-6">
-          <div className="flex rounded-2xl bg-card ios-shadow divide-x divide-border">
-          <div className="flex-1 py-4 text-center">
+      {/* Stats card — overlapping the hero */}
+      <div className="relative z-10 mx-5 -mt-12 mb-6">
+        <div className="flex rounded-2xl bg-card shadow-lg divide-x divide-border">
+          <div className="flex-1 py-5 text-center">
             <p className="text-2xl font-bold text-primary">{stats.sessions}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsSessions")}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsSessions")}</p>
           </div>
-          <div className="flex-1 py-4 text-center">
+          <div className="flex-1 py-5 text-center">
             <p className="text-2xl font-bold text-foreground">{stats.studios}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsStudios")}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsStudios")}</p>
           </div>
-          <div className="flex-1 py-4 text-center">
+          <div className="flex-1 py-5 text-center">
             <p className="text-2xl font-bold text-primary">{stats.hours}</p>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t("statsHours")}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsHours")}</p>
           </div>
         </div>
       </div>
@@ -366,7 +366,7 @@ export default function Profile() {
             <button
               key={tag}
               onClick={() => removeInterest(tag)}
-              className="group flex items-center gap-1 rounded-full border-2 border-primary/30 bg-primary/5 px-3.5 py-1.5 text-xs font-semibold text-primary transition-all hover:border-destructive hover:bg-destructive/5 hover:text-destructive"
+              className="group flex items-center gap-1 rounded-full bg-accent px-3.5 py-1.5 text-xs font-semibold text-accent-foreground transition-all hover:bg-destructive/10 hover:text-destructive"
             >
               {tag}
               <X className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -438,31 +438,22 @@ export default function Profile() {
 
       {/* Language + Log out */}
       <div className="relative z-10 px-5 mb-6 space-y-3">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setLang("en")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              lang === "en" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-            }`}
-          >
-            English
-          </button>
-          <button
-            onClick={() => setLang("ka")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              lang === "ka" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-            }`}
-          >
-            ქართული
-          </button>
-          <button
-            onClick={() => setLang("ru")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              lang === "ru" ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-            }`}
-          >
-            Русский
-          </button>
+        <div className="flex gap-2 rounded-2xl bg-card p-1.5 shadow-sm border border-border/50">
+          {[
+            { code: "en" as const, label: "English" },
+            { code: "ka" as const, label: "ქართული" },
+            { code: "ru" as const, label: "Русский" },
+          ].map((l) => (
+            <button
+              key={l.code}
+              onClick={() => setLang(l.code)}
+              className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-all ${
+                lang === l.code ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {l.label}
+            </button>
+          ))}
         </div>
 
         <button
