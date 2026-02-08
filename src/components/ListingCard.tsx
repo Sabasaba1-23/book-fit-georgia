@@ -96,17 +96,19 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
-
-  const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
-  const spotsLeft = listing.max_spots - (listing.booked_spots || 0);
-  const date = new Date(listing.scheduled_at);
-  const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
-
   const [booking, setBooking] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
+
+  // Guard against null partner data (e.g. deleted partner or missing join)
+  if (!listing.partner) return null;
+
+  const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
+  const spotsLeft = listing.max_spots - (listing.booked_spots || 0);
+  const date = new Date(listing.scheduled_at);
+  const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
