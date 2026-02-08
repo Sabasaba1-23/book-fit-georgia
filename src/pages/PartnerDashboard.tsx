@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import PartnerScheduleTab from "@/components/PartnerScheduleTab";
 import PartnerMessagesTab from "@/components/PartnerMessagesTab";
 import PartnerProfileTab from "@/components/PartnerProfileTab";
+import PartnerPaymentsTab from "@/components/PartnerPaymentsTab";
 
 interface PartnerListing {
   id: string;
@@ -48,7 +49,7 @@ const SPORT_COLORS: Record<string, string> = {
   "Rock Climbing": "bg-stone-100", Gymnastics: "bg-sky-100",
 };
 
-type Tab = "dashboard" | "schedule" | "messages" | "insights" | "profile";
+type Tab = "dashboard" | "schedule" | "messages" | "payments" | "profile";
 
 export default function PartnerDashboard() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -155,7 +156,7 @@ export default function PartnerDashboard() {
     { key: "dashboard", label: "Home", icon: <LayoutDashboard className="h-5 w-5" /> },
     { key: "schedule", label: "Schedule", icon: <CalendarDays className="h-5 w-5" /> },
     { key: "messages", label: "Messages", icon: <MessageCircle className="h-5 w-5" /> },
-    { key: "insights", label: "Insights", icon: <BarChart3 className="h-5 w-5" /> },
+    { key: "payments", label: "Payments", icon: <BarChart3 className="h-5 w-5" /> },
     { key: "profile", label: "Profile", icon: <User className="h-5 w-5" /> },
   ];
 
@@ -317,22 +318,10 @@ export default function PartnerDashboard() {
         </div>
       )}
 
-      {activeTab === "insights" && (
+      {activeTab === "payments" && (
         <div className="relative z-10 px-5 pt-4">
-          <h2 className="text-lg font-bold text-foreground mb-4">Insights</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-card border border-border/50 p-4 text-center">
-              <p className="text-2xl font-extrabold text-foreground">{listings.length}</p>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Total Listings</p>
-            </div>
-            <div className="rounded-2xl bg-card border border-border/50 p-4 text-center">
-              <p className="text-2xl font-extrabold text-primary">{approved}</p>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-1">Live Now</p>
-            </div>
-          </div>
-          <div className="mt-4 rounded-2xl bg-muted/40 p-6 text-center">
-            <p className="text-sm text-muted-foreground">Detailed analytics coming soon.</p>
-          </div>
+          <h2 className="text-lg font-bold text-foreground mb-4">Payments</h2>
+          <PartnerPaymentsTab partnerId={profile.id} />
         </div>
       )}
 

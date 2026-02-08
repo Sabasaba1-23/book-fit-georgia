@@ -1,43 +1,59 @@
 import { useState, useMemo } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
-import { X, Search, SlidersHorizontal, User, Users, CalendarDays, ArrowRight, MapPin, Package, Zap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { X, Search, SlidersHorizontal, User, Users, CalendarDays, ArrowRight, MapPin, Package, Zap, ChevronDown, ChevronUp, Target, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { addDays, format } from "date-fns";
 import { SPORTS } from "@/constants/sports";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { translateSport, translateCity, translateLanguageName } from "@/i18n/sportTranslations";
 
-const ACTIVITIES = [...SPORTS];
+const TOP_SPORTS = SPORTS.slice(0, 10);
+const ALL_SPORTS = [...SPORTS];
 
 const CITIES: Record<string, string[]> = {
-  Tbilisi: ["Vake", "Saburtalo", "Old Town", "Vera", "Didube", "Gldani", "Isani", "Nadzaladevi", "Ortachala"],
+  Tbilisi: ["Vake", "Saburtalo", "Old Town", "Vera", "Didube", "Gldani", "Isani", "Nadzaladevi", "Ortachala", "Mtatsminda", "Chugureti", "Samgori", "Dighomi", "Varketili", "Avlabari"],
   Batumi: ["Boulevard", "Old Batumi", "Gonio", "Khelvachauri", "Airport Area"],
   Kutaisi: ["City Center", "Nikea", "Balakhvani"],
 };
 
 const LANGUAGES_LIST = ["English", "Georgian", "Russian", "Spanish"];
 
+const GOALS = ["Muscle Gain", "Weight Loss", "Speed & Performance", "General Health", "Mobility / Recovery"];
+
+const TIME_OPTIONS = Array.from({ length: 30 }, (_, i) => {
+  const h = Math.floor(i / 2) + 6; // 06:00 to 21:00
+  const m = i % 2 === 0 ? "00" : "30";
+  return `${h.toString().padStart(2, "0")}:${m}`;
+});
+
 export interface FilterState {
   activities: string[];
-  selectedDate: string | null; // ISO string or null for "anytime"
+  selectedDate: string | null;
+  timeRange: [string, string] | null;
   budgetRange: [number, number];
-  trainingType: string | null; // "one_on_one" | "group" | "event" | null
-  sessionType: string | null; // "single" | "package" | null
+  trainingType: string | null;
+  sessionType: string | null;
   languages: string[];
   city: string | null;
   district: string | null;
+  trainerGender: string | null;
+  goals: string[];
 }
 
 const DEFAULT_FILTERS: FilterState = {
   activities: [],
   selectedDate: null,
+  timeRange: null,
   budgetRange: [0, 500],
   trainingType: null,
   sessionType: null,
   languages: [],
   city: null,
   district: null,
+  trainerGender: null,
+  goals: [],
 };
 
 interface FilterOverlayProps {
@@ -50,6 +66,9 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
   const { t, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const [local, setLocal] = useState<FilterState>(filters);
+  const [showAllSports, setShowAllSports] = useState(false);
+  const [sportSearch, setSportSearch] = useState("");
+  const [locationSearch, setLocationSearch] = useState("");
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) setLocal(filters);
@@ -75,6 +94,41 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
       languages: p.languages.includes(l) ? p.languages.filter((x) => x !== l) : [...p.languages, l],
     }));
 
+  const toggleGoal = (g: string) =>
+    setLocal((p) => ({
+      ...p,
+      goals: p.goals.includes(g) ? p.goals.filter((x) => x !== g) : [...p.goals, g],
+    }));
+
+  // Sports filtering
+  const displayedSports = useMemo(() => {
+    if (sportSearch.trim()) {
+      return ALL_SPORTS.filter((s) =>
+        translateSport(s, lang).toLowerCase().includes(sportSearch.toLowerCase()) ||
+        s.toLowerCase().includes(sportSearch.toLowerCase())
+      );
+    }
+    return showAllSports ? ALL_SPORTS : TOP_SPORTS;
+  }, [sportSearch, showAllSports, lang]);
+
+  // Location filtering
+  const filteredCities = useMemo(() => {
+    if (!locationSearch.trim()) return Object.keys(CITIES);
+    const q = locationSearch.toLowerCase();
+    return Object.keys(CITIES).filter(
+      (city) =>
+        city.toLowerCase().includes(q) ||
+        CITIES[city].some((d) => d.toLowerCase().includes(q))
+    );
+  }, [locationSearch]);
+
+  const filteredDistricts = useMemo(() => {
+    if (!local.city) return [];
+    const districts = CITIES[local.city] || [];
+    if (!locationSearch.trim()) return districts;
+    return districts.filter((d) => d.toLowerCase().includes(locationSearch.toLowerCase()));
+  }, [local.city, locationSearch]);
+
   // Next 7 days for date picker
   const dates = useMemo(() => {
     const today = new Date();
@@ -87,14 +141,15 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
   const activeCount = [
     local.activities.length > 0,
     local.selectedDate !== null,
+    local.timeRange !== null,
     local.budgetRange[0] > 0 || local.budgetRange[1] < 500,
     local.trainingType !== null,
     local.sessionType !== null,
     local.languages.length > 0,
     local.city !== null,
+    local.trainerGender !== null,
+    local.goals.length > 0,
   ].filter(Boolean).length;
-
-  const districts = local.city ? CITIES[local.city] || [] : [];
 
   return (
     <Sheet open={open} onOpenChange={handleOpen}>
@@ -127,12 +182,38 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
 
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto px-5 pb-28 space-y-6">
-            {/* Activity */}
+            {/* Activity / Sport */}
             <Section title={t("activityLabel")} icon={<Search className="h-4 w-4 text-primary" />}>
+              <Input
+                placeholder="Search activities..."
+                value={sportSearch}
+                onChange={(e) => setSportSearch(e.target.value)}
+                className="h-10 rounded-xl border-0 bg-muted/60 text-sm mb-3"
+              />
               <div className="flex flex-wrap gap-2">
-                {ACTIVITIES.map((a) => (
+                {displayedSports.map((a) => (
                   <ChipButton key={a} active={local.activities.includes(a)} onClick={() => toggleActivity(a)}>
                     {translateSport(a, lang)}
+                  </ChipButton>
+                ))}
+              </div>
+              {!sportSearch.trim() && (
+                <button
+                  onClick={() => setShowAllSports(!showAllSports)}
+                  className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary"
+                >
+                  {showAllSports ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                  {showAllSports ? "Show less" : `Show all ${ALL_SPORTS.length} activities`}
+                </button>
+              )}
+            </Section>
+
+            {/* Goals */}
+            <Section title="Goals" icon={<Target className="h-4 w-4 text-primary" />}>
+              <div className="flex flex-wrap gap-2">
+                {GOALS.map((g) => (
+                  <ChipButton key={g} active={local.goals.includes(g)} onClick={() => toggleGoal(g)}>
+                    {g}
                   </ChipButton>
                 ))}
               </div>
@@ -140,8 +221,14 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
 
             {/* Location */}
             <Section title={t("locationLabel")} icon={<MapPin className="h-4 w-4 text-primary" />}>
+              <Input
+                placeholder="Search locations..."
+                value={locationSearch}
+                onChange={(e) => setLocationSearch(e.target.value)}
+                className="h-10 rounded-xl border-0 bg-muted/60 text-sm mb-3"
+              />
               <div className="flex flex-wrap gap-2 mb-3">
-                {Object.keys(CITIES).map((city) => (
+                {filteredCities.map((city) => (
                   <ChipButton
                     key={city}
                     active={local.city === city}
@@ -151,9 +238,9 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                   </ChipButton>
                 ))}
               </div>
-              {districts.length > 0 && (
+              {filteredDistricts.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {districts.map((d) => (
+                  {filteredDistricts.map((d) => (
                     <ChipButton
                       key={d}
                       active={local.district === d}
@@ -167,8 +254,8 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
               )}
             </Section>
 
-            {/* Date & Time */}
-            <Section title={t("dateTimeLabel")} icon={<CalendarDays className="h-4 w-4 text-primary" />}>
+            {/* Date */}
+            <Section title="Date" icon={<CalendarDays className="h-4 w-4 text-primary" />}>
               <div className="hide-scrollbar flex gap-2 overflow-x-auto">
                 <ChipButton active={local.selectedDate === null} onClick={() => setLocal((p) => ({ ...p, selectedDate: null }))}>
                   {t("anytimeLabel")}
@@ -187,6 +274,68 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
                     <span className="text-[10px] font-semibold uppercase">{d.day}</span>
                     <span className="text-lg font-bold">{d.date}</span>
                   </button>
+                ))}
+              </div>
+            </Section>
+
+            {/* Time Range */}
+            <Section title="Time" icon={<Clock className="h-4 w-4 text-primary" />}>
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">From</label>
+                  <select
+                    value={local.timeRange?.[0] || ""}
+                    onChange={(e) => {
+                      const from = e.target.value;
+                      if (!from) {
+                        setLocal((p) => ({ ...p, timeRange: null }));
+                      } else {
+                        setLocal((p) => ({ ...p, timeRange: [from, p.timeRange?.[1] || "22:00"] }));
+                      }
+                    }}
+                    className="w-full h-10 rounded-xl border-0 bg-muted/60 text-sm px-3 text-foreground"
+                  >
+                    <option value="">Any</option>
+                    {TIME_OPTIONS.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+                <span className="text-muted-foreground font-bold mt-5">–</span>
+                <div className="flex-1">
+                  <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">To</label>
+                  <select
+                    value={local.timeRange?.[1] || ""}
+                    onChange={(e) => {
+                      const to = e.target.value;
+                      if (!to) {
+                        setLocal((p) => ({ ...p, timeRange: null }));
+                      } else {
+                        setLocal((p) => ({ ...p, timeRange: [p.timeRange?.[0] || "06:00", to] }));
+                      }
+                    }}
+                    className="w-full h-10 rounded-xl border-0 bg-muted/60 text-sm px-3 text-foreground"
+                  >
+                    <option value="">Any</option>
+                    {TIME_OPTIONS.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </Section>
+
+            {/* Gender */}
+            <Section title="Trainer Gender">
+              <div className="flex gap-2">
+                {["Male", "Female", "Any"].map((g) => (
+                  <ChipButton
+                    key={g}
+                    active={g === "Any" ? local.trainerGender === null : local.trainerGender === g.toLowerCase()}
+                    onClick={() => setLocal((p) => ({ ...p, trainerGender: g === "Any" ? null : g.toLowerCase() }))}
+                  >
+                    {g}
+                  </ChipButton>
                 ))}
               </div>
             </Section>
@@ -269,7 +418,7 @@ export default function FilterOverlay({ filters, onApply, children }: FilterOver
             </Section>
           </div>
 
-          {/* Apply button — fixed bottom */}
+          {/* Apply button */}
           <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl px-5 pb-8 pt-4 border-t border-border/50">
             <button
               onClick={apply}

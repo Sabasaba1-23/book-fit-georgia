@@ -9,6 +9,7 @@ import BottomNav from "@/components/BottomNav";
 import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
+import UserMenuDropdown from "@/components/UserMenuDropdown";
 import { Search, Bell } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -117,6 +118,11 @@ export default function Home() {
       const listingDate = new Date(l.scheduled_at).toISOString().split("T")[0];
       if (listingDate !== filters.selectedDate) return false;
     }
+    if (filters.timeRange) {
+      const listingTime = new Date(l.scheduled_at);
+      const hhmm = `${listingTime.getHours().toString().padStart(2, "0")}:${listingTime.getMinutes().toString().padStart(2, "0")}`;
+      if (hhmm < filters.timeRange[0] || hhmm > filters.timeRange[1]) return false;
+    }
     if (filters.city && l.location) {
       if (!l.location.toLowerCase().includes(filters.city.toLowerCase())) return false;
     }
@@ -156,8 +162,6 @@ export default function Home() {
 
   const hasResults = filteredListings.length > 0 || filteredPackages.length > 0;
 
-  const userInitial = user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "?";
-
   return (
     <div className="relative min-h-screen bg-background pb-24 overflow-x-hidden overscroll-none">
       {/* Background blobs */}
@@ -178,17 +182,7 @@ export default function Home() {
             >
               <Bell className="h-5 w-5 text-background" />
             </button>
-            <button
-              onClick={() => {
-                if (user) navigate("/profile");
-                else navigate("/auth");
-              }}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary p-[2px] transition-transform active:scale-95"
-            >
-              <div className="flex h-full w-full items-center justify-center rounded-full bg-background">
-                <span className="text-sm font-medium text-primary">{userInitial}</span>
-              </div>
-            </button>
+            <UserMenuDropdown />
           </div>
         </div>
       </header>

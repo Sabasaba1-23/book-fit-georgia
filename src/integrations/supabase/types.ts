@@ -265,6 +265,44 @@ export type Database = {
           },
         ]
       }
+      partner_payouts: {
+        Row: {
+          account_holder: string | null
+          bank_name: string | null
+          created_at: string
+          iban: string | null
+          id: string
+          partner_id: string
+          updated_at: string
+        }
+        Insert: {
+          account_holder?: string | null
+          bank_name?: string | null
+          created_at?: string
+          iban?: string | null
+          id?: string
+          partner_id: string
+          updated_at?: string
+        }
+        Update: {
+          account_holder?: string | null
+          bank_name?: string | null
+          created_at?: string
+          iban?: string | null
+          id?: string
+          partner_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_payouts_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_profiles: {
         Row: {
           approved: boolean
@@ -274,6 +312,7 @@ export type Database = {
           created_at: string
           display_name: string
           dispute_rate: number | null
+          gender: string | null
           id: string
           languages: string[] | null
           location: string | null
@@ -294,6 +333,7 @@ export type Database = {
           created_at?: string
           display_name: string
           dispute_rate?: number | null
+          gender?: string | null
           id?: string
           languages?: string[] | null
           location?: string | null
@@ -314,6 +354,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           dispute_rate?: number | null
+          gender?: string | null
           id?: string
           languages?: string[] | null
           location?: string | null
@@ -428,6 +469,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           full_name: string | null
+          gender: string | null
           id: string
           language_preference: string
           updated_at: string
@@ -437,6 +479,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
+          gender?: string | null
           id?: string
           language_preference?: string
           updated_at?: string
@@ -446,6 +489,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
+          gender?: string | null
           id?: string
           language_preference?: string
           updated_at?: string
@@ -558,6 +602,7 @@ export type Database = {
           duration_minutes: number
           equipment_notes_en: string | null
           equipment_notes_ka: string | null
+          goals: string[] | null
           gym_facebook: string | null
           gym_instagram: string | null
           gym_name: string | null
@@ -588,6 +633,7 @@ export type Database = {
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
+          goals?: string[] | null
           gym_facebook?: string | null
           gym_instagram?: string | null
           gym_name?: string | null
@@ -618,6 +664,7 @@ export type Database = {
           duration_minutes?: number
           equipment_notes_en?: string | null
           equipment_notes_ka?: string | null
+          goals?: string[] | null
           gym_facebook?: string | null
           gym_instagram?: string | null
           gym_name?: string | null
@@ -656,6 +703,7 @@ export type Database = {
           description_ka: string | null
           difficulty_level: string | null
           duration_minutes: number
+          goals: string[] | null
           gym_facebook: string | null
           gym_instagram: string | null
           gym_name: string | null
@@ -683,6 +731,7 @@ export type Database = {
           description_ka?: string | null
           difficulty_level?: string | null
           duration_minutes?: number
+          goals?: string[] | null
           gym_facebook?: string | null
           gym_instagram?: string | null
           gym_name?: string | null
@@ -710,6 +759,7 @@ export type Database = {
           description_ka?: string | null
           difficulty_level?: string | null
           duration_minutes?: number
+          goals?: string[] | null
           gym_facebook?: string | null
           gym_instagram?: string | null
           gym_name?: string | null

@@ -63,6 +63,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [gender, setGender] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -121,7 +122,7 @@ export default function Auth() {
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: fullName, phone_number: phoneNumber.trim() },
+        data: { full_name: fullName, phone_number: phoneNumber.trim(), gender: gender || undefined },
       },
     });
     if (error) {
@@ -403,6 +404,17 @@ export default function Auth() {
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
                 <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">Gender</label>
+                <div className="flex gap-2">
+                  {["Male", "Female"].map((g) => (
+                    <button key={g} type="button" onClick={() => setGender(g.toLowerCase())}
+                      className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-all ${gender === g.toLowerCase() ? "bg-foreground text-background shadow-lg" : "border border-border bg-card text-muted-foreground"}`}>
+                      {g}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
