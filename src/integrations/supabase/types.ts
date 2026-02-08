@@ -834,6 +834,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_thread_with_participants: {
+        Args: {
+          p_listing_id: string
+          p_other_user_id: string
+          p_user_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
