@@ -167,7 +167,7 @@ export default function PartnerDashboard() {
       <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
 
       {/* Header */}
-      <header className="relative z-40 px-5 pb-2" style={{ paddingTop: 'calc(var(--safe-top, 0px) + 1rem)' }}>
+      <header className="relative z-40 px-5 pb-2 pt-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-14 w-14 border-2 border-primary/20">
             {profile.logo_url ? <AvatarImage src={profile.logo_url} /> : null}

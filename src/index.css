@@ -122,6 +122,8 @@
   #root {
     min-height: 100%;
     overflow-x: hidden;
+    /* Global safe-area top padding so nothing ever renders under the Dynamic Island / notch */
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   /* Prevent zoom on input focus (iOS) */

@@ -194,7 +194,7 @@ export default function PartnerProfile() {
       <div className="relative h-56 w-full bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/5">
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
-        <div className="absolute left-3 right-3 z-10 flex items-center justify-between" style={{ top: 'calc(var(--safe-top, 0px) + 0.75rem)' }}>
+        <div className="absolute left-3 right-3 z-10 flex items-center justify-between top-3">
           <button
             onClick={() => navigate(-1)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40"
