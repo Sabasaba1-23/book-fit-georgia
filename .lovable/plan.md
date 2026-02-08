@@ -1,142 +1,124 @@
 
 
-# Verification System Redesign
+# Partner Dashboard Payments, Profile Improvements, User Menu & Advanced Filters
 
-## Overview
+This plan covers four major areas of work across the platform.
 
-Replace the current flat, bureaucratic verification form (buried in Settings) with a modern, step-based verification flow on its own dedicated dashboard tab. The flow will be role-aware (different for Individual Trainers vs Gyms), progressive, skippable, and motivating rather than pressuring.
+---
 
-## What Changes
+## 1. Partner Payments Section (Dashboard)
 
-### 1. Dashboard Navigation Restructure
+**What changes:**
+- Add a new "Payments" tab to the partner dashboard bottom nav (replacing or alongside "Insights")
+- Create a `PartnerPaymentsTab` component with three sub-sections:
+  - **Bank Account Details**: Form to add/edit bank name, account holder name, IBAN/account number. Stored in a new `partner_payouts` database table
+  - **Card for Payouts**: Placeholder section (marked "Coming Soon") for card-based payouts since Stripe Connect isn't set up yet
+  - **Payout History**: Table/list showing payout records (empty state for now with "No payouts yet" message)
 
-- Rename the "Settings" tab to "Profile" (personal settings, display info, account)
-- Move verification OUT of Settings into a new dedicated tab or a prominent card on the Dashboard home
-- Add a "Verification" card on the Dashboard home tab that shows current status with a clear CTA
-- The verification flow opens as a full-screen overlay/sheet when tapped
+**Database changes:**
+- New table `partner_payouts` with columns: `id`, `partner_id`, `bank_name`, `account_holder`, `iban`, `created_at`, `updated_at`
+- RLS: Partners can insert/update/view their own records; admins can view all
 
-### 2. Soft Nudge Popup (First Login + Weekly)
+---
 
-- On dashboard load, check `localStorage` for `verification_nudge_dismissed_at`
-- If partner is unverified AND (first visit OR last dismissal > 7 days ago), show a friendly dialog:
-  - Title: "Build trust with your clients"
-  - Body: "Verified profiles get more bookings and appear more trustworthy to users."
-  - Buttons: **"Get Verified"** (primary) | **"Maybe Later"** (ghost)
-- Never blocks navigation; dismisses on any click outside
+## 2. Trainer Profile Improvements
 
-### 3. Verification Status Card on Dashboard Home
+**What changes in `PartnerProfile.tsx`:**
 
-A compact card always visible on the dashboard home tab:
+- **Remove all fake/placeholder data**: Delete the hardcoded `BIOS`, `CERTIFICATIONS`, `SPECIALTIES`, `LOCATIONS`, `COVER_IMAGES`, `AVATAR_IMAGES`, `GALLERY_IMAGES` arrays and the `seededRandom` logic
+- **Show only real data**: Display bio, sports, location, rating, review count only if they exist in the database
+- **Age display**: Add `date_of_birth` to the partner verification data query; calculate and display age on the profile if available
+- **Gym associations**: Query `training_listings` for distinct `gym_name` values where `location_type = 'gym'`; show one gym name if single, list all if multiple
+- **Reviews section**: Fetch real reviews from the `reviews` table (joined through bookings and listings). If no reviews exist, hide the entire Reviews section -- no placeholder, no fake reviews
+- **Stats**: Show rating and review count only when `review_count > 0`. Remove fabricated "Years", "Clients" stats unless real data exists
 
+---
+
+## 3. User Menu (Top-Right Initials Button)
+
+**What changes in `Home.tsx`:**
+
+- Replace the current initials button (which navigates to `/profile`) with a `DropdownMenu` from the existing Radix UI components
+- Menu items:
+  - User's display name (non-clickable header)
+  - "View Profile" -- navigates to `/profile`
+  - "Settings" -- navigates to `/profile` (scrolled to settings) or opens a settings sheet
+  - "Log Out" -- calls `signOut()` from AuthContext
+- For non-authenticated users, the button still navigates to `/auth`
+
+---
+
+## 4. Home Page Filter Improvements
+
+All changes happen in `FilterOverlay.tsx` and related filter state.
+
+### 4a. Activity/Sport Filter (Top Priority)
+- Show only the top 10 most popular sports by default (subset of the SPORTS constant)
+- Add a "Show more" button that expands to show all sports
+- Add a search input above the sport chips to filter the list by typing
+- Ensure the section stays compact when collapsed
+
+### 4b. Date and Time Filters (Separate)
+- Split the current "Date & Time" section into two distinct sections
+- **Date**: Keep the existing 7-day date picker
+- **Time**: Add a time range selector with two dropdowns or sliders (e.g., "From 08:00" / "To 22:00") in 30-minute increments
+- Add `timeRange: [string, string] | null` to `FilterState` (e.g., `["17:00", "20:00"]`)
+- Apply time filtering in `Home.tsx` by comparing `scheduled_at` hour/minute
+
+### 4c. Gender Filter
+- Add a "Gender" section with chips: "Male", "Female", "Any"
+- Add `trainerGender: string | null` to `FilterState`
+- **Database**: Add `gender` column (text, nullable) to `profiles` table and `partner_profiles` table
+- **Registration**: Add gender selection during user and partner registration in `Auth.tsx`
+- Filter listings by joining `partner_profiles.gender` when applying filters
+
+### 4d. Location Filter (Georgia-Specific)
+- Restructure the `CITIES` constant into a more detailed hierarchy with regions and neighborhoods
+- Add more districts for Tbilisi (e.g., Mtatsminda, Chugureti, Samgori, Dighomi, Varketili)
+- Add a search input for locations so users can type to find their area
+- Make the UI a two-step flow: select city first, then district chips appear below
+
+### 4e. Goals Filter
+- Add a "Goals" section with selectable chips:
+  - Muscle Gain, Weight Loss, Speed & Performance, General Health, Mobility / Recovery
+- Add `goals: string[]` to `FilterState`
+- **Database**: Add `goals` column (text array, nullable) to `training_listings` and `training_packages`
+- Partners can tag their listings with goals during creation
+- Filter by checking if listing goals overlap with selected filter goals
+
+---
+
+## Technical Details
+
+### New Database Migration
 ```text
-+--------------------------------------------------+
-|  [Shield icon]   Identity Verification            |
-|  Status: Unverified / In Progress / Verified      |
-|  "Complete 2 more steps to get verified"           |
-|  [Get Verified ->]  or  [View Details ->]          |
-+--------------------------------------------------+
+- Add table: partner_payouts (id, partner_id, bank_name, account_holder, iban, timestamps, RLS)
+- Add column: partner_profiles.gender (text, nullable)
+- Add column: profiles.gender (text, nullable)
+- Add column: training_listings.goals (text[], nullable)
+- Add column: training_packages.goals (text[], nullable)
 ```
 
-For Gyms, show dual status:
-- Representative: Verified / Pending
-- Business: Verified / Pending
+### Files to Create
+- `src/components/PartnerPaymentsTab.tsx` -- payments management UI
 
-### 4. Individual Trainer Verification Flow (3 Steps)
+### Files to Modify
+- `src/pages/PartnerDashboard.tsx` -- add Payments tab
+- `src/pages/PartnerProfile.tsx` -- remove fake data, show real reviews, age, gym associations
+- `src/pages/Home.tsx` -- replace initials button with dropdown menu
+- `src/components/FilterOverlay.tsx` -- all filter improvements (sport search, time range, gender, goals, better locations)
+- `src/pages/Auth.tsx` -- add gender field to registration forms
+- `src/components/CreateListingSheet.tsx` -- add goals selection during listing creation
+- `src/integrations/supabase/types.ts` -- update types for new columns/tables
+- `src/i18n/translations.ts` -- new translation keys for all added UI elements
 
-Opens as a sheet/overlay with a progress bar at top.
-
-**Step 1 -- About You**
-- Full name (pre-filled from display_name)
-- Country / City (maps to existing `address` field)
-- Short professional bio/description (new field, stored in partner_verifications or partner_profiles.bio)
-
-**Step 2 -- Your Experience**
-- Trainer type chips (Personal Trainer, Group Instructor, Coach, etc.)
-- Years of experience (dropdown: <1, 1-3, 3-5, 5-10, 10+)
-- Specializations (multi-select checkboxes from sports list)
-- Certificate upload (clearly marked OPTIONAL with friendly copy)
-
-**Step 3 -- Identity Confirmation**
-- Document type selector (ID Card / Passport / Driver's License)
-- Upload area with drag-drop feel
-- Privacy note: "Only visible to our admin team. Never shown publicly."
-- Submit button
-
-Each step has Next / Back buttons. Progress saves to DB after each step so users can return later (stored via existing `partner_verifications` table with new columns).
-
-### 5. Gym / Business Verification Flow (2 Parts)
-
-Same sheet overlay, but with two clearly labeled sections and independent progress:
-
-**Part 1 -- Representative**
-- Full name
-- Role at business (Owner / Manager / Representative) -- new field
-- Personal ID upload
-- Status badge shown independently
-
-**Part 2 -- Business Details**
-- Business name (pre-filled from display_name)
-- Business type (Gym / Studio / Sports Club / Other)
-- City / Address
-- Business registration document (OPTIONAL)
-- Website or social link (OPTIONAL)
-- Status badge shown independently
-
-### 6. Database Changes
-
-Add new columns to `partner_verifications`:
-
-| Column | Type | Notes |
-|--------|------|-------|
-| full_name | text | Pre-filled from profile |
-| country_city | text | Replaces address semantically |
-| professional_description | text | Short bio |
-| trainer_type | text | e.g. "personal_trainer" |
-| years_experience | text | e.g. "3-5" |
-| specializations | text[] | Array of sports |
-| business_type | text | For gyms only |
-| representative_role | text | For gyms only |
-| website_social | text | For gyms only |
-| verification_step | integer | Tracks progress (1, 2, 3) |
-| rep_status | text | For gyms: representative verification status |
-| biz_status | text | For gyms: business verification status |
-
-No existing columns removed -- backward compatible migration.
-
-### 7. New Components
-
-| Component | Purpose |
-|-----------|---------|
-| `VerificationSheet.tsx` | Main overlay container with step navigation and progress bar |
-| `TrainerVerificationFlow.tsx` | 3-step flow for individual trainers |
-| `GymVerificationFlow.tsx` | 2-part flow for gyms/studios |
-| `VerificationStatusCard.tsx` | Dashboard home card showing status + CTA |
-| `VerificationNudgeDialog.tsx` | Soft popup for unverified partners |
-
-### 8. Files Modified
-
-| File | Change |
-|------|--------|
-| `PartnerDashboard.tsx` | Add VerificationStatusCard to home tab; remove verification from Settings; rename Settings to Profile |
-| `PartnerVerificationForm.tsx` | Replaced entirely by the new flow components |
-| `supabase/migrations/[new].sql` | Add new columns to partner_verifications |
-| `integrations/supabase/types.ts` | Auto-updated with new schema |
-
-### 9. UX Copy Guidelines
-
-All copy will follow these principles:
-- Friendly, encouraging tone: "Help clients trust you" not "You must verify"
-- Benefits-focused: "Verified profiles are more likely to get bookings"
-- No false promises: Will NOT claim ranking boosts unless implemented
-- Privacy reassurance on document uploads: "Only visible to admins"
-- Clear progress: "Step 2 of 3" with visual progress bar
-
-### 10. What Will NOT Change
-
-- Auth logic remains untouched
-- Documents remain in private `partner-documents` storage bucket
-- Admin approve/reject flow stays the same
-- RLS policies unchanged
-- Existing `partner_documents` table and upload logic reused
-- Account deletion already cascades via foreign keys
+### Execution Order
+1. Database migration (new table + new columns)
+2. Update Supabase types
+3. Partner Payments tab (new component + dashboard integration)
+4. Trainer profile cleanup (remove fake data, add real reviews/age/gyms)
+5. User menu dropdown on Home page
+6. Filter improvements (sport search, time range, gender, goals, locations)
+7. Registration gender field
+8. Translation keys
 
