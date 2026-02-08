@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import MultiLangDescriptionField from "@/components/MultiLangDescriptionField";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -25,6 +24,13 @@ import {
   Backpack,
   ShoppingBag,
   BarChart3,
+  Building2,
+  Home,
+  Car,
+  Package,
+  Zap,
+  Instagram,
+  Facebook,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SPORTS, DIFFICULTY_LEVELS } from "@/constants/sports";
@@ -35,6 +41,9 @@ interface CreateListingSheetProps {
   partnerId: string;
   onCreated: () => void;
 }
+
+type ServiceType = "single" | "package";
+type LocationType = "gym" | "home" | "mobile";
 
 export default function CreateListingSheet({
   open,
@@ -50,7 +59,14 @@ export default function CreateListingSheet({
   const [title, setTitle] = useState("");
   const [sport, setSport] = useState("");
   const [trainingType, setTrainingType] = useState<"one_on_one" | "group">("one_on_one");
+  const [serviceType, setServiceType] = useState<ServiceType>("single");
+
+  // Location fields
+  const [locationType, setLocationType] = useState<LocationType>("gym");
   const [location, setLocation] = useState("");
+  const [gymName, setGymName] = useState("");
+  const [gymInstagram, setGymInstagram] = useState("");
+  const [gymFacebook, setGymFacebook] = useState("");
 
   // Step 2 fields
   const [description, setDescription] = useState("");
@@ -61,6 +77,10 @@ export default function CreateListingSheet({
   const [scheduledAt, setScheduledAt] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // Package fields
+  const [sessionsCount, setSessionsCount] = useState("8");
+  const [totalPriceGel, setTotalPriceGel] = useState("");
 
   // Step 3 fields (optional extras)
   const [difficultyLevel, setDifficultyLevel] = useState("");
@@ -79,7 +99,12 @@ export default function CreateListingSheet({
     setTitle("");
     setSport("");
     setTrainingType("one_on_one");
+    setServiceType("single");
+    setLocationType("gym");
     setLocation("");
+    setGymName("");
+    setGymInstagram("");
+    setGymFacebook("");
     setDescription("");
     setDescriptionKa("");
     setDescriptionRu("");
@@ -88,6 +113,8 @@ export default function CreateListingSheet({
     setScheduledAt("");
     setImageFile(null);
     setImagePreview(null);
+    setSessionsCount("8");
+    setTotalPriceGel("");
     setDifficultyLevel("");
     setEquipmentNotes("");
     setEquipmentNotesKa("");
@@ -114,7 +141,9 @@ export default function CreateListingSheet({
   };
 
   const canContinueStep1 = title.trim() && sport && location.trim();
-  const canContinueStep2 = scheduledAt && priceGel && parseFloat(priceGel) > 0;
+  const canContinueStep2 = serviceType === "package"
+    ? (totalPriceGel && parseFloat(totalPriceGel) > 0)
+    : (scheduledAt && priceGel && parseFloat(priceGel) > 0);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -135,26 +164,51 @@ export default function CreateListingSheet({
       }
     }
 
-    const { error } = await supabase.from("training_listings").insert({
+    const commonFields = {
       partner_id: partnerId,
       title_en: title.trim(),
       description_en: description.trim() || null,
       description_ka: descriptionKa.trim() || null,
       sport,
       training_type: trainingType,
-      scheduled_at: new Date(scheduledAt).toISOString(),
       duration_minutes: parseInt(durationMinutes) || 60,
-      price_gel: parseFloat(priceGel),
       max_spots: parseInt(maxSpots) || 1,
       background_image_url: backgroundImageUrl,
       location: location.trim(),
+      location_type: locationType,
+      gym_name: locationType === "gym" ? (gymName.trim() || null) : null,
+      gym_instagram: locationType === "gym" ? (gymInstagram.trim() || null) : null,
+      gym_facebook: locationType === "gym" ? (gymFacebook.trim() || null) : null,
       difficulty_level: difficultyLevel || null,
       equipment_notes_en: equipmentNotes.trim() || null,
       equipment_notes_ka: equipmentNotesKa.trim() || null,
       rental_info_en: rentalInfo.trim() || null,
       rental_info_ka: rentalInfoKa.trim() || null,
-      status: "pending",
-    });
+      status: "pending" as const,
+    };
+
+    let error: any;
+
+    if (serviceType === "package") {
+      const sessions = parseInt(sessionsCount) || 8;
+      const total = parseFloat(totalPriceGel) || 0;
+      const perSession = sessions > 0 ? Math.round((total / sessions) * 100) / 100 : 0;
+
+      const { error: pkgError } = await supabase.from("training_packages").insert({
+        ...commonFields,
+        sessions_count: sessions,
+        total_price_gel: total,
+        price_per_session_gel: perSession,
+      });
+      error = pkgError;
+    } else {
+      const { error: listingError } = await supabase.from("training_listings").insert({
+        ...commonFields,
+        scheduled_at: new Date(scheduledAt).toISOString(),
+        price_gel: parseFloat(priceGel),
+      });
+      error = listingError;
+    }
 
     if (error) {
       const msg = error.message.includes("violates")
@@ -170,7 +224,6 @@ export default function CreateListingSheet({
   };
 
   const scheduledDate = scheduledAt ? new Date(scheduledAt) : null;
-
   const stepLabels = ["Basics", "Details & Pricing", "Additional Info"];
 
   return (
@@ -211,11 +264,17 @@ export default function CreateListingSheet({
                 title={title} setTitle={setTitle}
                 sport={sport} setSport={setSport}
                 trainingType={trainingType} setTrainingType={setTrainingType}
+                serviceType={serviceType} setServiceType={setServiceType}
+                locationType={locationType} setLocationType={setLocationType}
                 location={location} setLocation={setLocation}
+                gymName={gymName} setGymName={setGymName}
+                gymInstagram={gymInstagram} setGymInstagram={setGymInstagram}
+                gymFacebook={gymFacebook} setGymFacebook={setGymFacebook}
               />
             )}
             {step === 2 && (
               <StepDetails
+                serviceType={serviceType}
                 imagePreview={imagePreview} onImageChange={handleImageChange}
                 description={description} setDescription={setDescription}
                 descriptionKa={descriptionKa} setDescriptionKa={setDescriptionKa}
@@ -225,6 +284,8 @@ export default function CreateListingSheet({
                 scheduledAt={scheduledAt} setScheduledAt={setScheduledAt}
                 scheduledDate={scheduledDate}
                 durationMinutes={durationMinutes} setDurationMinutes={setDurationMinutes}
+                sessionsCount={sessionsCount} setSessionsCount={setSessionsCount}
+                totalPriceGel={totalPriceGel} setTotalPriceGel={setTotalPriceGel}
               />
             )}
             {step === 3 && (
@@ -246,7 +307,7 @@ export default function CreateListingSheet({
               <Button
                 disabled={step === 1 ? !canContinueStep1 : !canContinueStep2}
                 onClick={() => {
-                  if (step === 2 && scheduledAt && new Date(scheduledAt) <= new Date()) {
+                  if (step === 2 && serviceType === "single" && scheduledAt && new Date(scheduledAt) <= new Date()) {
                     toast({ title: "Date must be in the future", variant: "destructive" });
                     return;
                   }
@@ -285,15 +346,25 @@ function StepBasics({
   title, setTitle,
   sport, setSport,
   trainingType, setTrainingType,
+  serviceType, setServiceType,
+  locationType, setLocationType,
   location, setLocation,
+  gymName, setGymName,
+  gymInstagram, setGymInstagram,
+  gymFacebook, setGymFacebook,
 }: {
   title: string; setTitle: (v: string) => void;
   sport: string; setSport: (v: string) => void;
   trainingType: "one_on_one" | "group"; setTrainingType: (v: "one_on_one" | "group") => void;
+  serviceType: ServiceType; setServiceType: (v: ServiceType) => void;
+  locationType: LocationType; setLocationType: (v: LocationType) => void;
   location: string; setLocation: (v: string) => void;
+  gymName: string; setGymName: (v: string) => void;
+  gymInstagram: string; setGymInstagram: (v: string) => void;
+  gymFacebook: string; setGymFacebook: (v: string) => void;
 }) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
       <div>
         <h1 className="text-3xl font-extrabold text-foreground">Basic Info</h1>
         <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
@@ -327,20 +398,36 @@ function StepBasics({
         </Select>
       </div>
 
-      {/* Location (required) */}
+      {/* Service Type */}
       <div>
-        <label className="mb-2 flex items-center gap-1.5 text-base font-bold text-foreground">
-          <MapPin className="h-4 w-4 text-primary" />
-          Address / Location
-          <span className="text-destructive">*</span>
-        </label>
-        <Input
-          placeholder="e.g., Vake Park, Tbilisi or Gym Name, Street"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/60"
-        />
-        <p className="mt-1.5 text-[12px] text-muted-foreground">Full address or well-known location name</p>
+        <label className="mb-2 block text-base font-bold text-foreground">Service Type</label>
+        <div className="flex rounded-2xl border border-border bg-muted/30 p-1">
+          <button
+            type="button"
+            onClick={() => setServiceType("single")}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all",
+              serviceType === "single" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+            )}
+          >
+            <Zap className="h-4 w-4" /> Single Session
+          </button>
+          <button
+            type="button"
+            onClick={() => setServiceType("package")}
+            className={cn(
+              "flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all",
+              serviceType === "package" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+            )}
+          >
+            <Package className="h-4 w-4" /> Package
+          </button>
+        </div>
+        {serviceType === "package" && (
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            Bundle multiple sessions at a discounted rate (e.g., 8 or 12 sessions).
+          </p>
+        )}
       </div>
 
       {/* Session Type */}
@@ -369,6 +456,93 @@ function StepBasics({
           </button>
         </div>
       </div>
+
+      {/* Location Type */}
+      <div>
+        <label className="mb-2 block text-base font-bold text-foreground">Location Type</label>
+        <div className="flex gap-2">
+          {([
+            { key: "gym" as const, icon: <Building2 className="h-4 w-4" />, label: "Gym" },
+            { key: "home" as const, icon: <Home className="h-4 w-4" />, label: "Home" },
+            { key: "mobile" as const, icon: <Car className="h-4 w-4" />, label: "I Come to You" },
+          ]).map((opt) => (
+            <button
+              key={opt.key}
+              type="button"
+              onClick={() => setLocationType(opt.key)}
+              className={cn(
+                "flex flex-1 flex-col items-center gap-1.5 rounded-2xl border py-3.5 text-xs font-semibold transition-all active:scale-95",
+                locationType === opt.key
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card text-muted-foreground"
+              )}
+            >
+              {opt.icon}
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Address / Location */}
+      <div>
+        <label className="mb-2 flex items-center gap-1.5 text-base font-bold text-foreground">
+          <MapPin className="h-4 w-4 text-primary" />
+          {locationType === "mobile" ? "Service Area" : "Address / Location"}
+          <span className="text-destructive">*</span>
+        </label>
+        <Input
+          placeholder={
+            locationType === "gym" ? "e.g., Vake, Tbilisi" :
+            locationType === "home" ? "e.g., Your home address" :
+            "e.g., Tbilisi area, Vake & Saburtalo"
+          }
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/60"
+        />
+      </div>
+
+      {/* Gym-specific fields */}
+      {locationType === "gym" && (
+        <div className="space-y-4 rounded-2xl border border-border/50 bg-muted/20 p-4">
+          <p className="text-sm font-bold text-foreground">Gym Details</p>
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold text-foreground">Gym / Company Name</label>
+            <Input
+              placeholder="e.g., FitLife Gym"
+              value={gymName}
+              onChange={(e) => setGymName(e.target.value)}
+              className="h-12 rounded-xl border-0 bg-background px-4 text-[14px] font-medium shadow-none placeholder:text-muted-foreground/60"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                <Instagram className="h-3.5 w-3.5" /> Instagram
+              </label>
+              <Input
+                placeholder="@gymhandle"
+                value={gymInstagram}
+                onChange={(e) => setGymInstagram(e.target.value)}
+                className="h-11 rounded-xl border-0 bg-background px-3 text-[13px] font-medium shadow-none placeholder:text-muted-foreground/60"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-muted-foreground">
+                <Facebook className="h-3.5 w-3.5" /> Facebook
+              </label>
+              <Input
+                placeholder="facebook.com/gym"
+                value={gymFacebook}
+                onChange={(e) => setGymFacebook(e.target.value)}
+                className="h-11 rounded-xl border-0 bg-background px-3 text-[13px] font-medium shadow-none placeholder:text-muted-foreground/60"
+              />
+            </div>
+          </div>
+          <p className="text-[11px] text-muted-foreground">Optional – helps users discover the venue</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -376,6 +550,7 @@ function StepBasics({
 /* ─── Step 2: Details & Pricing ──────────────────── */
 
 function StepDetails({
+  serviceType,
   imagePreview, onImageChange,
   description, setDescription,
   descriptionKa, setDescriptionKa,
@@ -385,7 +560,10 @@ function StepDetails({
   scheduledAt, setScheduledAt,
   scheduledDate,
   durationMinutes, setDurationMinutes,
+  sessionsCount, setSessionsCount,
+  totalPriceGel, setTotalPriceGel,
 }: {
+  serviceType: ServiceType;
   imagePreview: string | null;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   description: string; setDescription: (v: string) => void;
@@ -396,7 +574,13 @@ function StepDetails({
   scheduledAt: string; setScheduledAt: (v: string) => void;
   scheduledDate: Date | null;
   durationMinutes: string; setDurationMinutes: (v: string) => void;
+  sessionsCount: string; setSessionsCount: (v: string) => void;
+  totalPriceGel: string; setTotalPriceGel: (v: string) => void;
 }) {
+  const sessions = parseInt(sessionsCount) || 0;
+  const total = parseFloat(totalPriceGel) || 0;
+  const perSession = sessions > 0 ? (total / sessions).toFixed(2) : "0.00";
+
   return (
     <div className="space-y-7">
       {/* Cover Image */}
@@ -429,52 +613,130 @@ function StepDetails({
         rows={4}
       />
 
-      {/* Price, Spots, Duration */}
-      <div className="grid grid-cols-3 gap-3">
-        <div>
-          <label className="mb-2 block text-sm font-bold text-foreground">Price (₾)</label>
-          <Input
-            type="number" min={0} step={0.5}
-            value={priceGel} onChange={(e) => setPriceGel(e.target.value)}
-            placeholder="0"
-            className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
-          />
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-bold text-foreground">Spots</label>
-          <Input
-            type="number" min={1} max={100}
-            value={maxSpots} onChange={(e) => setMaxSpots(e.target.value)}
-            placeholder="10"
-            className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
-          />
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-bold text-foreground">Duration</label>
-          <Select value={durationMinutes} onValueChange={setDurationMinutes}>
-            <SelectTrigger className="h-14 rounded-2xl border-0 bg-muted/60 px-3 text-[15px] font-medium shadow-none">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[30, 45, 60, 75, 90, 120].map((m) => (
-                <SelectItem key={m} value={String(m)}>{m} min</SelectItem>
+      {serviceType === "package" ? (
+        <>
+          {/* Package pricing */}
+          <div>
+            <label className="mb-2 block text-base font-bold text-foreground">Package Sessions</label>
+            <div className="flex flex-wrap gap-2">
+              {["4", "8", "12", "16", "20"].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setSessionsCount(n)}
+                  className={cn(
+                    "rounded-full px-5 py-2.5 text-sm font-semibold transition-all active:scale-95",
+                    sessionsCount === n
+                      ? "bg-foreground text-background shadow-lg"
+                      : "border border-border bg-card text-muted-foreground"
+                  )}
+                >
+                  {n} sessions
+                </button>
               ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+            </div>
+            <Input
+              type="number" min={1} max={100}
+              value={sessionsCount}
+              onChange={(e) => setSessionsCount(e.target.value)}
+              placeholder="Custom number"
+              className="mt-3 h-12 rounded-xl border-0 bg-muted/60 px-4 text-[14px] font-medium shadow-none"
+            />
+          </div>
 
-      {/* Date & Time */}
-      <div>
-        <label className="mb-2 block text-base font-bold text-foreground">Date & Time</label>
-        <Input
-          type="datetime-local"
-          value={scheduledAt}
-          onChange={(e) => setScheduledAt(e.target.value)}
-          min={new Date().toISOString().slice(0, 16)}
-          className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
-        />
-      </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Total Price (₾)</label>
+              <Input
+                type="number" min={0} step={0.5}
+                value={totalPriceGel} onChange={(e) => setTotalPriceGel(e.target.value)}
+                placeholder="0"
+                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Per Session</label>
+              <div className="flex h-14 items-center rounded-2xl bg-muted/40 px-4">
+                <span className="text-[15px] font-bold text-primary">{perSession} ₾</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Spots</label>
+              <Input
+                type="number" min={1} max={100}
+                value={maxSpots} onChange={(e) => setMaxSpots(e.target.value)}
+                placeholder="10"
+                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Duration / session</label>
+              <Select value={durationMinutes} onValueChange={setDurationMinutes}>
+                <SelectTrigger className="h-14 rounded-2xl border-0 bg-muted/60 px-3 text-[15px] font-medium shadow-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[30, 45, 60, 75, 90, 120].map((m) => (
+                    <SelectItem key={m} value={String(m)}>{m} min</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Single session pricing */}
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Price (₾)</label>
+              <Input
+                type="number" min={0} step={0.5}
+                value={priceGel} onChange={(e) => setPriceGel(e.target.value)}
+                placeholder="0"
+                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Spots</label>
+              <Input
+                type="number" min={1} max={100}
+                value={maxSpots} onChange={(e) => setMaxSpots(e.target.value)}
+                placeholder="10"
+                className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-bold text-foreground">Duration</label>
+              <Select value={durationMinutes} onValueChange={setDurationMinutes}>
+                <SelectTrigger className="h-14 rounded-2xl border-0 bg-muted/60 px-3 text-[15px] font-medium shadow-none">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[30, 45, 60, 75, 90, 120].map((m) => (
+                    <SelectItem key={m} value={String(m)}>{m} min</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Date & Time */}
+          <div>
+            <label className="mb-2 block text-base font-bold text-foreground">Date & Time</label>
+            <Input
+              type="datetime-local"
+              value={scheduledAt}
+              onChange={(e) => setScheduledAt(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+              className="h-14 rounded-2xl border-0 bg-muted/60 px-4 text-[15px] font-medium shadow-none"
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
