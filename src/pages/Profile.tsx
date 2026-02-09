@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNav from "@/components/BottomNav";
 import ClientAchievements from "@/components/badges/ClientAchievements";
+import BackButton from "@/components/BackButton";
 import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
@@ -251,6 +252,11 @@ export default function Profile() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(168_76%_50%/0.35),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,hsl(168_76%_36%/0.25),transparent_50%)]" />
         <div className="absolute -bottom-12 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+
+        {/* Back button */}
+        <div className="absolute left-4 top-4 z-20">
+          <BackButton variant="overlay" />
+        </div>
 
         {/* Avatar section */}
         <div className="relative z-10 flex flex-col items-center">

@@ -535,9 +535,12 @@ export default function Messages() {
       <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
 
       <header
-        className="relative z-40 px-5 pb-2 pt-4"
+        className="relative z-40 px-5 pb-2 pt-8"
       >
-        <h1 className="text-2xl font-extrabold text-foreground">{t("messages")}</h1>
+        <div className="flex items-center gap-3">
+          <BackButton onClick={() => navigate("/")} />
+          <h1 className="text-2xl font-extrabold text-foreground">{t("messages")}</h1>
+        </div>
       </header>
 
       <main className="relative z-10 px-5 py-3 space-y-2">
