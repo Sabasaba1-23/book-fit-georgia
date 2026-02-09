@@ -77,7 +77,7 @@ export default function BookingTicket({ open, onClose, booking }: BookingTicketP
             <p className="mt-1 text-sm text-white/80">{t("sessionSecured")}</p>
           </div>
 
-          <div className="relative h-6">
+          <div className="relative h-6 overflow-hidden">
             <div className="absolute -left-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-foreground/40" />
             <div className="absolute -right-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-foreground/40" />
             <div className="absolute inset-x-6 top-1/2 border-t border-dashed border-border" />
