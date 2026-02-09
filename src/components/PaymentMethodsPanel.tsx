@@ -45,7 +45,7 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
           </div>
         ) : (
           <div className="mb-5 rounded-2xl bg-muted/30 p-6 text-center">
-            <CreditCard className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+            <BankCard size={32} fill="hsl(var(--muted-foreground))" className="mx-auto mb-2" />
             <p className="text-sm font-medium text-muted-foreground">{t("noPaymentMethods")}</p>
           </div>
         )}
