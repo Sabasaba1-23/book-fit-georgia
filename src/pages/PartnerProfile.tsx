@@ -359,6 +359,27 @@ export default function PartnerProfile() {
         </section>
       )}
 
+      {/* ─────────── BADGES ─────────── */}
+      {badges.length > 0 && (
+        <div className="mt-6 mx-5 flex items-center gap-2 flex-wrap">
+          {badges.slice(0, 6).map((eb) => (
+            <div key={eb.badge_key} className="group relative">
+              <BadgeIcon icon={eb.badge.icon} tier={eb.badge.tier} size="sm" />
+              <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground/75 backdrop-blur-sm px-2 py-1 text-[10px] font-medium text-background opacity-0 transition-opacity group-hover:opacity-100 z-30">
+                {eb.badge.title}
+              </span>
+            </div>
+          ))}
+          {badges.length > 6 && (
+            <BadgesModal badges={badges} name={partner.display_name}>
+              <button className="text-[10px] font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                +{badges.length - 6} more
+              </button>
+            </BadgesModal>
+          )}
+        </div>
+      )}
+
       {/* ─────────── PHOTOS & VIDEOS ─────────── */}
       {mediaItems.length > 0 && (
         <section className="mt-6 mx-5">
