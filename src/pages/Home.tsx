@@ -237,7 +237,7 @@ export default function Home() {
       {/* Search bar */}
       <div className="relative z-30 px-4 md:px-6 pb-3">
         <div className="flex items-center gap-2">
-          <div className="flex flex-1 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5">
+          <div className="flex flex-1 items-center gap-2.5 rounded-full border border-border/40 bg-card px-4 py-2">
             <SearchIcon size={16} fill="hsl(var(--muted-foreground))" />
             <input
               type="text"
