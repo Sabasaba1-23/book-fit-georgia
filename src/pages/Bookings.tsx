@@ -378,7 +378,7 @@ export default function Bookings() {
                     <div className="min-w-0 flex-1">
                       <h3 className="text-card-title leading-tight truncate">{title}</h3>
                       <p
-                        className="text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors"
+                        className="text-meta cursor-pointer hover:text-primary transition-colors"
                         onClick={() => navigate(`/partner/${partner.id}`)}
                       >
                         {partner.display_name}

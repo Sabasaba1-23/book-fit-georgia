@@ -260,7 +260,7 @@ export default function Home() {
       </div>
 
       {/* Feed */}
-      <main className="relative z-10 px-4 md:px-6">
+      <main className="relative z-10 px-5 md:px-6">
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
             {[1, 2, 3].map((i) => (
