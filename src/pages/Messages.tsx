@@ -403,12 +403,9 @@ export default function Messages() {
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Start the conversation!</p>
-              {!hasConfirmedBooking && (
-                <p className="text-xs text-muted-foreground/70 mt-1 max-w-xs">
-                  Feel free to ask about the session, schedule, or anything you need before booking.
-                </p>
-              )}
+              <p className="text-sm text-muted-foreground">
+                {hasConfirmedBooking ? "Start the conversation!" : "Select a question below to get started"}
+              </p>
             </div>
           )}
           {messages.map((msg) => {
