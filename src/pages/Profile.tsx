@@ -10,17 +10,11 @@ import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
 import DeleteAccountDialog from "@/components/DeleteAccountDialog";
+import { EditTwo, BankCard, Remind, HeadsetOne, Logout, Camera as CameraIcon, Delete } from "@icon-park/react";
 import {
-  Pencil,
-  CreditCard,
-  Bell,
-  HelpCircle,
   ChevronRight,
-  LogOut,
   Plus,
   X,
-  Camera,
-  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
