@@ -125,7 +125,7 @@ export default function PartnerProfile() {
       if (partnerRes.data) {
         const { data: vData } = await supabase
           .from("partner_verifications")
-          .select("date_of_birth, years_experience, specializations, trainer_type")
+          .select("date_of_birth, years_experience, specializations, trainer_type, social_instagram, social_facebook")
           .eq("partner_id", id)
           .maybeSingle();
         if (vData) {
