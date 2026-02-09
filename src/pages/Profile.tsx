@@ -73,6 +73,7 @@ export default function Profile() {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("");
   const [showInterestPicker, setShowInterestPicker] = useState(false);
+  const [interestSearch, setInterestSearch] = useState("");
   const [showPayment, setShowPayment] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
