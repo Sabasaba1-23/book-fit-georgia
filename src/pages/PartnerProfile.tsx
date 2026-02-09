@@ -378,6 +378,43 @@ export default function PartnerProfile() {
         </section>
       )}
 
+      {/* ─────────── SECTION 3.5: PHOTOS & VIDEOS ─────────── */}
+      {mediaItems.length > 0 && (
+        <section className="mt-10 mx-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Camera className="h-3.5 w-3.5 text-muted-foreground" />
+            <SectionTitle>Photos & Videos</SectionTitle>
+          </div>
+          <Carousel opts={{ align: "start", loop: false }} className="w-full">
+            <CarouselContent className="-ml-3">
+              {mediaItems.map((item, idx) => (
+                <CarouselItem
+                  key={item.id}
+                  className="pl-3 basis-[75%] sm:basis-[60%]"
+                >
+                  <button
+                    onClick={() => setLightboxIndex(idx)}
+                    className="w-full overflow-hidden rounded-2xl bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    <div className="aspect-[4/3]">
+                      <img
+                        src={item.image_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  </button>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+          {mediaItems.length > 2 && (
+            <p className="mt-2 text-[11px] text-muted-foreground text-center">Swipe to see more</p>
+          )}
+        </section>
+      )}
+
       {/* ─────────── SECTION 4: DETAILS (COLLAPSIBLE) ─────────── */}
       {(verification?.years_experience || verification?.specializations?.length || verification?.trainer_type ||
         (partner.sports && partner.sports.length > 0) ||
