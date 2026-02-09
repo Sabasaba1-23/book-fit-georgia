@@ -228,6 +228,7 @@ export default function PartnerDashboard() {
             }}
             onNavigate={setProfileSubScreen}
             onSwitchTab={(tab) => handleTabChange(tab as Tab)}
+            onOpenVerification={() => setShowVerification(true)}
           />
         );
     }
