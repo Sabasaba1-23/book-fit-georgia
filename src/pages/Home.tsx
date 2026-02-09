@@ -201,7 +201,7 @@ export default function Home() {
     <div className="relative min-h-screen bg-background overflow-x-hidden overscroll-none mx-auto max-w-7xl pb-[calc(60px+var(--sab))]">
 
       {/* Header */}
-      <header className="relative z-40 px-4 md:px-6 pt-4 pb-3">
+      <header className="relative z-40 px-4 md:px-6 pt-6 pb-3">
         <div className="flex items-center justify-between">
           <div>
             {firstName && (
@@ -237,7 +237,7 @@ export default function Home() {
       {/* Search bar */}
       <div className="relative z-30 px-4 md:px-6 pb-3">
         <div className="flex items-center gap-2">
-          <div className="flex flex-1 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5">
+          <div className="flex flex-1 items-center gap-2.5 rounded-full border border-border/40 bg-card px-4 py-2">
             <SearchIcon size={16} fill="hsl(var(--muted-foreground))" />
             <input
               type="text"
@@ -255,17 +255,17 @@ export default function Home() {
       <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
       {/* Section header */}
-      <div className="px-4 md:px-6 pt-4 pb-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">{t("recommended") || "Recommended"}</h2>
+      <div className="px-4 md:px-6 pt-5 pb-3 flex items-center justify-between">
+        <h2 className="text-[17px] font-semibold text-foreground">{t("recommended") || "Recommended"}</h2>
       </div>
 
       {/* Feed */}
       <main className="relative z-10 px-4 md:px-6">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="overflow-hidden rounded-2xl border border-border/60">
-                <Skeleton className="h-[200px] w-full" />
+              <div key={i} className="overflow-hidden rounded-[22px] border border-border/60">
+                <Skeleton className="w-full" style={{ height: "clamp(220px, 55vw, 320px)" }} />
                 <div className="p-4 space-y-3">
                   <Skeleton className="h-4 w-2/3" />
                   <Skeleton className="h-4 w-1/2" />
@@ -282,7 +282,7 @@ export default function Home() {
             <p className="text-muted-foreground text-sm">{t("noListings")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
             {feedItems.map((item) => {
               if (item.type === "listing") {
                 const l = item.data;
