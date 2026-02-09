@@ -7,13 +7,8 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  CreditCard,
-  Lock,
-  CheckCircle2,
-  Smartphone,
-  ArrowRight,
-} from "lucide-react";
+import { Lock, CheckCircle2, ArrowRight } from "lucide-react";
+import { BankCard, PaymentMethod, Iphone } from "@icon-park/react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 
