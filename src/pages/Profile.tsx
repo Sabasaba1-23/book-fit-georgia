@@ -316,7 +316,7 @@ export default function Profile() {
       {/* Bookmarked */}
       <div className="relative z-10 px-5 mb-10">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground">{t("bookmarkedSection")}</h2>
+          <h2 className="text-section-title">{t("bookmarkedSection")}</h2>
           {bookmarks.length > 4 && (
             <button className="text-[14px] font-medium text-primary opacity-75">{t("viewAllLabel")}</button>
           )}
