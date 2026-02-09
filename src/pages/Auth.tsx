@@ -228,11 +228,22 @@ export default function Auth() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Green gradient background accents */}
+      {/* Rich green gradient background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-24 -right-24 h-[340px] w-[340px] rounded-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent blur-3xl" />
-        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-primary/15 via-accent/20 to-transparent blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[200px] w-[600px] rounded-full bg-gradient-to-t from-primary/8 via-transparent to-transparent blur-2xl" />
+        {/* Top-right glow */}
+        <div className="absolute -top-28 -right-28 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-primary/25 via-primary/12 to-transparent blur-[80px]" />
+        {/* Left-center accent */}
+        <div className="absolute top-[30%] -left-36 h-[350px] w-[350px] rounded-full bg-gradient-to-tr from-primary/18 via-accent/20 to-transparent blur-[70px]" />
+        {/* Center-right subtle */}
+        <div className="absolute top-[55%] right-[-10%] h-[250px] w-[250px] rounded-full bg-gradient-to-bl from-primary/12 via-accent/10 to-transparent blur-[60px]" />
+        {/* Bottom wide gradient band */}
+        <div className="absolute bottom-0 left-0 right-0 h-[320px] bg-gradient-to-t from-primary/14 via-primary/6 to-transparent" />
+        {/* Bottom-left orb */}
+        <div className="absolute -bottom-16 -left-16 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-[70px]" />
+        {/* Bottom-right orb */}
+        <div className="absolute -bottom-12 -right-12 h-[260px] w-[260px] rounded-full bg-gradient-to-tl from-primary/16 via-primary/8 to-transparent blur-[60px]" />
+        {/* Bottom center highlight */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 h-[120px] w-[500px] rounded-full bg-gradient-to-t from-primary/10 via-accent/8 to-transparent blur-[50px]" />
       </div>
 
       {/* ─── LOGIN ─── */}
