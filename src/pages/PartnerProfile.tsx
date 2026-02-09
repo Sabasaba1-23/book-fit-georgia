@@ -6,7 +6,6 @@ import { Camera } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import MediaLightbox from "@/components/partner/MediaLightbox";
 import { useAuth } from "@/contexts/AuthContext";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/BottomNav";
 import {
   Share2,
@@ -18,8 +17,6 @@ import {
   Users,
   Bookmark,
   Calendar,
-  Zap,
-  Trophy,
   Phone,
   Lock,
   MessageCircle,
@@ -32,9 +29,8 @@ import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useBadges } from "@/hooks/useBadges";
-import { ProfileBadges } from "@/components/badges/ProfileBadges";
-
-const LISTING_ICONS = [Zap, Dumbbell, Trophy];
+import { BadgeIcon } from "@/components/badges/BadgeIcon";
+import { BadgesModal } from "@/components/badges/BadgesModal";
 
 interface PartnerData {
   id: string;
@@ -135,7 +131,6 @@ export default function PartnerProfile() {
         setGymNames(gyms);
       }
 
-      // Fetch verification data (age, experience, specializations)
       if (partnerRes.data) {
         const { data: vData } = await supabase
           .from("partner_verifications")
@@ -150,7 +145,6 @@ export default function PartnerProfile() {
         }
       }
 
-      // Count completed sessions
       const { count: completedCount } = await supabase
         .from("bookings")
         .select("id, training_listings!inner(partner_id)", { count: "exact", head: true })
@@ -158,7 +152,6 @@ export default function PartnerProfile() {
         .eq("booking_status", "completed");
       setSessionsCompleted(completedCount || 0);
 
-      // Fetch real reviews
       const { data: reviewsData } = await supabase
         .from("reviews")
         .select("id, rating, review_text, created_at, reviewer_id, bookings!inner(training_listings!inner(partner_id))")
@@ -179,7 +172,6 @@ export default function PartnerProfile() {
         );
       }
 
-      // Check if current user has a confirmed booking
       if (user && partnerRes.data) {
         const { data: bookings } = await supabase
           .from("bookings")
@@ -191,7 +183,6 @@ export default function PartnerProfile() {
         setHasBooking(booked);
       }
 
-      // Fetch partner media
       const { data: mediaData } = await supabase
         .from("partner_media")
         .select("id, image_url, is_featured, sort_order")
@@ -243,9 +234,7 @@ export default function PartnerProfile() {
       ? verification.trainer_type.charAt(0).toUpperCase() + verification.trainer_type.slice(1) + " Trainer"
       : (partner.sports?.[0] || "Fitness") + " Specialist";
 
-  // Collect unique training types from listings
   const sessionTypes = [...new Set(listings.map(l => trainingTypeLabel(l.training_type)))];
-  // Collect location types
   const locationTypes = [...new Set(
     listings.map(l => {
       const raw = (l as any).location_type;
@@ -255,132 +244,136 @@ export default function PartnerProfile() {
   )];
 
   const bioText = partner.bio || "";
-  const bioIsLong = bioText.length > 200;
+  const bioIsLong = bioText.length > 160;
+
+  // Hero image: logo_url, first featured media, or null for gradient fallback
+  const heroImage = partner.logo_url || (mediaItems.length > 0 ? mediaItems[0].image_url : null);
+
+  // Stats line items for the hero overlay
+  const statsItems: string[] = [];
+  if (rating) statsItems.push(`⭐ ${rating} (${reviewCount})`);
+  if (verification?.years_experience) statsItems.push(`${verification.years_experience}+ yrs`);
+  if (partner.location) statsItems.push(partner.location);
 
   return (
     <div className="relative min-h-screen bg-background pb-28">
-      {/* ─────────── SECTION 1: HERO / IDENTITY ─────────── */}
+      {/* ─────────── HERO SECTION ─────────── */}
       <div className="relative">
-        {/* Gradient hero background */}
-        <div className="h-52 w-full bg-gradient-to-br from-primary/25 via-accent/30 to-secondary/15">
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
-        </div>
+        {heroImage ? (
+          <div className="relative h-[420px] w-full overflow-hidden">
+            <img
+              src={heroImage}
+              alt={partner.display_name}
+              className="h-full w-full object-cover"
+            />
+            {/* Bottom gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          </div>
+        ) : (
+          <div className="relative h-[420px] w-full bg-gradient-to-br from-primary/25 via-accent/30 to-secondary/15">
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-[120px] font-extrabold text-primary/10">{partner.display_name.charAt(0)}</span>
+            </div>
+          </div>
+        )}
 
-        {/* Top actions */}
+        {/* Top floating actions */}
         <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between">
           <BackButton variant="overlay" />
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40">
-            <Share2 className="h-4 w-4 text-primary-foreground" />
+          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50">
+            <Share2 className="h-4 w-4 text-white" />
           </button>
         </div>
 
-        {/* Avatar — overlapping hero */}
-        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 z-20">
-          <div className="relative">
-            <Avatar className="h-32 w-32 border-[5px] border-card shadow-2xl">
-              {partner.logo_url && <AvatarImage src={partner.logo_url} className="object-cover" />}
-              <AvatarFallback className="bg-primary/10 text-4xl font-bold text-primary">
-                {partner.display_name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
+        {/* Bookmark floating button */}
+        <button className="absolute bottom-24 right-5 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-lg transition-all hover:bg-white/25 active:scale-95">
+          <Bookmark className="h-5 w-5 text-white" />
+        </button>
+
+        {/* Hero overlay card — anchored to bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5">
+          {/* Name + verified */}
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
+              {partner.display_name}
+            </h1>
+            {age && <span className="text-lg text-muted-foreground">{age}</span>}
             {isVerified && (
-              <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary shadow-lg">
-                <CheckCircle2 className="h-4 w-4 text-primary-foreground" />
-              </div>
+              <CheckCircle2 className="h-5 w-5 text-primary fill-primary/20" />
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Identity text — centered below avatar */}
-      <div className="pt-20 text-center px-6">
-        <div className="flex items-center justify-center gap-2">
-          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">{partner.display_name}</h1>
-          {age && <span className="text-base text-muted-foreground">{age}</span>}
-        </div>
-        <p className="mt-1 text-sm font-semibold text-primary">{roleLabel}</p>
+          {/* Role / specialization */}
+          <p className="mt-0.5 text-[11px] font-bold uppercase tracking-[0.15em] text-primary">
+            {roleLabel}
+          </p>
 
-        {/* Gym association */}
-        {gymNames.length > 0 && (
-          <div className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <Building2 className="h-3.5 w-3.5" />
-            <span>{gymNames.join(" · ")}</span>
-          </div>
-        )}
-
-        {/* Location */}
-        {partner.location && (
-          <div className="mt-1.5 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" />
-            <span>{partner.location}</span>
-          </div>
-        )}
-
-        {/* Badges */}
-        <ProfileBadges badges={badges} name={partner.display_name} maxVisible={3} />
-      </div>
-
-      {/* ─────────── SECTION 2: QUICK STATS ROW ─────────── */}
-      <div className="mt-6 mx-5">
-        <div className="grid grid-cols-3 gap-2.5">
-          {verification?.years_experience && (
-            <StatBlock icon={<Award className="h-4 w-4 text-primary" />} value={`${verification.years_experience}+`} label="Years Exp." />
+          {/* Gym association */}
+          {gymNames.length > 0 && (
+            <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Building2 className="h-3 w-3" />
+              <span>{gymNames.join(" · ")}</span>
+            </div>
           )}
-          {sessionsCompleted > 0 && (
-            <StatBlock icon={<Calendar className="h-4 w-4 text-primary" />} value={String(sessionsCompleted)} label="Sessions" />
+
+          {/* Badge icons row */}
+          {badges.length > 0 && (
+            <BadgesModal badges={badges} name={partner.display_name}>
+              <button className="mt-2 flex items-center gap-1">
+                {badges.slice(0, 5).map((eb) => (
+                  <BadgeIcon key={eb.badge_key} icon={eb.badge.icon} tier={eb.badge.tier} size="sm" />
+                ))}
+                {badges.length > 5 && (
+                  <span className="text-[10px] font-semibold text-muted-foreground ml-1">+{badges.length - 5}</span>
+                )}
+              </button>
+            </BadgesModal>
           )}
-          {rating && (
-            <StatBlock icon={<Star className="h-4 w-4 fill-primary text-primary" />} value={rating} label={`${reviewCount} reviews`} />
+
+          {/* Compact stats row */}
+          {statsItems.length > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground font-medium">
+              {statsItems.join("  ·  ")}
+            </p>
           )}
         </div>
       </div>
 
       {/* ─────────── PRIMARY CTA ─────────── */}
-      <div className="mt-8 mx-5 flex items-center gap-3">
-        <button className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted active:scale-95">
-          <Bookmark className="h-5 w-5 text-primary" />
-        </button>
+      <div className="mx-5 mt-5">
         <button
           onClick={() => document.getElementById("sessions-section")?.scrollIntoView({ behavior: "smooth" })}
-          className="relative flex-1 rounded-2xl bg-primary py-4 text-center text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
+          className="w-full rounded-2xl bg-primary py-4 text-center text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
         >
           Book a Session
         </button>
-        <button
-          onClick={() => navigate(`/messages`)}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted active:scale-95"
-        >
-          <MessageCircle className="h-5 w-5 text-muted-foreground" />
-        </button>
       </div>
 
-      {/* ─────────── SECTION 3: BIO / ABOUT ─────────── */}
+      {/* ─────────── ABOUT ─────────── */}
       {bioText && (
-        <section className="mt-10 mx-5">
+        <section className="mt-6 mx-5">
           <SectionTitle>About</SectionTitle>
-          <div className="mt-3 rounded-2xl bg-card border border-border/50 p-5">
-            <p className={cn(
-              "text-[15px] leading-[1.75] text-foreground/80",
-              !bioExpanded && bioIsLong && "line-clamp-4"
-            )}>
-              {bioText}
-            </p>
-            {bioIsLong && (
-              <button
-                onClick={() => setBioExpanded(!bioExpanded)}
-                className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary"
-              >
-                {bioExpanded ? "Show less" : "Read more"}
-                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", bioExpanded && "rotate-180")} />
-              </button>
-            )}
-          </div>
+          <p className={cn(
+            "mt-2.5 text-[15px] leading-[1.7] text-foreground/80",
+            !bioExpanded && bioIsLong && "line-clamp-3"
+          )}>
+            {bioText}
+          </p>
+          {bioIsLong && (
+            <button
+              onClick={() => setBioExpanded(!bioExpanded)}
+              className="mt-1.5 text-xs font-semibold text-primary"
+            >
+              {bioExpanded ? "Show less" : "Read more"}
+            </button>
+          )}
         </section>
       )}
 
-      {/* ─────────── SECTION 3.5: PHOTOS & VIDEOS ─────────── */}
+      {/* ─────────── PHOTOS & VIDEOS ─────────── */}
       {mediaItems.length > 0 && (
-        <section className="mt-10 mx-5">
+        <section className="mt-6 mx-5">
           <div className="flex items-center gap-2 mb-3">
             <Camera className="h-3.5 w-3.5 text-muted-foreground" />
             <SectionTitle>Photos & Videos</SectionTitle>
@@ -388,21 +381,13 @@ export default function PartnerProfile() {
           <Carousel opts={{ align: "start", loop: false }} className="w-full">
             <CarouselContent className="-ml-3">
               {mediaItems.map((item, idx) => (
-                <CarouselItem
-                  key={item.id}
-                  className="pl-3 basis-[75%] sm:basis-[60%]"
-                >
+                <CarouselItem key={item.id} className="pl-3 basis-[75%] sm:basis-[60%]">
                   <button
                     onClick={() => setLightboxIndex(idx)}
                     className="w-full overflow-hidden rounded-2xl bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   >
                     <div className="aspect-[4/3]">
-                      <img
-                        src={item.image_url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
+                      <img src={item.image_url} alt="" className="h-full w-full object-cover" loading="lazy" />
                     </div>
                   </button>
                 </CarouselItem>
@@ -415,11 +400,11 @@ export default function PartnerProfile() {
         </section>
       )}
 
-      {/* ─────────── SECTION 4: DETAILS (COLLAPSIBLE) ─────────── */}
+      {/* ─────────── EXPERIENCE & DETAILS (COLLAPSIBLE) ─────────── */}
       {(verification?.years_experience || verification?.specializations?.length || verification?.trainer_type ||
         (partner.sports && partner.sports.length > 0) ||
         (partner.languages && partner.languages.length > 0) || sessionTypes.length > 0 || locationTypes.length > 0) && (
-        <section className="mt-8 mx-5">
+        <section className="mt-6 mx-5">
           <button
             onClick={() => setDetailsExpanded(!detailsExpanded)}
             className="flex w-full items-center justify-between rounded-2xl bg-card border border-border/50 p-4 transition-colors hover:border-primary/30 active:bg-muted/30"
@@ -445,7 +430,6 @@ export default function PartnerProfile() {
 
           {detailsExpanded && (
             <div className="mt-3 space-y-3 animate-in slide-in-from-top-2 fade-in duration-200">
-              {/* Credentials */}
               {verification?.years_experience && (
                 <CredentialRow icon={<Award className="h-4 w-4 text-primary" />} label="Experience" value={`${verification.years_experience}+ years`} />
               )}
@@ -465,8 +449,6 @@ export default function PartnerProfile() {
                   </div>
                 </div>
               )}
-
-              {/* Sports */}
               {partner.sports && partner.sports.length > 0 && (
                 <div className="rounded-2xl bg-card border border-border/50 p-4">
                   <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2.5">Sports & Activities</p>
@@ -477,8 +459,6 @@ export default function PartnerProfile() {
                   </div>
                 </div>
               )}
-
-              {/* Languages & Details */}
               {partner.languages && partner.languages.length > 0 && (
                 <DetailChipRow icon={<Globe className="h-4 w-4 text-primary" />} label="Languages" items={partner.languages} />
               )}
@@ -493,10 +473,10 @@ export default function PartnerProfile() {
         </section>
       )}
 
-      {/* ─────────── SECTION 7: CONTACT ─────────── */}
-      <section className="mt-10 mx-5">
+      {/* ─────────── CONTACT ─────────── */}
+      <section className="mt-6 mx-5">
         <SectionTitle>Contact</SectionTitle>
-        <div className="mt-3 rounded-2xl bg-card border border-border/50 p-5">
+        <div className="mt-2.5">
           {hasBooking ? (
             <div className="flex items-center gap-3">
               <button
@@ -545,7 +525,7 @@ export default function PartnerProfile() {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 rounded-2xl bg-card border border-border/50 p-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
                 <Lock className="h-4 w-4 text-muted-foreground" />
               </div>
@@ -555,26 +535,21 @@ export default function PartnerProfile() {
         </div>
       </section>
 
-      {/* ─────────── SECTION 8: REVIEWS ─────────── */}
+      {/* ─────────── REVIEWS ─────────── */}
       {reviews.length > 0 && (
-        <section className="mt-10 mx-5">
+        <section className="mt-6 mx-5">
           <SectionTitle>Reviews ({reviewCount})</SectionTitle>
-          <div className="mt-3 space-y-3">
+          <div className="mt-2.5 space-y-2.5">
             {reviews.slice(0, 5).map((review) => (
-              <div key={review.id} className="rounded-2xl bg-card border border-border/50 p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2.5">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">U</AvatarFallback>
-                    </Avatar>
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: review.rating }).map((_, si) => (
-                        <Star key={si} className="h-3.5 w-3.5 fill-primary text-primary" />
-                      ))}
-                      {Array.from({ length: 5 - review.rating }).map((_, si) => (
-                        <Star key={`e-${si}`} className="h-3.5 w-3.5 text-border" />
-                      ))}
-                    </div>
+              <div key={review.id} className="rounded-2xl bg-card border border-border/50 p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: review.rating }).map((_, si) => (
+                      <Star key={si} className="h-3.5 w-3.5 fill-primary text-primary" />
+                    ))}
+                    {Array.from({ length: 5 - review.rating }).map((_, si) => (
+                      <Star key={`e-${si}`} className="h-3.5 w-3.5 text-border" />
+                    ))}
                   </div>
                   <span className="text-[11px] text-muted-foreground">
                     {format(new Date(review.created_at), "MMM d, yyyy")}
@@ -589,10 +564,10 @@ export default function PartnerProfile() {
         </section>
       )}
 
-      {/* ─────────── SECTION 9: UPCOMING SESSIONS ─────────── */}
-      <section id="sessions-section" className="mt-10 mx-5 pb-4">
-        <SectionTitle>Upcoming Sessions</SectionTitle>
-        <div className="mt-3 space-y-3">
+      {/* ─────────── AVAILABLE SESSIONS ─────────── */}
+      <section id="sessions-section" className="mt-6 mx-5 pb-4">
+        <SectionTitle>Available Sessions</SectionTitle>
+        <div className="mt-2.5 space-y-2.5">
           {listings.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border py-10 text-center">
               <Calendar className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
@@ -600,35 +575,42 @@ export default function PartnerProfile() {
             </div>
           ) : (
             listings.map((listing, idx) => {
-              const Icon = LISTING_ICONS[idx % LISTING_ICONS.length];
               const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
               const nextDate = new Date(listing.scheduled_at);
+              const isNext = idx === 0;
               const isLimitedSpots = listing.max_spots <= 3;
               return (
                 <div
                   key={listing.id}
-                  className="flex items-center gap-3.5 rounded-2xl bg-card border border-border/50 p-4 cursor-pointer transition-all hover:border-primary/30 active:scale-[0.99]"
+                  className={cn(
+                    "flex items-center gap-3.5 rounded-2xl bg-card border p-4 cursor-pointer transition-all hover:border-primary/30 active:scale-[0.99]",
+                    isNext ? "border-primary/40" : "border-border/50"
+                  )}
                   onClick={() => navigate("/")}
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                    <Calendar className="h-5 w-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-foreground truncate">{title}</p>
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-1">
-                      <span className="flex items-center gap-0.5"><Calendar className="h-3 w-3" /> {format(nextDate, "MMM d")}</span>
-                      <span className="flex items-center gap-0.5"><Clock className="h-3 w-3" /> {listing.duration_minutes} min</span>
-                      <span className="flex items-center gap-0.5"><Users className="h-3 w-3" /> {trainingTypeLabel(listing.training_type)}</span>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-foreground truncate">{title}</p>
+                      {isNext && (
+                        <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">Next</span>
+                      )}
+                      {isLimitedSpots && !isNext && (
+                        <span className="shrink-0 rounded-full bg-destructive/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-destructive">Limited</span>
+                      )}
                     </div>
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                      <span>{format(nextDate, "MMM d, hh:mm a")}</span>
+                      <span>·</span>
+                      <span>{listing.duration_minutes} min</span>
+                      <span>·</span>
+                      <span>{trainingTypeLabel(listing.training_type)}</span>
+                    </div>
+                    <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{listing.sport}</span>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-base font-extrabold text-primary">{listing.price_gel}₾</p>
-                    {isLimitedSpots ? (
-                      <p className="text-[9px] font-bold uppercase tracking-wider text-destructive">Limited</p>
-                    ) : (
-                      <p className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">{format(nextDate, "hh:mm a")}</p>
-                    )}
-                  </div>
+                  <p className="text-lg font-extrabold text-primary shrink-0">{listing.price_gel}₾</p>
                 </div>
               );
             })
@@ -637,7 +619,7 @@ export default function PartnerProfile() {
       </section>
 
       {/* ─────────── STICKY BOTTOM CTA ─────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-card/95 backdrop-blur-lg px-5 py-3 safe-area-pb">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-card/95 backdrop-blur-xl px-5 py-3 safe-area-pb">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <div className="flex-1 min-w-0">
             <p className="text-sm font-bold text-foreground truncate">{partner.display_name}</p>
@@ -674,16 +656,6 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
     <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
       {children}
     </h2>
-  );
-}
-
-function StatBlock({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
-  return (
-    <div className="flex flex-col items-center rounded-2xl bg-card border border-border/50 py-4 px-2">
-      {icon}
-      <span className="mt-1.5 text-lg font-extrabold text-foreground">{value}</span>
-      <span className="mt-0.5 text-[10px] text-muted-foreground font-medium">{label}</span>
-    </div>
   );
 }
 
