@@ -282,15 +282,15 @@ export default function PartnerProfile() {
         {/* Top floating actions */}
         <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between">
           <BackButton variant="overlay" />
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50">
-            <Share2 className="h-4 w-4 text-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50 active:scale-95">
+              <Bookmark className="h-4 w-4 text-white" />
+            </button>
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50 active:scale-95">
+              <Share2 className="h-4 w-4 text-white" />
+            </button>
+          </div>
         </div>
-
-        {/* Bookmark floating button */}
-        <button className="absolute bottom-24 right-5 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-lg transition-all hover:bg-white/25 active:scale-95">
-          <Bookmark className="h-5 w-5 text-white" />
-        </button>
 
         {/* Hero overlay card — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5">
