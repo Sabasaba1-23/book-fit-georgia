@@ -40,6 +40,15 @@ interface Message {
 
 const PRE_BOOKING_MSG_SOFT_LIMIT = 15;
 
+const PRESET_QUESTIONS = [
+  "Is this session suitable for beginners?",
+  "What equipment do I need to bring?",
+  "Is this session indoors or outdoors?",
+  "Can this session be adapted to injuries or limitations?",
+  "What language is the session conducted in?",
+  "How many participants are usually in the session?",
+];
+
 export default function Messages() {
   const { t } = useLanguage();
   const { user } = useAuth();
