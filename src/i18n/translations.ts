@@ -1319,6 +1319,7 @@ export const translations = {
     loading: "Загрузка...",
     logOut: "Выйти",
     settings: "Настройки",
+    partnerDashboard: "Панель партнёра",
     languageLabel: "Язык",
     loginRequired: "Пожалуйста, войдите для продолжения",
     loginToBook: "Войдите, чтобы забронировать",
