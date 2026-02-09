@@ -287,7 +287,7 @@ export default function Profile() {
               onClick={() => setEditingName(true)}
               className="mt-3 flex items-center gap-1.5 group"
             >
-              <h1 className="text-2xl font-bold text-primary-foreground">{displayName}</h1>
+              <h1 className="text-[30px] font-semibold tracking-[-0.3px] leading-[1.15] text-primary-foreground">{displayName}</h1>
               <EditTwo size={14} fill="hsl(var(--primary-foreground) / 0.5)" className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           )}
