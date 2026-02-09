@@ -126,6 +126,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const spotsLeft = listing.max_spots - (listing.booked_spots || 0);
   const date = new Date(listing.scheduled_at);
   const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
+  const rentalInfo = lang === "ka" ? listing.rental_info_ka : listing.rental_info_en;
   const imageUrl = listing.background_image_url || SPORT_FALLBACK_IMAGES[listing.sport] || SPORT_FALLBACK_IMAGES.HIIT;
   const hasRating = !!(listing.partner.avg_rating && listing.partner.review_count && listing.partner.review_count > 0);
 
