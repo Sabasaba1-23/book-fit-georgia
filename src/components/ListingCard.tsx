@@ -314,25 +314,27 @@ export default function ListingCard({ listing }: ListingCardProps) {
       {expanded && (
         <div className="border-t border-border/60 animate-in slide-in-from-top-2 fade-in duration-300">
           {/* Partner row with avatar */}
-          <div className="px-5 pt-5 pb-2 flex items-center gap-2.5">
-            <Avatar
-              className="h-8 w-8 cursor-pointer"
+          <div className="px-5 pt-5 pb-2 flex items-center justify-between">
+            <button
               onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 const pid = listing.partner_id || listing.partner?.id;
                 if (pid) navigate(`/partner/${pid}`);
               }}
+              className="flex items-center gap-2.5 rounded-full border border-border/60 bg-muted/30 pl-1 pr-4 py-1 transition-colors hover:bg-muted/60 active:scale-[0.97]"
             >
-              {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
-              <AvatarFallback className="bg-primary/10 text-[10px] font-semibold text-primary">
-                {listing.partner.display_name.charAt(0)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-[14px] font-medium text-foreground">
-              {listing.partner.display_name}
-            </span>
+              <Avatar className="h-7 w-7">
+                {listing.partner.logo_url ? <AvatarImage src={listing.partner.logo_url} /> : null}
+                <AvatarFallback className="bg-primary/10 text-[10px] font-semibold text-primary">
+                  {listing.partner.display_name.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-[13px] font-medium text-foreground">
+                {listing.partner.display_name}
+              </span>
+            </button>
             {hasRating && (
-              <div className="ml-auto flex items-center gap-1">
+              <div className="flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-primary text-primary" />
                 <span className="text-[13px] font-semibold text-foreground">
                   {Number(listing.partner.avg_rating).toFixed(1)}
