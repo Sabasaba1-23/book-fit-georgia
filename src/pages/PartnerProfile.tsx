@@ -74,6 +74,8 @@ interface VerificationData {
   years_experience: string | null;
   specializations: string[] | null;
   trainer_type: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
 }
 
 export default function PartnerProfile() {
