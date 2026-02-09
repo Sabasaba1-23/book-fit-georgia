@@ -22,6 +22,7 @@ import PartnerEditProfile from "@/components/partner/PartnerEditProfile";
 import PartnerPhotosMedia from "@/components/partner/PartnerPhotosMedia";
 import PartnerBadgesScreen from "@/components/partner/PartnerBadgesScreen";
 import PartnerSettings from "@/components/partner/PartnerSettings";
+import GymTrainerManager from "@/components/partner/GymTrainerManager";
 
 interface PartnerListing {
   id: string;
