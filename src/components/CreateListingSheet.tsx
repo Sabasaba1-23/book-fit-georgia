@@ -174,7 +174,10 @@ export default function CreateListingSheet({
           .from("listing-images")
           .upload(path, imageFile);
 
-        if (!uploadError) {
+        if (uploadError) {
+          console.error("Listing image upload failed:", uploadError);
+          toast({ title: "Cover image upload failed", description: uploadError.message, variant: "destructive" });
+        } else {
           const { data: urlData } = supabase.storage
             .from("listing-images")
             .getPublicUrl(path);
