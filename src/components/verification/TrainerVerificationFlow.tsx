@@ -66,7 +66,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
 
   // Step 2
   const [trainerType, setTrainerType] = useState("");
-  const [yearsExp, setYearsExp] = useState(0);
+  const [yearsExp, setYearsExp] = useState("");
   const [specializations, setSpecializations] = useState<string[]>([]);
 
   // Step 3
