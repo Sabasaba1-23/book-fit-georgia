@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useChatBookingStatus } from "@/hooks/useChatBookingStatus";
 import { containsContactInfo, getContactWarning } from "@/lib/contactDetection";
 import {
-  ArrowLeft,
   Send,
   MessageCircle,
   Shield,
@@ -18,6 +17,7 @@ import {
   Info,
   X,
 } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { format, isToday, isYesterday } from "date-fns";
 
 interface Thread {

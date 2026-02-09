@@ -9,7 +9,8 @@ import SessionConfirmationCard from "@/components/SessionConfirmationCard";
 import ReviewForm from "@/components/ReviewForm";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import { Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { format, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 

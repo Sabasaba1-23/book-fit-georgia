@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import BackButton from "@/components/BackButton";
 
 export default function TermsConditions() {
   const navigate = useNavigate();
