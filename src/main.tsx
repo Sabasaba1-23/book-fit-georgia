@@ -1,8 +1,12 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import "@icon-park/react/styles/index.css";
+import { IconProvider, DEFAULT_ICON_CONFIGS } from "@icon-park/react";
 import { initNativePlugins } from "./lib/native";
 import { Capacitor } from "@capacitor/core";
+
+const IconConfig = { ...DEFAULT_ICON_CONFIGS, strokeWidth: 3, strokeLinecap: "round" as const, theme: "outline" as const };
 
 // Initialize native plugins (no-op on web)
 initNativePlugins();
@@ -14,4 +18,8 @@ if (Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
   });
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <IconProvider value={IconConfig}>
+    <App />
+  </IconProvider>
+);
