@@ -584,34 +584,42 @@ export default function PartnerProfile() {
                 <div
                   key={listing.id}
                   className={cn(
-                    "flex items-center gap-3.5 rounded-2xl bg-card border p-4 cursor-pointer transition-all hover:border-primary/30 active:scale-[0.99]",
+                    "flex items-center gap-3 rounded-2xl bg-card border p-3 cursor-pointer transition-all hover:border-primary/30 active:scale-[0.99]",
                     isNext ? "border-primary/40" : "border-border/50"
                   )}
                   onClick={() => navigate("/")}
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                    <Calendar className="h-5 w-5 text-primary" />
-                  </div>
+                  {listing.background_image_url ? (
+                    <img
+                      src={listing.background_image_url}
+                      alt=""
+                      className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                      <Dumbbell className="h-5 w-5 text-primary" />
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-foreground truncate">{title}</p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="text-[13px] font-bold text-foreground truncate max-w-[140px]">{title}</p>
                       {isNext && (
-                        <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">Next</span>
+                        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-primary leading-none">Next</span>
                       )}
                       {isLimitedSpots && !isNext && (
-                        <span className="shrink-0 rounded-full bg-destructive/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-destructive">Limited</span>
+                        <span className="shrink-0 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-destructive leading-none">Limited</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 flex-wrap">
                       <span>{format(nextDate, "MMM d, hh:mm a")}</span>
                       <span>·</span>
-                      <span>{listing.duration_minutes} min</span>
+                      <span>{listing.duration_minutes}min</span>
                       <span>·</span>
                       <span>{trainingTypeLabel(listing.training_type)}</span>
                     </div>
-                    <span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">{listing.sport}</span>
+                    <span className="mt-0.5 inline-block rounded-full bg-muted px-2 py-0.5 text-[9px] font-medium text-muted-foreground">{listing.sport}</span>
                   </div>
-                  <p className="text-lg font-extrabold text-primary shrink-0">{listing.price_gel}₾</p>
+                  <p className="text-base font-extrabold text-primary shrink-0">{listing.price_gel}₾</p>
                 </div>
               );
             })
