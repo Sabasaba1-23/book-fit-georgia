@@ -811,6 +811,7 @@ export const translations = {
     loading: "იტვირთება...",
     logOut: "გასვლა",
     settings: "პარამეტრები",
+    partnerDashboard: "პარტნიორის პანელი",
     languageLabel: "ენა",
     loginRequired: "გთხოვთ შეხვიდეთ გასაგრძელებლად",
     loginToBook: "შეხვიდეთ ვარჯიშის დასაჯავშნად",
