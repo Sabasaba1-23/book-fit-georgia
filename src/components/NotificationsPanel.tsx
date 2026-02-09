@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BellRing, CloseRemind, CalendarThirtyTwo, MessageOne, Star, VolumeNotice } from "@icon-park/react";
+import { Alarm, CloseRemind, CalendarThirtyTwo, MessageOne, Star, VolumeNotice } from "@icon-park/react";
 import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
