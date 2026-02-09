@@ -181,7 +181,7 @@ export default function PartnerDashboard() {
             <h1 className="text-xl font-extrabold text-foreground">{profile.display_name}</h1>
           </div>
           <button className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-transform active:scale-95">
-            <Bell className="h-5 w-5 text-primary" />
+            <Alarm size={20} fill="hsl(var(--primary))" />
           </button>
         </div>
       </header>
