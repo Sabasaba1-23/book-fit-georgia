@@ -173,7 +173,7 @@ export default function PaymentSheet({
                       onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                       className="h-13 rounded-2xl border-0 bg-muted/60 pl-4 pr-12 text-[15px] font-medium shadow-none tracking-wider"
                     />
-                    <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50" />
+                    <BankCard size={20} fill="hsl(var(--muted-foreground) / 0.5)" className="absolute right-4 top-1/2 -translate-y-1/2" />
                   </div>
                 </div>
 
