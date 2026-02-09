@@ -398,25 +398,25 @@ export default function Profile() {
         <h2 className="text-lg font-bold text-foreground mb-3">{t("accountSettings")}</h2>
         <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border">
           <SettingsRow
-            icon={<CreditCard className="h-5 w-5" />}
+            icon={<BankCard size={20} />}
             iconBg="bg-primary/10 text-primary"
             label={t("paymentMethods")}
             onClick={() => setShowPayment(true)}
           />
           <SettingsRow
-            icon={<Bell className="h-5 w-5" />}
+            icon={<Remind size={20} />}
             iconBg="bg-blue-500/10 text-blue-500"
             label={t("notifications")}
             onClick={() => setShowNotifications(true)}
           />
           <SettingsRow
-            icon={<HelpCircle className="h-5 w-5" />}
+            icon={<HeadsetOne size={20} />}
             iconBg="bg-emerald-500/10 text-emerald-500"
             label={t("helpSupport")}
             onClick={() => setShowHelp(true)}
           />
           <SettingsRow
-            icon={<Trash2 className="h-5 w-5" />}
+            icon={<Delete size={20} />}
             iconBg="bg-destructive/10 text-destructive"
             label={t("deleteAccount")}
             onClick={() => setShowDeleteAccount(true)}
