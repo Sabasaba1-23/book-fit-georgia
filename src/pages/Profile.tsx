@@ -291,7 +291,7 @@ export default function Profile() {
               <EditTwo size={14} fill="hsl(var(--primary-foreground) / 0.5)" className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           )}
-          <p className="text-sm text-primary-foreground/70">{t("memberSince")} {memberSince}</p>
+          <p className="text-[14px] font-normal text-primary-foreground opacity-65 mt-2">{t("memberSince")} {memberSince}</p>
         </div>
       </div>
 
