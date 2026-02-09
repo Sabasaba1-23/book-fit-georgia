@@ -86,7 +86,7 @@ export default function PackageCard({ pkg }: PackageCardProps) {
   const savings = fullPrice - pkg.total_price_gel;
   const savingsPercent = Math.round((savings / fullPrice) * 100);
   const imageUrl = pkg.background_image_url || SPORT_IMAGES[pkg.sport] || SPORT_IMAGES["Personal Trainer"];
-  const hasRating = pkg.partner_profiles.avg_rating && pkg.partner_profiles.review_count && pkg.partner_profiles.review_count > 0;
+  const hasRating = !!(pkg.partner_profiles.avg_rating && pkg.partner_profiles.review_count && pkg.partner_profiles.review_count > 0);
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();

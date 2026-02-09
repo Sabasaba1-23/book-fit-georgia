@@ -223,7 +223,12 @@ export default function Messages() {
           filter: `thread_id=eq.${activeThread.id}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new as Message]);
+          const newMsg = payload.new as Message;
+          setMessages((prev) => {
+            // Skip if already present (optimistic or duplicate)
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
         }
       )
       .subscribe();
@@ -252,20 +257,38 @@ export default function Messages() {
     // Check for contact info and show gentle warning (don't block)
     if (!hasConfirmedBooking && containsContactInfo(newMessage)) {
       setContactWarningVisible(true);
-      // Still allow sending — just show the warning
     }
 
     setSending(true);
     const content = newMessage.trim();
     setNewMessage("");
 
-    const { error } = await supabase.from("messages").insert({
+    // Optimistic update — show message instantly
+    const optimisticMsg: Message = {
+      id: `optimistic-${Date.now()}`,
       thread_id: activeThread.id,
       sender_id: user.id,
       content,
-    });
+      sent_at: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
 
-    if (error) setNewMessage(content);
+    const { data, error } = await supabase.from("messages").insert({
+      thread_id: activeThread.id,
+      sender_id: user.id,
+      content,
+    }).select("*").single();
+
+    if (error) {
+      // Remove optimistic message on failure
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      setNewMessage(content);
+    } else if (data) {
+      // Replace optimistic message with real one
+      setMessages((prev) =>
+        prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m))
+      );
+    }
     setSending(false);
   }
 

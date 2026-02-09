@@ -131,7 +131,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const equipmentKey = lang === "ka" ? listing.equipment_notes_ka : listing.equipment_notes_en;
   const imageUrl = listing.background_image_url || SPORT_FALLBACK_IMAGES[listing.sport] || SPORT_FALLBACK_IMAGES.HIIT;
 
-  const hasRating = listing.partner.avg_rating && listing.partner.review_count && listing.partner.review_count > 0;
+  const hasRating = !!(listing.partner.avg_rating && listing.partner.review_count && listing.partner.review_count > 0);
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
