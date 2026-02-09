@@ -318,19 +318,6 @@ export default function PartnerProfile() {
             </div>
           )}
 
-          {/* Badge icons row */}
-          {badges.length > 0 && (
-            <BadgesModal badges={badges} name={partner.display_name}>
-              <button className="mt-2 flex items-center gap-1">
-                {badges.slice(0, 5).map((eb) => (
-                  <BadgeIcon key={eb.badge_key} icon={eb.badge.icon} tier={eb.badge.tier} size="sm" />
-                ))}
-                {badges.length > 5 && (
-                  <span className="text-[10px] font-semibold text-muted-foreground ml-1">+{badges.length - 5}</span>
-                )}
-              </button>
-            </BadgesModal>
-          )}
 
           {/* Compact stats row */}
           {statsItems.length > 0 && (
