@@ -37,7 +37,7 @@ interface Props {
   onOpenVerification: () => void;
 }
 
-export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut, onNavigate, onSwitchTab }: Props) {
+export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut, onNavigate, onSwitchTab, onOpenVerification }: Props) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
