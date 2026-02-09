@@ -114,7 +114,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       country_city: countryCity.trim(),
       professional_description: description.trim(),
       trainer_type: trainerType,
-      years_experience: EXPERIENCE_VALUES[yearsExp],
+      years_experience: yearsExp.trim() || null,
       specializations,
       verification_step: nextStep,
     } as any;
