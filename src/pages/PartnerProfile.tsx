@@ -195,12 +195,7 @@ export default function PartnerProfile() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
         <div className="absolute left-3 right-3 z-10 flex items-center justify-between top-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40"
-          >
-            <ArrowLeft className="h-5 w-5 text-white" />
-          </button>
+          <BackButton variant="overlay" />
           <div className="flex items-center gap-2">
             <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
               <Share2 className="h-4 w-4 text-white" />
