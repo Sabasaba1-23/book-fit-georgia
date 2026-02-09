@@ -21,7 +21,7 @@ export default function NotFound() {
             onClick={() => navigate(-1)}
             className="flex items-center justify-center gap-2 rounded-2xl border-2 border-border bg-card px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted active:scale-95"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <Left size={16} />
             Go Back
           </button>
           <button

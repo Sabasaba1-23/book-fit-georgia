@@ -9,12 +9,7 @@ export default function TermsConditions() {
       <header
         className="sticky top-0 z-20 flex items-center gap-3 bg-background/80 backdrop-blur-lg border-b border-border px-4 py-3"
       >
-        <button
-          onClick={() => navigate(-1)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground active:scale-95 transition-transform"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </button>
+        <BackButton />
         <h1 className="text-lg font-bold text-foreground">Terms & Conditions</h1>
       </header>
 

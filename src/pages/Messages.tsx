@@ -325,12 +325,7 @@ export default function Messages() {
         <header
           className="flex items-center gap-3 border-b border-border/50 px-4 py-3 bg-background/90 backdrop-blur-xl"
         >
-          <button
-            onClick={() => { setActiveThread(null); setMessages([]); }}
-            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted transition-colors active:scale-95"
-          >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </button>
+          <BackButton onClick={() => { setActiveThread(null); setMessages([]); }} />
           <Avatar className="h-10 w-10 border border-border/50">
             {activeThread.otherUser?.avatar_url ? (
               <AvatarImage src={activeThread.otherUser.avatar_url} />
