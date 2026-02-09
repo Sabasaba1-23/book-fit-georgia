@@ -219,7 +219,7 @@ export default function PaymentSheet({
 
             {method !== "card" && (
               <div className="flex flex-col items-center py-6 animate-in fade-in duration-200">
-                <Smartphone className="h-12 w-12 text-primary/40 mb-3" />
+                <Iphone size={48} fill="hsl(var(--primary) / 0.4)" className="mb-3" />
                 <p className="text-sm font-medium text-muted-foreground">
                   {t("tapToPayWith")}{" "}
                   {method === "apple" ? "Apple Pay" : "Google Pay"}
