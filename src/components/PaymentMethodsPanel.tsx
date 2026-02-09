@@ -39,7 +39,7 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
                   <p className="text-sm font-bold text-foreground">{m.label}</p>
                   {m.last4 && <p className="text-xs text-muted-foreground">•••• {m.last4}</p>}
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <Right size={16} fill="hsl(var(--muted-foreground))" />
               </div>
             ))}
           </div>
