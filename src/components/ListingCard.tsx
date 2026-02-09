@@ -313,10 +313,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
       {/* ─── EXPANDED DETAIL PANEL ─── */}
       {expanded && (
         <div className="border-t border-border/60 animate-in slide-in-from-top-2 fade-in duration-300">
-          {/* Partner row with avatar — shown in expanded */}
-          <div className="px-5 pt-4 pb-2 flex items-center gap-2">
+          {/* Partner row with avatar */}
+          <div className="px-5 pt-5 pb-2 flex items-center gap-2.5">
             <Avatar
-              className="h-7 w-7 cursor-pointer"
+              className="h-8 w-8 cursor-pointer"
               onClick={(e: React.MouseEvent) => {
                 e.stopPropagation();
                 const pid = listing.partner_id || listing.partner?.id;
@@ -328,13 +328,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
                 {listing.partner.display_name.charAt(0)}
               </AvatarFallback>
             </Avatar>
-            <span className="text-[13px] font-medium text-foreground">
+            <span className="text-[14px] font-medium text-foreground">
               {listing.partner.display_name}
             </span>
             {hasRating && (
               <div className="ml-auto flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-                <span className="text-[12px] font-semibold text-foreground">
+                <span className="text-[13px] font-semibold text-foreground">
                   {Number(listing.partner.avg_rating).toFixed(1)}
                 </span>
               </div>
@@ -357,34 +357,77 @@ export default function ListingCard({ listing }: ListingCardProps) {
                 <span className="text-[12px] font-medium text-foreground">{listing.location}</span>
               </div>
             )}
+            {listing.difficulty_level && (
+              <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+                <BarChart3 className="h-3.5 w-3.5 text-primary" />
+                <span className="text-[12px] font-medium text-foreground capitalize">{listing.difficulty_level}</span>
+              </div>
+            )}
           </div>
 
-          {/* Spots left — only in expanded, if relevant */}
+          {/* Gym name */}
+          {listing.gym_name && (
+            <div className="px-5 pb-3 flex items-center gap-1.5">
+              <Dumbbell className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-[13px] text-muted-foreground">{listing.gym_name}</span>
+            </div>
+          )}
+
+          {/* Spots left */}
           {listing.max_spots > 1 && spotsLeft <= 5 && spotsLeft > 0 && (
-            <p className="text-[11px] text-muted-foreground px-5 pb-2">
+            <p className="text-[12px] text-muted-foreground px-5 pb-3">
               {spotsLeft} {t("spotsLeftLabel")} · {getTrainingTypeLabel(listing.training_type)}
             </p>
           )}
 
           {/* Description */}
-          <div className="px-5 pb-3">
-            <p className="text-[13px] leading-relaxed text-muted-foreground">{description}</p>
+          <div className="px-5 pb-4">
+            <p className="text-label mb-2">{t("aboutSession") || "About"}</p>
+            <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
           </div>
+
+          {/* Goals */}
+          {listing.goals && listing.goals.length > 0 && (
+            <div className="px-5 pb-4">
+              <p className="text-label mb-2">{t("goalsLabel") || "Goals"}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {listing.goals.map((goal) => (
+                  <span key={goal} className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[12px] font-medium text-foreground">
+                    <Target className="h-3 w-3 text-primary" />
+                    {goal}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* What to bring */}
-          <div className="px-5 pb-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">{t("whatToBringLabel")}</p>
-            <div className="flex flex-wrap gap-1.5">
-              {equipment.map((item) => (
-                <span key={item} className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[11px] font-medium text-foreground">
-                  {item}
-                </span>
-              ))}
+          {equipment.length > 0 && (
+            <div className="px-5 pb-4">
+              <p className="text-label mb-2">{t("whatToBringLabel")}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {equipment.map((item) => (
+                  <span key={item} className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[12px] font-medium text-foreground">
+                    {item}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Rental info */}
+          {rentalInfo && (
+            <div className="px-5 pb-4">
+              <p className="text-label mb-2">{t("rentalInfoLabel") || "Rental Info"}</p>
+              <div className="flex items-start gap-1.5">
+                <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground mt-0.5" />
+                <p className="text-[13px] leading-relaxed text-muted-foreground">{rentalInfo}</p>
+              </div>
+            </div>
+          )}
 
           {/* Action buttons */}
-          <div className="flex gap-2 px-5 pb-5">
+          <div className="flex gap-2 px-5 pb-5 pt-1">
             <button
               onClick={handleBookmark}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors active:scale-95"
