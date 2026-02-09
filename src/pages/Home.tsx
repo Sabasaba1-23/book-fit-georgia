@@ -201,7 +201,7 @@ export default function Home() {
     <div className="relative min-h-screen bg-background overflow-x-hidden overscroll-none mx-auto max-w-7xl pb-[calc(60px+var(--sab))]">
 
       {/* Header */}
-      <header className="relative z-40 px-4 md:px-6 pt-4 pb-3">
+      <header className="relative z-40 px-4 md:px-6 pt-6 pb-3">
         <div className="flex items-center justify-between">
           <div>
             {firstName && (
