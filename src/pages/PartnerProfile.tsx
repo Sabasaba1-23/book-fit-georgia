@@ -85,8 +85,6 @@ export default function PartnerProfile() {
   const navigate = useNavigate();
   const { lang } = useLanguage();
   const { user } = useAuth();
-  const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
-  const { badges } = useBadges(entityType, id);
   const [partner, setPartner] = useState<PartnerData | null>(null);
   const [listings, setListings] = useState<ListingData[]>([]);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
