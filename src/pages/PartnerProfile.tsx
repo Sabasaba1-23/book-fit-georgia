@@ -74,6 +74,11 @@ interface ReviewData {
   reviewer_name: string;
 }
 
+interface MediaItem {
+  id: string;
+  image_url: string;
+}
+
 interface VerificationData {
   date_of_birth: string | null;
   years_experience: string | null;
