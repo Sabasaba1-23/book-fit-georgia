@@ -123,7 +123,13 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     const channel = supabase
       .channel(`partner-messages-${activeThread.id}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: `thread_id=eq.${activeThread.id}` },
-        (payload) => setMessages((prev) => [...prev, payload.new as Message])
+        (payload) => {
+          const newMsg = payload.new as Message;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+        }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
