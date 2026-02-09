@@ -128,6 +128,10 @@ export default function PartnerProfile() {
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [gymTrainers, setGymTrainers] = useState<GymTrainerLink[]>([]);
+  const [linkedGyms, setLinkedGyms] = useState<GymLink[]>([]);
+  const [locations, setLocations] = useState<PartnerLocation[]>([]);
+  const [locationExpanded, setLocationExpanded] = useState(false);
   const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
   const { badges } = useBadges(entityType, id);
 
