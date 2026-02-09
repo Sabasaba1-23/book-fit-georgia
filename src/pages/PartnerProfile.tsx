@@ -654,6 +654,14 @@ export default function PartnerProfile() {
         </div>
       </div>
 
+      {lightboxIndex !== null && (
+        <MediaLightbox
+          items={mediaItems}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
+
       <BottomNav />
     </div>
   );
