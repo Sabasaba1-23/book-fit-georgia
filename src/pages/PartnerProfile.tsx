@@ -191,6 +191,15 @@ export default function PartnerProfile() {
         setHasBooking(booked);
       }
 
+      // Fetch partner media
+      const { data: mediaData } = await supabase
+        .from("partner_media")
+        .select("id, image_url, is_featured, sort_order")
+        .eq("partner_id", id)
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true });
+      if (mediaData) setMediaItems(mediaData as MediaItem[]);
+
       setLoading(false);
     }
     load();
