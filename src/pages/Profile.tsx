@@ -236,7 +236,7 @@ export default function Profile() {
   return (
     <div className="relative min-h-screen bg-background pb-24">
       {/* Hero gradient header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent pb-20 pt-6">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent pb-24 pt-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(168_76%_50%/0.3),transparent_60%)]" />
 
         {/* Avatar section */}
