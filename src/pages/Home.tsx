@@ -262,10 +262,10 @@ export default function Home() {
       {/* Feed */}
       <main className="relative z-10 px-4 md:px-6">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="overflow-hidden rounded-2xl border border-border/60">
-                <Skeleton className="h-[200px] w-full" />
+              <div key={i} className="overflow-hidden rounded-[22px] border border-border/60">
+                <Skeleton className="w-full" style={{ height: "clamp(220px, 55vw, 320px)" }} />
                 <div className="p-4 space-y-3">
                   <Skeleton className="h-4 w-2/3" />
                   <Skeleton className="h-4 w-1/2" />
