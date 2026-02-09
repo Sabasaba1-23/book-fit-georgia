@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import BackButton from "@/components/BackButton";
 import MultiLangDescriptionField from "@/components/MultiLangDescriptionField";
 import ActivitySearchSelect from "@/components/listing/ActivitySearchSelect";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
