@@ -235,6 +235,9 @@ export default function PartnerProfileTab({ profile, user, onRefetch, onSignOut 
         />
       </div>
 
+      {/* Badges */}
+      <PartnerBadgesSection partnerId={profile.id} partnerType={profile.partner_type} />
+
       {/* Log Out */}
       <button
         onClick={onSignOut}
