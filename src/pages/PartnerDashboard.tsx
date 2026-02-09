@@ -202,6 +202,13 @@ export default function PartnerDashboard() {
         );
       case "settings":
         return <PartnerSettings onBack={() => setProfileSubScreen("hub")} />;
+      case "trainers":
+        return (
+          <GymTrainerManager
+            gymPartnerId={profile.id}
+            onBack={() => setProfileSubScreen("hub")}
+          />
+        );
       case "payments":
         return (
           <div className="relative z-10 px-5 pt-4">
