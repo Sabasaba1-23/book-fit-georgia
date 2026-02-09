@@ -378,19 +378,59 @@ export default function Profile() {
 
         {/* Interest picker */}
         {showInterestPicker && (
-          <div className="mt-3 flex flex-wrap gap-2 rounded-2xl bg-card ios-shadow p-4 animate-in fade-in slide-in-from-top-2 duration-200">
-            {AVAILABLE_INTERESTS.filter((t) => !interests.includes(t)).map((tag) => (
-              <button
-                key={tag}
-                onClick={() => {
-                  addInterest(tag);
-                  if (interests.length >= AVAILABLE_INTERESTS.length - 2) setShowInterestPicker(false);
-                }}
-                className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
-              >
-                {tag}
-              </button>
-            ))}
+          <div className="mt-3 rounded-2xl bg-card ios-shadow p-4 animate-in fade-in slide-in-from-top-2 duration-200 space-y-3">
+            {/* Search */}
+            <input
+              type="text"
+              value={interestSearch}
+              onChange={(e) => setInterestSearch(e.target.value)}
+              placeholder="Search interests..."
+              className="w-full rounded-xl border border-border/50 bg-background px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/40 focus:border-primary/50"
+            />
+            {/* Goals section */}
+            {(() => {
+              const filteredGoals = GOALS.filter(
+                (t) => !interests.includes(t) && (!interestSearch || t.toLowerCase().includes(interestSearch.toLowerCase()))
+              );
+              return filteredGoals.length > 0 ? (
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2">Goals</p>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredGoals.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => addInterest(tag)}
+                        className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 text-xs font-medium text-primary transition-all hover:bg-primary/15 active:scale-95"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null;
+            })()}
+            {/* Activities section */}
+            {(() => {
+              const filteredActivities = ACTIVITIES.filter(
+                (t) => !interests.includes(t) && (!interestSearch || t.toLowerCase().includes(interestSearch.toLowerCase()))
+              );
+              return filteredActivities.length > 0 ? (
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2">Activities</p>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredActivities.map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => addInterest(tag)}
+                        className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-all hover:border-primary hover:text-primary active:scale-95"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null;
+            })()}
           </div>
         )}
       </div>
