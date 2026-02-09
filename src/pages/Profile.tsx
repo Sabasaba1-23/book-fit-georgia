@@ -454,7 +454,7 @@ export default function Profile() {
           onClick={signOut}
           className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-destructive/20 py-3 text-sm font-bold text-destructive transition-all hover:bg-destructive/5 active:scale-[0.98]"
         >
-          <LogOut className="h-4 w-4" />
+          <Logout size={16} fill="hsl(var(--destructive))" />
           {t("logOut")}
         </button>
       </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { CreditCard, Smartphone, ChevronRight } from "lucide-react";
-import {
+import { BankCard, Right } from "@icon-park/react";
+import { Smartphone } from "lucide-react";
   Sheet,
   SheetContent,
   SheetHeader,

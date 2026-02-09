@@ -277,7 +277,7 @@ export default function Home() {
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-              <Search className="h-6 w-6 text-muted-foreground" />
+              <SearchIcon size={24} fill="hsl(var(--muted-foreground))" />
             </div>
             <p className="text-muted-foreground text-sm">{t("noListings")}</p>
           </div>
