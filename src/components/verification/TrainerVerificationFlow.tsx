@@ -91,8 +91,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       setCountryCity(d.country_city || d.address || "");
       setDescription(d.professional_description || existingBio || "");
       setTrainerType(d.trainer_type || "");
-      const expIdx = EXPERIENCE_VALUES.indexOf(d.years_experience || "");
-      setYearsExp(expIdx >= 0 ? expIdx : 0);
+      setYearsExp(d.years_experience || "");
       setSpecializations(d.specializations || []);
       if (d.verification_step) setStep(Math.min(d.verification_step, 3));
     }
