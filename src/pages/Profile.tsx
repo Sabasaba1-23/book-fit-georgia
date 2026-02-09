@@ -287,17 +287,17 @@ export default function Profile() {
               onClick={() => setEditingName(true)}
               className="mt-3 flex items-center gap-1.5 group"
             >
-              <h1 className="text-[30px] font-semibold tracking-[-0.3px] leading-[1.15] text-primary-foreground">{displayName}</h1>
+              <h1 className="text-[28px] font-semibold tracking-[-0.3px] leading-[1.15] text-primary-foreground">{displayName}</h1>
               <EditTwo size={14} fill="hsl(var(--primary-foreground) / 0.5)" className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           )}
-          <p className="text-[14px] font-normal text-primary-foreground opacity-65 mt-2">{t("memberSince")} {memberSince}</p>
+          <p className="text-[13px] font-normal text-primary-foreground/60 mt-2">{t("memberSince")} {memberSince}</p>
         </div>
       </div>
 
       {/* Stats card — overlapping the hero */}
       <div className="relative z-10 mx-5 -mt-12 mb-8">
-        <div className="flex rounded-2xl bg-card shadow-md divide-x divide-border/20 p-1">
+        <div className="flex rounded-2xl bg-card premium-shadow divide-x divide-border/20 p-1">
           <div className="flex-1 py-6 text-center">
             <p className="text-[27px] font-semibold leading-[1.1] text-primary">{stats.sessions}</p>
             <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsSessions")}</p>
@@ -316,7 +316,7 @@ export default function Profile() {
       {/* Bookmarked */}
       <div className="relative z-10 px-5 mb-10">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground">{t("bookmarkedSection")}</h2>
+          <h2 className="text-section-title">{t("bookmarkedSection")}</h2>
           {bookmarks.length > 4 && (
             <button className="text-[14px] font-medium text-primary opacity-75">{t("viewAllLabel")}</button>
           )}
@@ -354,7 +354,7 @@ export default function Profile() {
 
       {/* Fitness Interests */}
       <div className="relative z-10 px-5 mb-10">
-        <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground mb-4">{t("fitnessInterests")}</h2>
+        <h2 className="text-section-title mb-4">{t("fitnessInterests")}</h2>
         <div className="flex flex-wrap gap-2">
           {interests.map((tag) => (
             <button
@@ -395,8 +395,8 @@ export default function Profile() {
 
       {/* Account Settings */}
       <div className="relative z-10 px-5 mb-10">
-        <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground mb-4">{t("accountSettings")}</h2>
-        <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border/20 p-3">
+        <h2 className="text-section-title mb-4">{t("accountSettings")}</h2>
+        <div className="rounded-2xl bg-card premium-shadow overflow-hidden divide-y divide-border/20 p-3">
           <SettingsRow
             icon={<BankCard size={20} />}
             iconBg="bg-primary/10 text-primary"

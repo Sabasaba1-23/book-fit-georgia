@@ -30,7 +30,7 @@ export default memo(function BottomNav() {
   }, [user, toast, t, navigate]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-xl border-t border-border/50 pb-[var(--sab)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 pb-[var(--sab)]">
       <div className="mx-auto max-w-lg">
         <div className="flex h-[60px] items-center justify-around px-4">
         {navItems.map(({ key, labelKey, Icon, path, requiresAuth }) => {
@@ -40,18 +40,18 @@ export default memo(function BottomNav() {
                 key={key}
                 onClick={() => handleNav(path, requiresAuth)}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 px-4 py-1.5 transition-all duration-200 active:scale-95",
+                  "flex flex-col items-center gap-1 px-4 py-1.5 transition-all duration-200 active:scale-95",
                 )}
               >
                 <Icon
                   size={22}
                   strokeWidth={active ? 3 : 2}
-                  fill={active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                  fill={active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)"}
                 />
                 <span
                   className={cn(
-                    "text-[10px] font-semibold tracking-[0.12em]",
-                    active ? "text-primary" : "text-muted-foreground"
+                    "text-[10px] font-medium tracking-[0.06em]",
+                    active ? "text-primary" : "text-muted-foreground/60"
                   )}
                 >
                   {t(labelKey)}

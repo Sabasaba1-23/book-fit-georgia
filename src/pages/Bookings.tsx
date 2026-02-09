@@ -226,42 +226,42 @@ export default function Bookings() {
     <div className="relative min-h-screen bg-background pb-[calc(60px+var(--sab))]">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      <header className="relative z-40 px-5 pb-1 pt-4">
+      <header className="relative z-40 px-5 pb-2 pt-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/")}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95"
             >
               <ArrowLeft className="h-5 w-5 text-foreground" />
             </button>
-            <h1 className="text-2xl font-extrabold text-foreground">{t("myBookings")}</h1>
+            <h1 className="text-page-title">{t("myBookings")}</h1>
           </div>
-          <button className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95">
+          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95">
             <Bell className="h-5 w-5 text-foreground" />
           </button>
         </div>
       </header>
 
-      <div className="relative z-30 px-5 py-3">
-        <div className="flex rounded-2xl bg-muted/50 p-1">
+      <div className="relative z-30 px-5 py-4">
+        <div className="flex rounded-full bg-muted/40 p-1">
           <button
             onClick={() => setTab("upcoming")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              tab === "upcoming" ? "bg-card text-primary ios-shadow" : "text-muted-foreground"
+            className={`flex-1 rounded-full py-2.5 text-[14px] font-semibold transition-all ${
+              tab === "upcoming" ? "bg-card text-primary premium-shadow" : "text-muted-foreground"
             }`}
           >
             {t("upcoming")}
             {upcoming.length > 0 && (
-              <span className="ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground px-1">
                 {upcoming.length}
               </span>
             )}
           </button>
           <button
             onClick={() => setTab("history")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              tab === "history" ? "bg-card text-foreground ios-shadow" : "text-muted-foreground"
+            className={`flex-1 rounded-full py-2.5 text-[14px] font-semibold transition-all ${
+              tab === "history" ? "bg-card text-foreground premium-shadow" : "text-muted-foreground"
             }`}
           >
             {t("history")}
@@ -269,7 +269,7 @@ export default function Bookings() {
         </div>
       </div>
 
-      <main className="relative z-10 mx-auto max-w-lg space-y-4 px-5 py-2">
+      <main className="relative z-10 mx-auto max-w-lg space-y-5 px-5 py-2">
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -323,9 +323,9 @@ export default function Bookings() {
             const canReview = isCompleted && !myReview;
 
             return (
-              <div
+                <div
                 key={booking.id}
-                className={`relative overflow-hidden rounded-[1.5rem] bg-card ios-shadow transition-all ${
+                className={`relative overflow-hidden rounded-[22px] bg-card premium-shadow transition-all ${
                   isCancelled ? "opacity-60" : ""
                 }`}
               >
@@ -376,9 +376,9 @@ export default function Bookings() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-base font-bold text-foreground leading-tight truncate">{title}</h3>
+                      <h3 className="text-card-title leading-tight truncate">{title}</h3>
                       <p
-                        className="text-xs text-muted-foreground cursor-pointer hover:text-primary transition-colors"
+                        className="text-meta cursor-pointer hover:text-primary transition-colors"
                         onClick={() => navigate(`/partner/${partner.id}`)}
                       >
                         {partner.display_name}
