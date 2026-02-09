@@ -101,6 +101,13 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
       showChevron: true,
     },
     {
+      icon: <ShieldCheck className="h-5 w-5" />,
+      label: "Identity Verification",
+      subtitle: profile.verification_status === "verified" ? "Verified" : "Verify your identity",
+      action: onOpenVerification,
+      showChevron: true,
+    },
+    {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Sessions & Listings",
       subtitle: "Manage your active trainings",
