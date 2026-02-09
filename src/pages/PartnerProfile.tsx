@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Camera } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import MediaLightbox from "@/components/partner/MediaLightbox";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/BottomNav";
@@ -71,6 +74,11 @@ interface ReviewData {
   reviewer_name: string;
 }
 
+interface MediaItem {
+  id: string;
+  image_url: string;
+}
+
 interface VerificationData {
   date_of_birth: string | null;
   years_experience: string | null;
@@ -96,6 +104,8 @@ export default function PartnerProfile() {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
   const { badges } = useBadges(entityType, id);
 
@@ -180,6 +190,15 @@ export default function PartnerProfile() {
         const booked = (bookings || []).some((b: any) => b.training_listings?.partner_id === id);
         setHasBooking(booked);
       }
+
+      // Fetch partner media
+      const { data: mediaData } = await supabase
+        .from("partner_media")
+        .select("id, image_url, is_featured, sort_order")
+        .eq("partner_id", id)
+        .order("is_featured", { ascending: false })
+        .order("sort_order", { ascending: true });
+      if (mediaData) setMediaItems(mediaData as MediaItem[]);
 
       setLoading(false);
     }
@@ -356,6 +375,43 @@ export default function PartnerProfile() {
               </button>
             )}
           </div>
+        </section>
+      )}
+
+      {/* ─────────── SECTION 3.5: PHOTOS & VIDEOS ─────────── */}
+      {mediaItems.length > 0 && (
+        <section className="mt-10 mx-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Camera className="h-3.5 w-3.5 text-muted-foreground" />
+            <SectionTitle>Photos & Videos</SectionTitle>
+          </div>
+          <Carousel opts={{ align: "start", loop: false }} className="w-full">
+            <CarouselContent className="-ml-3">
+              {mediaItems.map((item, idx) => (
+                <CarouselItem
+                  key={item.id}
+                  className="pl-3 basis-[75%] sm:basis-[60%]"
+                >
+                  <button
+                    onClick={() => setLightboxIndex(idx)}
+                    className="w-full overflow-hidden rounded-2xl bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    <div className="aspect-[4/3]">
+                      <img
+                        src={item.image_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  </button>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+          {mediaItems.length > 2 && (
+            <p className="mt-2 text-[11px] text-muted-foreground text-center">Swipe to see more</p>
+          )}
         </section>
       )}
 
@@ -597,6 +653,14 @@ export default function PartnerProfile() {
           </button>
         </div>
       </div>
+
+      {lightboxIndex !== null && (
+        <MediaLightbox
+          items={mediaItems}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
 
       <BottomNav />
     </div>
