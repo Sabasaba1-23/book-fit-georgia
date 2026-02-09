@@ -235,16 +235,16 @@ export default function Home() {
       </header>
 
       {/* Search bar */}
-      <div className="relative z-30 px-4 md:px-6 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="flex flex-1 items-center gap-2.5 rounded-full border border-border/40 bg-card px-4 py-2">
-            <SearchIcon size={16} fill="hsl(var(--muted-foreground))" />
+      <div className="relative z-30 px-5 md:px-6 pb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex flex-1 items-center gap-2.5 rounded-full border border-border/30 bg-card px-4 py-2.5 premium-shadow">
+            <SearchIcon size={16} fill="hsl(var(--muted-foreground) / 0.5)" />
             <input
               type="text"
               placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-transparent text-sm font-medium outline-none placeholder:text-muted-foreground/50"
+              className="w-full bg-transparent text-[15px] font-normal outline-none placeholder:text-muted-foreground/40"
             />
           </div>
           <FilterOverlay filters={filters} onApply={handleFiltersApply} />
