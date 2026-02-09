@@ -96,6 +96,8 @@ export default function PartnerProfile() {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
+  const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
+  const { badges } = useBadges(entityType, id);
 
   useEffect(() => {
     if (!id) return;
