@@ -476,12 +476,12 @@ function SettingsRow({
   onClick?: () => void;
 }) {
   return (
-    <button onClick={onClick} className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30 active:bg-muted/50">
+    <button onClick={onClick} className="flex w-full items-center gap-3 px-[18px] py-4 transition-colors hover:bg-muted/30 active:bg-muted/50">
       <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}>
         {icon}
       </div>
-      <span className="flex-1 text-left text-sm font-semibold text-foreground">{label}</span>
-      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      <span className="flex-1 text-left text-[16px] font-semibold text-foreground">{label}</span>
+      <ChevronRight className="h-4 w-4 text-muted-foreground opacity-50" />
     </button>
   );
 }
