@@ -130,7 +130,7 @@ export default function PaymentSheet({
                       : "text-muted-foreground"
                   )}
                 >
-                  <CreditCard className="h-3.5 w-3.5" />
+                  <BankCard size={14} fill="currentColor" />
                   {t("cardLabel")}
                 </button>
                 <button
