@@ -18,6 +18,21 @@ export default function UserMenuDropdown() {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
+  const { data: isPartner } = useQuery({
+    queryKey: ["isPartner", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from("partner_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const userInitial =
     user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ||
     user?.email?.charAt(0)?.toUpperCase() ||
