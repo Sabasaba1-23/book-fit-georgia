@@ -303,6 +303,7 @@ export const translations = {
     loading: "Loading...",
     logOut: "Log Out",
     settings: "Settings",
+    partnerDashboard: "Partner Dashboard",
     languageLabel: "Language",
     loginRequired: "Please log in to continue",
     loginToBook: "Log in to book this training",
