@@ -110,7 +110,8 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Noto Sans Georgian', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
