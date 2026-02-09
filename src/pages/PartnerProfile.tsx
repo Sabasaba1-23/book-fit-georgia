@@ -28,6 +28,8 @@ import {
 import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useBadges } from "@/hooks/useBadges";
+import { ProfileBadges } from "@/components/badges/ProfileBadges";
 
 const LISTING_ICONS = [Zap, Dumbbell, Trophy];
 
