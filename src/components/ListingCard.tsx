@@ -86,6 +86,12 @@ interface ListingCardProps {
     background_image_url: string | null;
     equipment_notes_en: string | null;
     equipment_notes_ka: string | null;
+    rental_info_en?: string | null;
+    rental_info_ka?: string | null;
+    difficulty_level?: string | null;
+    goals?: string[] | null;
+    gym_name?: string | null;
+    location_type?: string | null;
     status: string;
     booked_spots?: number;
     partner_id?: string;
