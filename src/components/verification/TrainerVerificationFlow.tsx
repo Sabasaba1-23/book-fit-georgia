@@ -324,29 +324,21 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
 
               <div>
                 <label className="mb-2 block text-xs font-semibold text-foreground">Years of experience</label>
-                <div className="px-1 pt-2 pb-1">
-                  <Slider
-                    value={[yearsExp]}
-                    onValueChange={(v) => setYearsExp(v[0])}
-                    min={0}
-                    max={4}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="mt-2 flex justify-between">
-                    {EXPERIENCE_LABELS.map((label, i) => (
-                      <span
-                        key={label}
-                        className={cn(
-                          "text-[10px] font-medium transition-colors",
-                          yearsExp === i ? "text-primary font-bold" : "text-muted-foreground"
-                        )}
-                      >
-                        {label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <Input
+                  type="number"
+                  min="0"
+                  max="50"
+                  value={yearsExp}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 2);
+                    setYearsExp(v);
+                  }}
+                  placeholder="e.g. 5"
+                  className="h-12 rounded-xl border-border bg-card"
+                />
+                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                  {yearsExp ? `Will display as "${yearsExp}+ years" on your profile` : "Enter the number of years you've been training"}
+                </p>
               </div>
 
               <div>
