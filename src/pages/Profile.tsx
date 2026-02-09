@@ -394,9 +394,9 @@ export default function Profile() {
       </div>
 
       {/* Account Settings */}
-      <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">{t("accountSettings")}</h2>
-        <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border">
+      <div className="relative z-10 px-5 mb-10">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground mb-4">{t("accountSettings")}</h2>
+        <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border/20 p-3">
           <SettingsRow
             icon={<BankCard size={20} />}
             iconBg="bg-primary/10 text-primary"
