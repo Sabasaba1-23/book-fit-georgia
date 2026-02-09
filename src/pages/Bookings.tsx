@@ -243,25 +243,25 @@ export default function Bookings() {
         </div>
       </header>
 
-      <div className="relative z-30 px-5 py-3">
-        <div className="flex rounded-2xl bg-muted/50 p-1">
+      <div className="relative z-30 px-5 py-4">
+        <div className="flex rounded-full bg-muted/40 p-1">
           <button
             onClick={() => setTab("upcoming")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              tab === "upcoming" ? "bg-card text-primary ios-shadow" : "text-muted-foreground"
+            className={`flex-1 rounded-full py-2.5 text-[14px] font-semibold transition-all ${
+              tab === "upcoming" ? "bg-card text-primary premium-shadow" : "text-muted-foreground"
             }`}
           >
             {t("upcoming")}
             {upcoming.length > 0 && (
-              <span className="ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground px-1">
                 {upcoming.length}
               </span>
             )}
           </button>
           <button
             onClick={() => setTab("history")}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-bold transition-all ${
-              tab === "history" ? "bg-card text-foreground ios-shadow" : "text-muted-foreground"
+            className={`flex-1 rounded-full py-2.5 text-[14px] font-semibold transition-all ${
+              tab === "history" ? "bg-card text-foreground premium-shadow" : "text-muted-foreground"
             }`}
           >
             {t("history")}
