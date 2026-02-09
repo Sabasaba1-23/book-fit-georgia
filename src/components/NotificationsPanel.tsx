@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, BellOff, Calendar, MessageCircle, Star, Megaphone } from "lucide-react";
+import { BellRing, CloseRemind, CalendarThirtyTwo, MessageOne, Star, VolumeNotice } from "@icon-park/react";
 import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
