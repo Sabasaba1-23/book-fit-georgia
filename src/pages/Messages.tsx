@@ -40,6 +40,15 @@ interface Message {
 
 const PRE_BOOKING_MSG_SOFT_LIMIT = 15;
 
+const PRESET_QUESTIONS = [
+  "Is this session suitable for beginners?",
+  "What equipment do I need to bring?",
+  "Is this session indoors or outdoors?",
+  "Can this session be adapted to injuries or limitations?",
+  "What language is the session conducted in?",
+  "How many participants are usually in the session?",
+];
+
 export default function Messages() {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -254,8 +263,8 @@ export default function Messages() {
   async function handleSend() {
     if (!newMessage.trim() || !activeThread || !user || sending) return;
 
-    // Check for contact info and show gentle warning (don't block)
-    if (!hasConfirmedBooking && containsContactInfo(newMessage)) {
+    // Contact info detection only relevant post-booking free-text
+    if (containsContactInfo(newMessage)) {
       setContactWarningVisible(true);
     }
 
@@ -307,9 +316,6 @@ export default function Messages() {
     return format(date, "MMM d");
   }
 
-  // Count messages from current user in this thread (for soft limit)
-  const myMessageCount = messages.filter((m) => m.sender_id === user?.id).length;
-  const isNearSoftLimit = !hasConfirmedBooking && myMessageCount >= PRE_BOOKING_MSG_SOFT_LIMIT;
   const showPreBookingBanner = !hasConfirmedBooking && !bookingLoading && !preBookingBannerDismissed;
 
   // ─── Chat View ──────────────────────────────────
@@ -377,8 +383,8 @@ export default function Messages() {
           </div>
         )}
 
-        {/* Contact info warning tooltip */}
-        {contactWarningVisible && !hasConfirmedBooking && (
+        {/* Contact info warning — only in post-booking free text */}
+        {contactWarningVisible && hasConfirmedBooking && (
           <div className="flex items-start gap-2.5 border-b border-primary/20 bg-primary/5 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
             <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <p className="flex-1 text-[11px] text-foreground/80 leading-snug">
@@ -397,12 +403,9 @@ export default function Messages() {
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Start the conversation!</p>
-              {!hasConfirmedBooking && (
-                <p className="text-xs text-muted-foreground/70 mt-1 max-w-xs">
-                  Feel free to ask about the session, schedule, or anything you need before booking.
-                </p>
-              )}
+              <p className="text-sm text-muted-foreground">
+                {hasConfirmedBooking ? "Start the conversation!" : "Select a question below to get started"}
+              </p>
             </div>
           )}
           {messages.map((msg) => {
@@ -427,53 +430,106 @@ export default function Messages() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Soft limit nudge */}
-        {isNearSoftLimit && (
-          <div className="flex items-center gap-2 border-t border-border/30 bg-muted/30 px-4 py-2.5">
-            <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
-            <p className="text-[11px] text-muted-foreground leading-snug flex-1">
-              Ready to book? In-app bookings unlock full chat, reviews, and verified sessions. 🎯
-            </p>
-            <button
-              onClick={() => navigate("/")}
-              className="shrink-0 rounded-full bg-primary px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground transition-all active:scale-95"
-            >
-              Browse
-            </button>
-          </div>
-        )}
-
         {/* Post-booking unlocked badge */}
-        {hasConfirmedBooking && messages.length > 0 && messages.length <= 1 && (
-          <div className="flex items-center justify-center gap-1.5 border-t border-border/20 bg-primary/5 px-4 py-2">
+        {hasConfirmedBooking && messages.length > 0 && messages.length <= 2 && (
+          <div className="flex items-center justify-center gap-1.5 border-t border-border/20 bg-primary/5 px-4 py-2.5">
             <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-            <p className="text-[11px] font-semibold text-primary">
-              Full chat unlocked — you're booked! Share any details you need.
+            <p className="text-[12px] font-semibold text-primary">
+              You're booked! You can now chat freely with your trainer.
             </p>
           </div>
         )}
 
-        <div
-          className="border-t border-border/50 bg-background/90 backdrop-blur-xl px-4 py-3"
-          style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}
-        >
-          <div className="flex items-center gap-2">
-            <Input
-              placeholder={hasConfirmedBooking ? "Type a message..." : "Ask about the session..."}
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              className="h-12 flex-1 rounded-full border-0 bg-muted/60 px-5 text-sm font-medium shadow-none"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!newMessage.trim() || sending}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground transition-all active:scale-95 disabled:opacity-50"
-            >
-              <Send className="h-5 w-5" />
-            </button>
+        {/* ─── INPUT AREA ─── */}
+        {hasConfirmedBooking || bookingLoading ? (
+          /* Full chat input — post-booking */
+          <div
+            className="border-t border-border/50 bg-background/90 backdrop-blur-xl px-4 py-3"
+            style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 2rem))' }}
+          >
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="Type a message..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                className="h-12 flex-1 rounded-full border-0 bg-muted/60 px-5 text-sm font-medium shadow-none"
+              />
+              <button
+                onClick={handleSend}
+                disabled={!newMessage.trim() || sending}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground transition-all active:scale-95 disabled:opacity-50"
+              >
+                <Send className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Preset questions — pre-booking */
+          <div
+            className="border-t border-border/40 bg-background"
+            style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom, 1.5rem))' }}
+          >
+            <div className="px-4 pt-3 pb-1">
+              <p className="text-[11px] text-muted-foreground/70 leading-snug mb-3">
+                Before booking, you can ask a few quick questions to make sure the session is right for you. Full chat access is available after booking.
+              </p>
+            </div>
+            <div className="px-4 pb-2 flex flex-wrap gap-2">
+              {PRESET_QUESTIONS.map((question) => {
+                const alreadySent = messages.some(
+                  (m) => m.sender_id === user?.id && m.content === question
+                );
+                return (
+                  <button
+                    key={question}
+                    disabled={alreadySent || sending}
+                    onClick={async () => {
+                      if (!activeThread || !user || sending) return;
+                      setSending(true);
+                      setNewMessage("");
+
+                      const optimisticMsg: Message = {
+                        id: `optimistic-${Date.now()}`,
+                        thread_id: activeThread.id,
+                        sender_id: user.id,
+                        content: question,
+                        sent_at: new Date().toISOString(),
+                      };
+                      setMessages((prev) => [...prev, optimisticMsg]);
+
+                      const { data, error } = await supabase
+                        .from("messages")
+                        .insert({
+                          thread_id: activeThread.id,
+                          sender_id: user.id,
+                          content: question,
+                        })
+                        .select("*")
+                        .single();
+
+                      if (error) {
+                        setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+                      } else if (data) {
+                        setMessages((prev) =>
+                          prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m))
+                        );
+                      }
+                      setSending(false);
+                    }}
+                    className={`rounded-full border px-3.5 py-2 text-[12px] font-medium text-left leading-snug transition-all active:scale-[0.97] ${
+                      alreadySent
+                        ? "border-primary/20 bg-primary/5 text-primary/50 cursor-default"
+                        : "border-border bg-card text-foreground hover:border-primary/40 hover:bg-primary/5"
+                    }`}
+                  >
+                    {alreadySent ? `✓ ${question}` : question}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
