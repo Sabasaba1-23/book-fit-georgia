@@ -107,6 +107,13 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
       action: onOpenVerification,
       showChevron: true,
     },
+    ...(profile.partner_type === "gym" ? [{
+      icon: <Users className="h-5 w-5" />,
+      label: "Manage Trainers",
+      subtitle: "Add or remove trainers at your gym",
+      action: () => onNavigate("trainers"),
+      showChevron: true,
+    }] : []),
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Sessions & Listings",
