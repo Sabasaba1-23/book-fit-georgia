@@ -74,6 +74,8 @@ interface VerificationData {
   years_experience: string | null;
   specializations: string[] | null;
   trainer_type: string | null;
+  social_instagram: string | null;
+  social_facebook: string | null;
 }
 
 export default function PartnerProfile() {
@@ -123,7 +125,7 @@ export default function PartnerProfile() {
       if (partnerRes.data) {
         const { data: vData } = await supabase
           .from("partner_verifications")
-          .select("date_of_birth, years_experience, specializations, trainer_type")
+          .select("date_of_birth, years_experience, specializations, trainer_type, social_instagram, social_facebook")
           .eq("partner_id", id)
           .maybeSingle();
         if (vData) {
@@ -433,24 +435,51 @@ export default function PartnerProfile() {
         <SectionTitle>Contact</SectionTitle>
         <div className="mt-3 rounded-2xl bg-card border border-border/50 p-5">
           {hasBooking ? (
-            <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(`/messages`)}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-colors hover:bg-primary/20 active:scale-95"
+                title="Chat"
+              >
+                <MessageCircle className="h-5 w-5 text-primary" />
+              </button>
               {partner.phone_number && (
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                    <Phone className="h-4 w-4 text-primary" />
-                  </div>
-                  <a href={`tel:${partner.phone_number}`} className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
-                    {partner.phone_number}
-                  </a>
-                </div>
+                <a
+                  href={`tel:${partner.phone_number}`}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-colors hover:bg-primary/20 active:scale-95"
+                  title="Call"
+                >
+                  <Phone className="h-5 w-5 text-primary" />
+                </a>
               )}
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
-                  <MessageCircle className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-sm font-semibold text-primary">Chat unlocked</span>
-                <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-              </div>
+              {verification?.social_instagram && (
+                <a
+                  href={`https://instagram.com/${verification.social_instagram.replace(/^@/, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-colors hover:bg-primary/20 active:scale-95"
+                  title="Instagram"
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                    <circle cx="12" cy="12" r="5" />
+                    <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
+                  </svg>
+                </a>
+              )}
+              {verification?.social_facebook && (
+                <a
+                  href={verification.social_facebook.startsWith("http") ? verification.social_facebook : `https://facebook.com/${verification.social_facebook}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-colors hover:bg-primary/20 active:scale-95"
+                  title="Facebook"
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 text-primary" fill="currentColor">
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                </a>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-3">
