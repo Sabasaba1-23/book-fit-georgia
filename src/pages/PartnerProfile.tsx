@@ -90,6 +90,7 @@ export default function PartnerProfile() {
   const [loading, setLoading] = useState(true);
   const [hasBooking, setHasBooking] = useState(false);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
 
   useEffect(() => {
@@ -349,63 +350,81 @@ export default function PartnerProfile() {
         </section>
       )}
 
-      {/* ─────────── SECTION 4: EXPERIENCE & CREDENTIALS ─────────── */}
-      {(verification?.years_experience || verification?.specializations?.length || verification?.trainer_type) && (
-        <section className="mt-10 mx-5">
-          <SectionTitle>Experience & Credentials</SectionTitle>
-          <div className="mt-3 space-y-3">
-            {verification.years_experience && (
-              <CredentialRow icon={<Award className="h-4 w-4 text-primary" />} label="Experience" value={`${verification.years_experience}+ years`} />
-            )}
-            {verification.trainer_type && (
-              <CredentialRow icon={<Dumbbell className="h-4 w-4 text-primary" />} label="Type" value={verification.trainer_type.charAt(0).toUpperCase() + verification.trainer_type.slice(1)} />
-            )}
-            {isVerified && (
-              <CredentialRow icon={<CheckCircle2 className="h-4 w-4 text-primary" />} label="Verification" value="Identity Verified" />
-            )}
-            {verification.specializations && verification.specializations.length > 0 && (
-              <div className="rounded-2xl bg-card border border-border/50 p-4">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2.5">Specializations</p>
-                <div className="flex flex-wrap gap-2">
-                  {verification.specializations.map(s => (
-                    <span key={s} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground">{s}</span>
-                  ))}
-                </div>
+      {/* ─────────── SECTION 4: DETAILS (COLLAPSIBLE) ─────────── */}
+      {(verification?.years_experience || verification?.specializations?.length || verification?.trainer_type ||
+        (partner.sports && partner.sports.length > 0) ||
+        (partner.languages && partner.languages.length > 0) || sessionTypes.length > 0 || locationTypes.length > 0) && (
+        <section className="mt-8 mx-5">
+          <button
+            onClick={() => setDetailsExpanded(!detailsExpanded)}
+            className="flex w-full items-center justify-between rounded-2xl bg-card border border-border/50 p-4 transition-colors hover:border-primary/30 active:bg-muted/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                <Award className="h-4 w-4 text-primary" />
               </div>
-            )}
-          </div>
-        </section>
-      )}
+              <div className="text-left">
+                <p className="text-sm font-bold text-foreground">Experience & Details</p>
+                <p className="text-[11px] text-muted-foreground">
+                  {[
+                    verification?.years_experience && `${verification.years_experience}+ yrs`,
+                    verification?.trainer_type && verification.trainer_type.charAt(0).toUpperCase() + verification.trainer_type.slice(1),
+                    partner.sports?.length && `${partner.sports.length} sports`,
+                    partner.languages?.length && `${partner.languages.length} languages`,
+                  ].filter(Boolean).join(" · ")}
+                </p>
+              </div>
+            </div>
+            <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", detailsExpanded && "rotate-180")} />
+          </button>
 
-      {/* ─────────── SECTION 5: SPORTS & ACTIVITIES ─────────── */}
-      {partner.sports && partner.sports.length > 0 && (
-        <section className="mt-10 mx-5">
-          <SectionTitle>Sports & Activities</SectionTitle>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {partner.sports.map((s) => (
-              <span key={s} className="rounded-full bg-primary/10 px-4 py-2 text-[13px] font-semibold text-foreground">
-                {s}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
+          {detailsExpanded && (
+            <div className="mt-3 space-y-3 animate-in slide-in-from-top-2 fade-in duration-200">
+              {/* Credentials */}
+              {verification?.years_experience && (
+                <CredentialRow icon={<Award className="h-4 w-4 text-primary" />} label="Experience" value={`${verification.years_experience}+ years`} />
+              )}
+              {verification?.trainer_type && (
+                <CredentialRow icon={<Dumbbell className="h-4 w-4 text-primary" />} label="Type" value={verification.trainer_type.charAt(0).toUpperCase() + verification.trainer_type.slice(1)} />
+              )}
+              {isVerified && (
+                <CredentialRow icon={<CheckCircle2 className="h-4 w-4 text-primary" />} label="Verification" value="Identity Verified" />
+              )}
+              {verification?.specializations && verification.specializations.length > 0 && (
+                <div className="rounded-2xl bg-card border border-border/50 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2.5">Specializations</p>
+                  <div className="flex flex-wrap gap-2">
+                    {verification.specializations.map(s => (
+                      <span key={s} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-      {/* ─────────── SECTION 6: LANGUAGES & DETAILS ─────────── */}
-      {((partner.languages && partner.languages.length > 0) || sessionTypes.length > 0 || locationTypes.length > 0) && (
-        <section className="mt-10 mx-5">
-          <SectionTitle>Details</SectionTitle>
-          <div className="mt-3 space-y-3">
-            {partner.languages && partner.languages.length > 0 && (
-              <DetailChipRow icon={<Globe className="h-4 w-4 text-primary" />} label="Languages" items={partner.languages} />
-            )}
-            {sessionTypes.length > 0 && (
-              <DetailChipRow icon={<Users className="h-4 w-4 text-primary" />} label="Session Types" items={sessionTypes} />
-            )}
-            {locationTypes.length > 0 && (
-              <DetailChipRow icon={<MapPin className="h-4 w-4 text-primary" />} label="Environments" items={locationTypes} />
-            )}
-          </div>
+              {/* Sports */}
+              {partner.sports && partner.sports.length > 0 && (
+                <div className="rounded-2xl bg-card border border-border/50 p-4">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2.5">Sports & Activities</p>
+                  <div className="flex flex-wrap gap-2">
+                    {partner.sports.map((s) => (
+                      <span key={s} className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-foreground">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Languages & Details */}
+              {partner.languages && partner.languages.length > 0 && (
+                <DetailChipRow icon={<Globe className="h-4 w-4 text-primary" />} label="Languages" items={partner.languages} />
+              )}
+              {sessionTypes.length > 0 && (
+                <DetailChipRow icon={<Users className="h-4 w-4 text-primary" />} label="Session Types" items={sessionTypes} />
+              )}
+              {locationTypes.length > 0 && (
+                <DetailChipRow icon={<MapPin className="h-4 w-4 text-primary" />} label="Environments" items={locationTypes} />
+              )}
+            </div>
+          )}
         </section>
       )}
 
