@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, BellOff, Calendar, MessageCircle, Star, Megaphone } from "lucide-react";
+import { BellRing, CloseRemind, CalendarThirtyTwo, MessageOne, Star, VolumeNotice } from "@icon-park/react";
 import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
@@ -64,47 +64,47 @@ export default function NotificationsPanel({ open, onOpenChange }: Notifications
 
         {allOff && (
           <div className="mb-4 flex items-center gap-3 rounded-2xl bg-destructive/5 p-4">
-            <BellOff className="h-5 w-5 text-destructive shrink-0" />
+            <CloseRemind theme="two-tone" size={20} fill={["hsl(var(--destructive))", "hsl(var(--destructive) / 0.2)"]} />
             <p className="text-xs font-medium text-destructive">All notifications are off. You may miss important updates.</p>
           </div>
         )}
 
         <div className="space-y-1">
           <NotifRow
-            icon={<Calendar className="h-5 w-5" />}
-            iconBg="bg-primary/10 text-primary"
+            icon={<CalendarThirtyTwo theme="two-tone" size={20} fill={["hsl(var(--primary))", "hsl(var(--primary) / 0.2)"]} />}
+            iconBg="bg-primary/10"
             title="Booking Reminders"
             description="Get reminded before your sessions start"
             checked={prefs.bookingReminders}
             onChange={() => toggle("bookingReminders")}
           />
           <NotifRow
-            icon={<MessageCircle className="h-5 w-5" />}
-            iconBg="bg-blue-500/10 text-blue-500"
+            icon={<MessageOne theme="two-tone" size={20} fill={["hsl(210 100% 50%)", "hsl(210 100% 50% / 0.2)"]} />}
+            iconBg="bg-blue-500/10"
             title="Messages"
             description="New messages from trainers and gyms"
             checked={prefs.messages}
             onChange={() => toggle("messages")}
           />
           <NotifRow
-            icon={<Bell className="h-5 w-5" />}
-            iconBg="bg-emerald-500/10 text-emerald-500"
+            icon={<BellRing theme="two-tone" size={20} fill={["hsl(152 60% 45%)", "hsl(152 60% 45% / 0.2)"]} />}
+            iconBg="bg-emerald-500/10"
             title="Session Updates"
             description="Changes to your booked sessions"
             checked={prefs.sessionUpdates}
             onChange={() => toggle("sessionUpdates")}
           />
           <NotifRow
-            icon={<Star className="h-5 w-5" />}
-            iconBg="bg-amber-500/10 text-amber-500"
+            icon={<Star theme="two-tone" size={20} fill={["hsl(38 92% 50%)", "hsl(38 92% 50% / 0.2)"]} />}
+            iconBg="bg-amber-500/10"
             title="New Listings"
             description="Sessions matching your interests"
             checked={prefs.newListings}
             onChange={() => toggle("newListings")}
           />
           <NotifRow
-            icon={<Megaphone className="h-5 w-5" />}
-            iconBg="bg-purple-500/10 text-purple-500"
+            icon={<VolumeNotice theme="two-tone" size={20} fill={["hsl(270 60% 55%)", "hsl(270 60% 55% / 0.2)"]} />}
+            iconBg="bg-purple-500/10"
             title="Promotions & Offers"
             description="Deals and special offers from partners"
             checked={prefs.promotions}

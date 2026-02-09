@@ -10,17 +10,11 @@ import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
 import DeleteAccountDialog from "@/components/DeleteAccountDialog";
+import { EditTwo, BankCard, Remind, HeadsetOne, Logout, Camera as CameraIcon, Delete } from "@icon-park/react";
 import {
-  Pencil,
-  CreditCard,
-  Bell,
-  HelpCircle,
   ChevronRight,
-  LogOut,
   Plus,
   X,
-  Camera,
-  Trash2,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -260,7 +254,7 @@ export default function Profile() {
               onClick={() => fileInputRef.current?.click()}
               className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg transition-transform active:scale-90"
             >
-              <Camera className="h-3.5 w-3.5" />
+              <CameraIcon size={14} fill="hsl(var(--primary))" />
             </button>
             <input
               ref={fileInputRef}
@@ -294,7 +288,7 @@ export default function Profile() {
               className="mt-3 flex items-center gap-1.5 group"
             >
               <h1 className="text-2xl font-bold text-primary-foreground">{displayName}</h1>
-              <Pencil className="h-3.5 w-3.5 text-primary-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <EditTwo size={14} fill="hsl(var(--primary-foreground) / 0.5)" className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           )}
           <p className="text-sm text-primary-foreground/70">{t("memberSince")} {memberSince}</p>
@@ -404,25 +398,25 @@ export default function Profile() {
         <h2 className="text-lg font-bold text-foreground mb-3">{t("accountSettings")}</h2>
         <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border">
           <SettingsRow
-            icon={<CreditCard className="h-5 w-5" />}
+            icon={<BankCard size={20} />}
             iconBg="bg-primary/10 text-primary"
             label={t("paymentMethods")}
             onClick={() => setShowPayment(true)}
           />
           <SettingsRow
-            icon={<Bell className="h-5 w-5" />}
+            icon={<Remind size={20} />}
             iconBg="bg-blue-500/10 text-blue-500"
             label={t("notifications")}
             onClick={() => setShowNotifications(true)}
           />
           <SettingsRow
-            icon={<HelpCircle className="h-5 w-5" />}
+            icon={<HeadsetOne size={20} />}
             iconBg="bg-emerald-500/10 text-emerald-500"
             label={t("helpSupport")}
             onClick={() => setShowHelp(true)}
           />
           <SettingsRow
-            icon={<Trash2 className="h-5 w-5" />}
+            icon={<Delete size={20} />}
             iconBg="bg-destructive/10 text-destructive"
             label={t("deleteAccount")}
             onClick={() => setShowDeleteAccount(true)}
@@ -460,7 +454,7 @@ export default function Profile() {
           onClick={signOut}
           className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-destructive/20 py-3 text-sm font-bold text-destructive transition-all hover:bg-destructive/5 active:scale-[0.98]"
         >
-          <LogOut className="h-4 w-4" />
+          <Logout size={16} fill="hsl(var(--destructive))" />
           {t("logOut")}
         </button>
       </div>

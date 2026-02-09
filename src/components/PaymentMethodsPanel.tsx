@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CreditCard, Smartphone, ChevronRight } from "lucide-react";
+import { BankCard, Right } from "@icon-park/react";
+import { Smartphone } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -33,18 +34,18 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
           <div className="space-y-3 mb-5">
             {methods.map((m) => (
               <div key={m.id} className="flex items-center gap-3 rounded-2xl bg-muted/40 p-4">
-                <CreditCard className="h-5 w-5 text-primary" />
+                <BankCard size={20} fill="hsl(var(--primary))" />
                 <div className="flex-1">
                   <p className="text-sm font-bold text-foreground">{m.label}</p>
                   {m.last4 && <p className="text-xs text-muted-foreground">•••• {m.last4}</p>}
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                <Right size={16} fill="hsl(var(--muted-foreground))" />
               </div>
             ))}
           </div>
         ) : (
           <div className="mb-5 rounded-2xl bg-muted/30 p-6 text-center">
-            <CreditCard className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+            <BankCard size={32} fill="hsl(var(--muted-foreground))" className="mx-auto mb-2" />
             <p className="text-sm font-medium text-muted-foreground">{t("noPaymentMethods")}</p>
           </div>
         )}
@@ -78,7 +79,7 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
 
           <button className="flex w-full items-center gap-3 rounded-2xl bg-card ios-shadow p-4 transition-all hover:bg-muted/30 active:scale-[0.98]">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-              <CreditCard className="h-5 w-5 text-primary" />
+              <BankCard size={20} fill="hsl(var(--primary))" />
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-bold text-foreground">{t("creditDebitCard")}</p>

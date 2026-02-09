@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { Home, CalendarCheck, MessageSquareMore } from "lucide-react";
+import { Home, CalendarThirtyTwo, Message } from "@icon-park/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
-  { key: "home" as const, labelKey: "navExplore" as const, icon: Home, path: "/", requiresAuth: false },
-  { key: "bookings" as const, labelKey: "navBookings" as const, icon: CalendarCheck, path: "/bookings", requiresAuth: true },
-  { key: "messages" as const, labelKey: "navChat" as const, icon: MessageSquareMore, path: "/messages", requiresAuth: true },
+  { key: "home" as const, labelKey: "navExplore" as const, Icon: Home, path: "/", requiresAuth: false },
+  { key: "bookings" as const, labelKey: "navBookings" as const, Icon: CalendarThirtyTwo, path: "/bookings", requiresAuth: true },
+  { key: "messages" as const, labelKey: "navChat" as const, Icon: Message, path: "/messages", requiresAuth: true },
 ];
 
 export default memo(function BottomNav() {
@@ -32,7 +32,7 @@ export default memo(function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/90 backdrop-blur-xl border-t border-border/50 pb-[var(--sab)]">
       <div className="mx-auto max-w-lg">
         <div className="flex h-[60px] items-center justify-around px-4">
-        {navItems.map(({ key, labelKey, icon: Icon, path, requiresAuth }) => {
+        {navItems.map(({ key, labelKey, Icon, path, requiresAuth }) => {
             const active = location.pathname === path;
             return (
               <button
@@ -43,11 +43,9 @@ export default memo(function BottomNav() {
                 )}
               >
                 <Icon
-                  className={cn(
-                    "h-[22px] w-[22px] transition-colors",
-                    active ? "text-primary" : "text-muted-foreground"
-                  )}
-                  strokeWidth={active ? 2.5 : 1.5}
+                  size={22}
+                  strokeWidth={active ? 3 : 2}
+                  fill={active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
                 />
                 <span
                   className={cn(

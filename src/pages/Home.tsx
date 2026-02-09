@@ -11,7 +11,8 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import UserMenuDropdown from "@/components/UserMenuDropdown";
-import { Search, Bell, SlidersHorizontal } from "lucide-react";
+import { Search as SearchIcon, BellRing } from "@icon-park/react";
+import { SlidersHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ListingWithPartner {
@@ -226,7 +227,7 @@ export default function Home() {
               onClick={() => setShowNotifications(true)}
               className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60 text-foreground transition-colors hover:bg-muted active:scale-95"
             >
-              <Bell className="h-5 w-5" />
+              <BellRing size={20} fill="currentColor" />
             </button>
             <UserMenuDropdown />
           </div>
@@ -237,7 +238,7 @@ export default function Home() {
       <div className="relative z-30 px-4 md:px-6 pb-3">
         <div className="flex items-center gap-2">
           <div className="flex flex-1 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5">
-            <Search className="h-4 w-4 text-muted-foreground" />
+            <SearchIcon size={16} fill="hsl(var(--muted-foreground))" />
             <input
               type="text"
               placeholder={t("searchPlaceholder")}
@@ -276,7 +277,7 @@ export default function Home() {
         ) : !hasResults ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
-              <Search className="h-6 w-6 text-muted-foreground" />
+              <SearchIcon size={24} fill="hsl(var(--muted-foreground))" />
             </div>
             <p className="text-muted-foreground text-sm">{t("noListings")}</p>
           </div>
