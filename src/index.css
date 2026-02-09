@@ -138,10 +138,12 @@
 /* Language-specific font families */
 [data-lang="ka"] body {
   font-family: 'Noto Sans Georgian', sans-serif;
+  line-height: 1.5;
 }
 
 [data-lang="ru"] body {
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Noto Sans', sans-serif;
+  line-height: 1.5;
 }
 
 /* Native app feel when running inside Capacitor */
