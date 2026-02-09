@@ -296,6 +296,9 @@ export default function PartnerProfile() {
             <span>{partner.location}</span>
           </div>
         )}
+
+        {/* Badges */}
+        <ProfileBadges badges={badges} name={partner.display_name} maxVisible={3} />
       </div>
 
       {/* ─────────── SECTION 2: QUICK STATS ROW ─────────── */}
