@@ -244,7 +244,7 @@ export default function Profile() {
           <div className="relative">
             <Avatar className="h-24 w-24 border-[3px] border-primary-foreground/30 shadow-xl">
               {profile?.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} />
+                <AvatarImage src={profile.avatar_url} className="object-cover" />
               ) : null}
               <AvatarFallback className="bg-primary-foreground/20 text-3xl font-bold text-primary-foreground">
                 {displayName.charAt(0).toUpperCase()}
