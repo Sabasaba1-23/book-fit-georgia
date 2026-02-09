@@ -8,8 +8,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ChevronLeft, Eye, EyeOff, Handshake, ArrowRight, User, Building2, Mail, BadgeCheck, ShieldCheck, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import authBg1 from "@/assets/auth-bg-1.svg";
-import authBg2 from "@/assets/auth-bg-2.svg";
 
 type AuthMode = "login" | "register-choice" | "register-user" | "register-partner" | "forgot-password";
 
@@ -230,9 +228,9 @@ export default function Auth() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Background decorative SVGs */}
-      <img src={authBg1} alt="" aria-hidden="true" className="pointer-events-none absolute -bottom-16 -left-16 w-[340px] opacity-15 select-none" />
-      <img src={authBg2} alt="" aria-hidden="true" className="pointer-events-none absolute -top-10 -right-10 w-[300px] opacity-10 select-none" />
+      {/* Background blobs */}
+      <div className="blob-warm-1 absolute -top-20 -right-20 h-64 w-64 rounded-full" />
+      <div className="blob-warm-2 absolute top-1/3 -left-32 h-72 w-72 rounded-full" />
 
       {/* ─── LOGIN ─── */}
       {mode === "login" && (
