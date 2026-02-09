@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import BackButton from "@/components/BackButton";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +14,6 @@ import {
   ChevronLeft,
   CalendarDays,
   MoreVertical,
-  ArrowLeft,
   Clock,
   Dumbbell,
   Flame,
@@ -397,12 +397,7 @@ function ReviewView({
     <div className="min-h-screen bg-background pb-8">
       {/* Header */}
       <header className="flex items-center justify-between px-5 pt-5 pb-3">
-        <button
-          onClick={onBack}
-          className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5 text-foreground" />
-        </button>
+        <BackButton onClick={onBack} />
         <div className="text-center">
           <h2 className="text-base font-bold text-foreground">
             Review Application

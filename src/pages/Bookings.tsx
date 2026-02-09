@@ -9,7 +9,8 @@ import SessionConfirmationCard from "@/components/SessionConfirmationCard";
 import ReviewForm from "@/components/ReviewForm";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import { Bell, Calendar, Clock, Ticket, MessageCircle } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { format, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
@@ -229,12 +230,7 @@ export default function Bookings() {
       <header className="relative z-40 px-5 pb-2 pt-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate("/")}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95"
-            >
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </button>
+            <BackButton onClick={() => navigate("/")} />
             <h1 className="text-page-title">{t("myBookings")}</h1>
           </div>
           <button className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95">

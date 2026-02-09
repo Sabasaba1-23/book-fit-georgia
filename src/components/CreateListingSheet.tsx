@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import BackButton from "@/components/BackButton";
 import MultiLangDescriptionField from "@/components/MultiLangDescriptionField";
 import ActivitySearchSelect from "@/components/listing/ActivitySearchSelect";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowRight,
-  ArrowLeft,
   User,
   Users,
   Camera,
@@ -257,12 +257,7 @@ export default function CreateListingSheet({
         <div className="flex h-full flex-col bg-background">
           {/* Header */}
           <header className="flex items-center justify-between px-5 pt-5 pb-2">
-            <button
-              onClick={() => (step > 1 ? setStep(step - 1) : handleClose())}
-              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-muted transition-colors"
-            >
-              <ArrowLeft className="h-5 w-5 text-foreground" />
-            </button>
+            <BackButton onClick={() => (step > 1 ? setStep(step - 1) : handleClose())} />
             <h2 className="text-lg font-bold text-foreground">
               {step === 1 ? "New Training" : step === 2 ? "Training Details" : "Extra Info"}
             </h2>
