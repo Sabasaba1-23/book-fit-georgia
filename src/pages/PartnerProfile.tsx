@@ -90,6 +90,7 @@ export default function PartnerProfile() {
   const [loading, setLoading] = useState(true);
   const [hasBooking, setHasBooking] = useState(false);
   const [bioExpanded, setBioExpanded] = useState(false);
+  const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
 
   useEffect(() => {
