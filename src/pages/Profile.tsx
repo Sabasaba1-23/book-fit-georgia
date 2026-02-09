@@ -353,8 +353,8 @@ export default function Profile() {
       </div>
 
       {/* Fitness Interests */}
-      <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">{t("fitnessInterests")}</h2>
+      <div className="relative z-10 px-5 mb-10">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground mb-4">{t("fitnessInterests")}</h2>
         <div className="flex flex-wrap gap-2">
           {interests.map((tag) => (
             <button
