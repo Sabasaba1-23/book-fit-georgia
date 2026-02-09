@@ -263,8 +263,8 @@ export default function Messages() {
   async function handleSend() {
     if (!newMessage.trim() || !activeThread || !user || sending) return;
 
-    // Check for contact info and show gentle warning (don't block)
-    if (!hasConfirmedBooking && containsContactInfo(newMessage)) {
+    // Contact info detection only relevant post-booking free-text
+    if (containsContactInfo(newMessage)) {
       setContactWarningVisible(true);
     }
 
