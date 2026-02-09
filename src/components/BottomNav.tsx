@@ -10,6 +10,7 @@ const navItems = [
   { key: "home" as const, labelKey: "navExplore" as const, Icon: Home, path: "/", requiresAuth: false },
   { key: "bookings" as const, labelKey: "navBookings" as const, Icon: CalendarThirtyTwo, path: "/bookings", requiresAuth: true },
   { key: "messages" as const, labelKey: "navChat" as const, Icon: Message, path: "/messages", requiresAuth: true },
+  { key: "profile" as const, labelKey: "navProfile" as const, Icon: User, path: "/profile", requiresAuth: true },
 ];
 
 export default memo(function BottomNav() {
