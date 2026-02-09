@@ -351,6 +351,41 @@ export type Database = {
           },
         ]
       }
+      partner_media: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          is_featured: boolean
+          partner_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          is_featured?: boolean
+          partner_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          is_featured?: boolean
+          partner_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_media_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_payouts: {
         Row: {
           account_holder: string | null

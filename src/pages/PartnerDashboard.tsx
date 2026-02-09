@@ -4,10 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePartnerProfile } from "@/hooks/usePartnerProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle, Camera, LogOut, ExternalLink, Pencil } from "lucide-react";
+import { PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, User, MessageCircle } from "lucide-react";
 import { Alarm } from "@icon-park/react";
 import { cn } from "@/lib/utils";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
 import VerificationStatusCard from "@/components/verification/VerificationStatusCard";
 import VerificationSheet from "@/components/verification/VerificationSheet";
@@ -16,8 +16,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 import PartnerScheduleTab from "@/components/PartnerScheduleTab";
 import PartnerMessagesTab from "@/components/PartnerMessagesTab";
-import PartnerProfileTab from "@/components/PartnerProfileTab";
 import PartnerPaymentsTab from "@/components/PartnerPaymentsTab";
+import PartnerProfileHub, { type ProfileSubScreen } from "@/components/partner/PartnerProfileHub";
+import PartnerEditProfile from "@/components/partner/PartnerEditProfile";
+import PartnerPhotosMedia from "@/components/partner/PartnerPhotosMedia";
+import PartnerBadgesScreen from "@/components/partner/PartnerBadgesScreen";
+import PartnerSettings from "@/components/partner/PartnerSettings";
 
 interface PartnerListing {
   id: string;
@@ -50,7 +54,7 @@ const SPORT_COLORS: Record<string, string> = {
   "Rock Climbing": "bg-stone-100", Gymnastics: "bg-sky-100",
 };
 
-type Tab = "dashboard" | "schedule" | "messages" | "payments" | "profile";
+type Tab = "dashboard" | "schedule" | "messages" | "profile";
 
 export default function PartnerDashboard() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -64,6 +68,7 @@ export default function PartnerDashboard() {
   const [showVerification, setShowVerification] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [showAll, setShowAll] = useState(false);
+  const [profileSubScreen, setProfileSubScreen] = useState<ProfileSubScreen>("hub");
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -73,7 +78,6 @@ export default function PartnerDashboard() {
 
   useEffect(() => {
     if (!profileLoading && !profile && user) {
-      // Not a partner, redirect
       navigate("/", { replace: true });
     }
   }, [profile, profileLoading, user, navigate]);
@@ -137,6 +141,14 @@ export default function PartnerDashboard() {
     }
   };
 
+  // When switching tabs, reset profile sub-screen
+  function handleTabChange(tab: Tab) {
+    setActiveTab(tab);
+    if (tab !== "profile") {
+      setProfileSubScreen("hub");
+    }
+  }
+
   if (authLoading || profileLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -157,9 +169,69 @@ export default function PartnerDashboard() {
     { key: "dashboard", label: "Home", icon: <LayoutDashboard className="h-5 w-5" /> },
     { key: "schedule", label: "Schedule", icon: <CalendarDays className="h-5 w-5" /> },
     { key: "messages", label: "Messages", icon: <MessageCircle className="h-5 w-5" /> },
-    { key: "payments", label: "Payments", icon: <BarChart3 className="h-5 w-5" /> },
     { key: "profile", label: "Profile", icon: <User className="h-5 w-5" /> },
   ];
+
+  // Render profile sub-screens
+  const renderProfileContent = () => {
+    switch (profileSubScreen) {
+      case "edit":
+        return (
+          <PartnerEditProfile
+            profile={profile}
+            onBack={() => setProfileSubScreen("hub")}
+            onRefetch={refetchProfile}
+          />
+        );
+      case "media":
+        return (
+          <PartnerPhotosMedia
+            partnerId={profile.id}
+            userId={user!.id}
+            onBack={() => setProfileSubScreen("hub")}
+          />
+        );
+      case "badges":
+        return (
+          <PartnerBadgesScreen
+            partnerId={profile.id}
+            partnerType={profile.partner_type}
+            onBack={() => setProfileSubScreen("hub")}
+          />
+        );
+      case "settings":
+        return <PartnerSettings onBack={() => setProfileSubScreen("hub")} />;
+      case "payments":
+        return (
+          <div className="relative z-10 px-5 pt-4">
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={() => setProfileSubScreen("hub")}
+                className="flex h-10 w-10 items-center justify-center rounded-xl bg-card transition-colors hover:bg-muted active:scale-95"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+              </button>
+              <h2 className="text-[20px] font-semibold text-foreground">Payments</h2>
+            </div>
+            <PartnerPaymentsTab partnerId={profile.id} />
+          </div>
+        );
+      default:
+        return (
+          <PartnerProfileHub
+            profile={profile}
+            user={user!}
+            onRefetch={refetchProfile}
+            onSignOut={async () => {
+              await signOut();
+              navigate("/auth", { replace: true });
+            }}
+            onNavigate={setProfileSubScreen}
+            onSwitchTab={(tab) => handleTabChange(tab as Tab)}
+          />
+        );
+    }
+  };
 
   return (
     <div className="relative min-h-screen bg-background pb-24 overflow-hidden">
@@ -167,24 +239,26 @@ export default function PartnerDashboard() {
       <div className="pointer-events-none fixed -right-32 -top-32 h-[360px] w-[360px] rounded-full bg-gradient-to-bl from-primary/18 via-primary/8 to-transparent blur-3xl" />
       <div className="pointer-events-none fixed -left-20 top-1/3 h-[280px] w-[280px] rounded-full bg-gradient-to-tr from-primary/12 via-accent/15 to-transparent blur-3xl" />
 
-      {/* Header */}
-      <header className="relative z-40 px-5 pb-2 pt-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-14 w-14 border-2 border-primary/20">
-            {profile.logo_url ? <AvatarImage src={profile.logo_url} /> : null}
-            <AvatarFallback className="bg-primary/10 text-lg font-bold text-primary">
-              {profile.display_name.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Partner Account</p>
-            <h1 className="text-xl font-extrabold text-foreground">{profile.display_name}</h1>
+      {/* Header - hidden when in profile sub-screens */}
+      {(activeTab !== "profile" || profileSubScreen === "hub") && (
+        <header className="relative z-40 px-5 pb-2 pt-4">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-14 w-14 border-2 border-primary/20">
+              {profile.logo_url ? <AvatarImage src={profile.logo_url} /> : null}
+              <AvatarFallback className="bg-primary/10 text-lg font-bold text-primary">
+                {profile.display_name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Partner Account</p>
+              <h1 className="text-xl font-extrabold text-foreground">{profile.display_name}</h1>
+            </div>
+            <button className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-transform active:scale-95">
+              <Alarm size={20} fill="hsl(var(--primary))" />
+            </button>
           </div>
-          <button className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-transform active:scale-95">
-            <Alarm size={20} fill="hsl(var(--primary))" />
-          </button>
-        </div>
-      </header>
+        </header>
+      )}
 
       {activeTab === "dashboard" && (
         <div className="relative z-10 px-5 pt-4 space-y-6">
@@ -242,7 +316,6 @@ export default function PartnerDashboard() {
                   const style = STATUS_STYLES[listing.status] || STATUS_STYLES.draft;
                   return (
                     <div key={listing.id} className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card p-3.5 ios-shadow">
-                      {/* Thumbnail */}
                       <div className={cn("flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl", SPORT_COLORS[listing.sport] || "bg-muted")}>
                         {listing.background_image_url ? (
                           <img src={listing.background_image_url} alt="" className="h-full w-full rounded-2xl object-cover" />
@@ -250,8 +323,6 @@ export default function PartnerDashboard() {
                           <span className="text-lg font-bold text-foreground/30">{listing.sport.charAt(0)}</span>
                         )}
                       </div>
-
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
                         <p className="text-[15px] font-bold text-foreground truncate">{listing.title_en}</p>
                         <p className="text-[12px] text-muted-foreground mt-0.5">
@@ -264,8 +335,6 @@ export default function PartnerDashboard() {
                           <p className="mt-1 text-[11px] text-red-400 italic truncate">Admin: {listing.admin_notes}</p>
                         )}
                       </div>
-
-                      {/* Actions */}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <button className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-muted transition-colors">
@@ -293,7 +362,6 @@ export default function PartnerDashboard() {
             )}
           </div>
 
-          {/* Approval status notice */}
           {!profile.approved && (
             <div className="rounded-2xl bg-amber-50 p-4">
               <p className="text-sm font-bold text-amber-700">Account Under Review</p>
@@ -319,24 +387,7 @@ export default function PartnerDashboard() {
         </div>
       )}
 
-      {activeTab === "payments" && (
-        <div className="relative z-10 px-5 pt-4">
-          <h2 className="text-lg font-bold text-foreground mb-4">Payments</h2>
-          <PartnerPaymentsTab partnerId={profile.id} />
-        </div>
-      )}
-
-      {activeTab === "profile" && (
-        <PartnerProfileTab
-          profile={profile}
-          user={user!}
-          onRefetch={refetchProfile}
-          onSignOut={async () => {
-            await signOut();
-            navigate("/auth", { replace: true });
-          }}
-        />
-      )}
+      {activeTab === "profile" && renderProfileContent()}
 
       {/* Create Listing Sheet */}
       <CreateListingSheet
@@ -368,7 +419,7 @@ export default function PartnerDashboard() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => handleTabChange(tab.key)}
             className={cn(
               "flex flex-col items-center gap-0.5 px-3 py-1 transition-colors",
               activeTab === tab.key ? "text-primary" : "text-muted-foreground"
