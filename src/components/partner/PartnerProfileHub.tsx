@@ -34,6 +34,7 @@ interface Props {
   onSignOut: () => Promise<void>;
   onNavigate: (screen: ProfileSubScreen) => void;
   onSwitchTab: (tab: string) => void;
+  onOpenVerification: () => void;
 }
 
 export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut, onNavigate, onSwitchTab }: Props) {
