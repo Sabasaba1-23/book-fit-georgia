@@ -236,7 +236,7 @@ export default function Profile() {
   return (
     <div className="relative min-h-screen bg-background pb-24">
       {/* Hero gradient header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent pb-20 pt-6">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/90 to-accent pb-24 pt-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(168_76%_50%/0.3),transparent_60%)]" />
 
         {/* Avatar section */}
@@ -287,38 +287,38 @@ export default function Profile() {
               onClick={() => setEditingName(true)}
               className="mt-3 flex items-center gap-1.5 group"
             >
-              <h1 className="text-2xl font-bold text-primary-foreground">{displayName}</h1>
+              <h1 className="text-[30px] font-semibold tracking-[-0.3px] leading-[1.15] text-primary-foreground">{displayName}</h1>
               <EditTwo size={14} fill="hsl(var(--primary-foreground) / 0.5)" className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           )}
-          <p className="text-sm text-primary-foreground/70">{t("memberSince")} {memberSince}</p>
+          <p className="text-[14px] font-normal text-primary-foreground opacity-65 mt-2">{t("memberSince")} {memberSince}</p>
         </div>
       </div>
 
       {/* Stats card — overlapping the hero */}
-      <div className="relative z-10 mx-5 -mt-12 mb-6">
-        <div className="flex rounded-2xl bg-card shadow-lg divide-x divide-border">
-          <div className="flex-1 py-5 text-center">
-            <p className="text-2xl font-bold text-primary">{stats.sessions}</p>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsSessions")}</p>
+      <div className="relative z-10 mx-5 -mt-12 mb-8">
+        <div className="flex rounded-2xl bg-card shadow-md divide-x divide-border/20 p-1">
+          <div className="flex-1 py-6 text-center">
+            <p className="text-[27px] font-semibold leading-[1.1] text-primary">{stats.sessions}</p>
+            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsSessions")}</p>
           </div>
-          <div className="flex-1 py-5 text-center">
-            <p className="text-2xl font-bold text-foreground">{stats.studios}</p>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsStudios")}</p>
+          <div className="flex-1 py-6 text-center">
+            <p className="text-[27px] font-semibold leading-[1.1] text-foreground">{stats.studios}</p>
+            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsStudios")}</p>
           </div>
-          <div className="flex-1 py-5 text-center">
-            <p className="text-2xl font-bold text-primary">{stats.hours}</p>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsHours")}</p>
+          <div className="flex-1 py-6 text-center">
+            <p className="text-[27px] font-semibold leading-[1.1] text-primary">{stats.hours}</p>
+            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsHours")}</p>
           </div>
         </div>
       </div>
 
       {/* Bookmarked */}
-      <div className="relative z-10 px-5 mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold text-foreground">{t("bookmarkedSection")}</h2>
+      <div className="relative z-10 px-5 mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground">{t("bookmarkedSection")}</h2>
           {bookmarks.length > 4 && (
-            <button className="text-sm font-bold text-primary">{t("viewAllLabel")}</button>
+            <button className="text-[14px] font-medium text-primary opacity-75">{t("viewAllLabel")}</button>
           )}
         </div>
         {bookmarks.length === 0 ? (
@@ -353,8 +353,8 @@ export default function Profile() {
       </div>
 
       {/* Fitness Interests */}
-      <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">{t("fitnessInterests")}</h2>
+      <div className="relative z-10 px-5 mb-10">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground mb-4">{t("fitnessInterests")}</h2>
         <div className="flex flex-wrap gap-2">
           {interests.map((tag) => (
             <button
@@ -394,9 +394,9 @@ export default function Profile() {
       </div>
 
       {/* Account Settings */}
-      <div className="relative z-10 px-5 mb-6">
-        <h2 className="text-lg font-bold text-foreground mb-3">{t("accountSettings")}</h2>
-        <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border">
+      <div className="relative z-10 px-5 mb-10">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-foreground mb-4">{t("accountSettings")}</h2>
+        <div className="rounded-2xl bg-card ios-shadow overflow-hidden divide-y divide-border/20 p-3">
           <SettingsRow
             icon={<BankCard size={20} />}
             iconBg="bg-primary/10 text-primary"
@@ -476,12 +476,12 @@ function SettingsRow({
   onClick?: () => void;
 }) {
   return (
-    <button onClick={onClick} className="flex w-full items-center gap-3 px-4 py-3.5 transition-colors hover:bg-muted/30 active:bg-muted/50">
+    <button onClick={onClick} className="flex w-full items-center gap-3 px-[18px] py-4 transition-colors hover:bg-muted/30 active:bg-muted/50">
       <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconBg}`}>
         {icon}
       </div>
-      <span className="flex-1 text-left text-sm font-semibold text-foreground">{label}</span>
-      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      <span className="flex-1 text-left text-[16px] font-semibold text-foreground">{label}</span>
+      <ChevronRight className="h-4 w-4 text-muted-foreground opacity-50" />
     </button>
   );
 }
