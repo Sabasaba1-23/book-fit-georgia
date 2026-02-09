@@ -28,6 +28,8 @@ import {
 import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useBadges } from "@/hooks/useBadges";
+import { ProfileBadges } from "@/components/badges/ProfileBadges";
 
 const LISTING_ICONS = [Zap, Dumbbell, Trophy];
 
@@ -94,6 +96,8 @@ export default function PartnerProfile() {
   const [bioExpanded, setBioExpanded] = useState(false);
   const [detailsExpanded, setDetailsExpanded] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
+  const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
+  const { badges } = useBadges(entityType, id);
 
   useEffect(() => {
     if (!id) return;
@@ -292,6 +296,9 @@ export default function PartnerProfile() {
             <span>{partner.location}</span>
           </div>
         )}
+
+        {/* Badges */}
+        <ProfileBadges badges={badges} name={partner.display_name} maxVisible={3} />
       </div>
 
       {/* ─────────── SECTION 2: QUICK STATS ROW ─────────── */}

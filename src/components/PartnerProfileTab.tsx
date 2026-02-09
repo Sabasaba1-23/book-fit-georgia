@@ -10,6 +10,7 @@ import EditableTagsField from "@/components/EditableTagsField";
 import { SPORTS } from "@/constants/sports";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
+import PartnerBadgesSection from "@/components/PartnerBadgesSection";
 
 interface PartnerProfile {
   id: string;
@@ -233,6 +234,9 @@ export default function PartnerProfileTab({ profile, user, onRefetch, onSignOut 
           onRefetch={onRefetch}
         />
       </div>
+
+      {/* Badges */}
+      <PartnerBadgesSection partnerId={profile.id} partnerType={profile.partner_type} />
 
       {/* Log Out */}
       <button

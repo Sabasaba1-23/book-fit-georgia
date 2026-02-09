@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      badges: {
+        Row: {
+          auto_criteria: Json | null
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_active: boolean
+          key: string
+          tier: Database["public"]["Enums"]["badge_tier"]
+          title: string
+          visibility_priority: number
+        }
+        Insert: {
+          auto_criteria?: Json | null
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          key: string
+          tier: Database["public"]["Enums"]["badge_tier"]
+          title: string
+          visibility_priority?: number
+        }
+        Update: {
+          auto_criteria?: Json | null
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_active?: boolean
+          key?: string
+          tier?: Database["public"]["Enums"]["badge_tier"]
+          title?: string
+          visibility_priority?: number
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           booking_status: Database["public"]["Enums"]["booking_status"]
@@ -186,6 +225,53 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "training_listings"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      entity_badges: {
+        Row: {
+          awarded_at: string
+          awarded_by: string | null
+          badge_key: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["badge_entity_type"]
+          id: string
+          notes: string | null
+          revoked_at: string | null
+          source: Database["public"]["Enums"]["badge_source"]
+          status: Database["public"]["Enums"]["badge_status"]
+        }
+        Insert: {
+          awarded_at?: string
+          awarded_by?: string | null
+          badge_key: string
+          entity_id: string
+          entity_type: Database["public"]["Enums"]["badge_entity_type"]
+          id?: string
+          notes?: string | null
+          revoked_at?: string | null
+          source?: Database["public"]["Enums"]["badge_source"]
+          status?: Database["public"]["Enums"]["badge_status"]
+        }
+        Update: {
+          awarded_at?: string
+          awarded_by?: string | null
+          badge_key?: string
+          entity_id?: string
+          entity_type?: Database["public"]["Enums"]["badge_entity_type"]
+          id?: string
+          notes?: string | null
+          revoked_at?: string | null
+          source?: Database["public"]["Enums"]["badge_source"]
+          status?: Database["public"]["Enums"]["badge_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entity_badges_badge_key_fkey"
+            columns: ["badge_key"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["key"]
           },
         ]
       }
@@ -856,6 +942,10 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "partner" | "user"
+      badge_entity_type: "trainer" | "studio" | "user"
+      badge_source: "manual_admin" | "auto_system"
+      badge_status: "active" | "pending" | "revoked"
+      badge_tier: "trust" | "experience" | "performance" | "loyalty"
       booking_status:
         | "pending"
         | "confirmed"
@@ -996,6 +1086,10 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "partner", "user"],
+      badge_entity_type: ["trainer", "studio", "user"],
+      badge_source: ["manual_admin", "auto_system"],
+      badge_status: ["active", "pending", "revoked"],
+      badge_tier: ["trust", "experience", "performance", "loyalty"],
       booking_status: [
         "pending",
         "confirmed",
