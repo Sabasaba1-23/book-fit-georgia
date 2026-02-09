@@ -227,7 +227,7 @@ export default function Home() {
               onClick={() => setShowNotifications(true)}
               className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted/60 text-foreground transition-colors hover:bg-muted active:scale-95"
             >
-              <Bell className="h-5 w-5" />
+              <BellRing size={20} fill="currentColor" />
             </button>
             <UserMenuDropdown />
           </div>
