@@ -269,7 +269,7 @@ export default function Bookings() {
         </div>
       </div>
 
-      <main className="relative z-10 mx-auto max-w-lg space-y-4 px-5 py-2">
+      <main className="relative z-10 mx-auto max-w-lg space-y-5 px-5 py-2">
         {loading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
