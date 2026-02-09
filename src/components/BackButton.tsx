@@ -18,8 +18,8 @@ export default function BackButton({ onClick, variant = "default", className }: 
       onClick();
       return;
     }
-    // Use history if available, otherwise go home
-    if (window.history.length > 1) {
+    // If there's real navigation history, go back; otherwise go home
+    if (window.history.state && window.history.state.idx > 0) {
       navigate(-1);
     } else {
       navigate("/");
