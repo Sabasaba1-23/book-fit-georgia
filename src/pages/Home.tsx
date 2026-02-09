@@ -11,7 +11,7 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import UserMenuDropdown from "@/components/UserMenuDropdown";
-import { Search as SearchIcon, BellRing } from "@icon-park/react";
+import { Search as SearchIcon, Alarm } from "@icon-park/react";
 import { SlidersHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -227,7 +227,7 @@ export default function Home() {
               onClick={() => setShowNotifications(true)}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-foreground transition-colors hover:bg-muted active:scale-95"
             >
-              <BellRing size={20} fill="currentColor" />
+              <Alarm size={20} fill="currentColor" />
             </button>
             <UserMenuDropdown />
           </div>

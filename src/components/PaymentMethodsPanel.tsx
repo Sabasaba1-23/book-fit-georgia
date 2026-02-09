@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { BankCard, Right } from "@icon-park/react";
-import { Smartphone } from "lucide-react";
+import { BankCard, Right, Iphone, PaymentMethod } from "@icon-park/react";
 import {
   Sheet,
   SheetContent,
@@ -68,7 +67,7 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
 
           <button className="flex w-full items-center gap-3 rounded-2xl bg-card ios-shadow p-4 transition-all hover:bg-muted/30 active:scale-[0.98]">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4285F4]">
-              <Smartphone className="h-5 w-5 text-white" />
+              <PaymentMethod size={20} fill="#fff" />
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-bold text-foreground">Google Pay</p>

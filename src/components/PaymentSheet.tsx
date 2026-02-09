@@ -7,13 +7,8 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  CreditCard,
-  Lock,
-  CheckCircle2,
-  Smartphone,
-  ArrowRight,
-} from "lucide-react";
+import { Lock, CheckCircle2, ArrowRight } from "lucide-react";
+import { BankCard, PaymentMethod, Iphone } from "@icon-park/react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -135,7 +130,7 @@ export default function PaymentSheet({
                       : "text-muted-foreground"
                   )}
                 >
-                  <CreditCard className="h-3.5 w-3.5" />
+                  <BankCard size={14} fill="currentColor" />
                   {t("cardLabel")}
                 </button>
                 <button
@@ -147,7 +142,7 @@ export default function PaymentSheet({
                       : "text-muted-foreground"
                   )}
                 >
-                  <Smartphone className="h-3.5 w-3.5" />
+                  <Iphone size={14} fill="currentColor" />
                   Apple Pay
                 </button>
                 <button
@@ -159,7 +154,7 @@ export default function PaymentSheet({
                       : "text-muted-foreground"
                   )}
                 >
-                  <Smartphone className="h-3.5 w-3.5" />
+                  <PaymentMethod size={14} fill="currentColor" />
                   Google Pay
                 </button>
               </div>
@@ -178,7 +173,7 @@ export default function PaymentSheet({
                       onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                       className="h-13 rounded-2xl border-0 bg-muted/60 pl-4 pr-12 text-[15px] font-medium shadow-none tracking-wider"
                     />
-                    <CreditCard className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50" />
+                    <BankCard size={20} fill="hsl(var(--muted-foreground) / 0.5)" className="absolute right-4 top-1/2 -translate-y-1/2" />
                   </div>
                 </div>
 
@@ -224,7 +219,7 @@ export default function PaymentSheet({
 
             {method !== "card" && (
               <div className="flex flex-col items-center py-6 animate-in fade-in duration-200">
-                <Smartphone className="h-12 w-12 text-primary/40 mb-3" />
+                <Iphone size={48} fill="hsl(var(--primary) / 0.4)" className="mb-3" />
                 <p className="text-sm font-medium text-muted-foreground">
                   {t("tapToPayWith")}{" "}
                   {method === "apple" ? "Apple Pay" : "Google Pay"}

@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePartnerProfile } from "@/hooks/usePartnerProfile";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bell, PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle, Camera, LogOut, ExternalLink, Pencil } from "lucide-react";
+import { PlusCircle, MoreHorizontal, LayoutDashboard, CalendarDays, BarChart3, User, MessageCircle, Camera, LogOut, ExternalLink, Pencil } from "lucide-react";
+import { Alarm } from "@icon-park/react";
 import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import CreateListingSheet from "@/components/CreateListingSheet";
@@ -180,7 +181,7 @@ export default function PartnerDashboard() {
             <h1 className="text-xl font-extrabold text-foreground">{profile.display_name}</h1>
           </div>
           <button className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-transform active:scale-95">
-            <Bell className="h-5 w-5 text-primary" />
+            <Alarm size={20} fill="hsl(var(--primary))" />
           </button>
         </div>
       </header>

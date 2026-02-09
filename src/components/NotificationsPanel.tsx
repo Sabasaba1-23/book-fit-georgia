@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BellRing, CloseRemind, CalendarThirtyTwo, MessageOne, Star, VolumeNotice } from "@icon-park/react";
+import { Alarm, CloseRemind, CalendarThirtyTwo, MessageOne, Star, VolumeNotice } from "@icon-park/react";
 import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
@@ -87,7 +87,7 @@ export default function NotificationsPanel({ open, onOpenChange }: Notifications
             onChange={() => toggle("messages")}
           />
           <NotifRow
-            icon={<BellRing theme="two-tone" size={20} fill={["hsl(152 60% 45%)", "hsl(152 60% 45% / 0.2)"]} />}
+            icon={<Alarm theme="two-tone" size={20} fill={["hsl(152 60% 45%)", "hsl(152 60% 45% / 0.2)"]} />}
             iconBg="bg-emerald-500/10"
             title="Session Updates"
             description="Changes to your booked sessions"
