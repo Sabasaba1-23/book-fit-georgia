@@ -282,7 +282,7 @@ export default function Home() {
             <p className="text-muted-foreground text-sm">{t("noListings")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-7">
             {feedItems.map((item) => {
               if (item.type === "listing") {
                 const l = item.data;
