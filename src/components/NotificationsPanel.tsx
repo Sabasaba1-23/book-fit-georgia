@@ -64,7 +64,7 @@ export default function NotificationsPanel({ open, onOpenChange }: Notifications
 
         {allOff && (
           <div className="mb-4 flex items-center gap-3 rounded-2xl bg-destructive/5 p-4">
-            <BellOff className="h-5 w-5 text-destructive shrink-0" />
+            <CloseRemind theme="two-tone" size={20} fill={["hsl(var(--destructive))", "hsl(var(--destructive) / 0.2)"]} />
             <p className="text-xs font-medium text-destructive">All notifications are off. You may miss important updates.</p>
           </div>
         )}
