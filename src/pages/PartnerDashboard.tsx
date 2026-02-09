@@ -163,9 +163,9 @@ export default function PartnerDashboard() {
 
   return (
     <div className="relative min-h-screen bg-background pb-24 overflow-hidden">
-      {/* Background blobs */}
-      <div className="blob-warm-1 pointer-events-none fixed -right-32 -top-32 h-80 w-80 rounded-full" />
-      <div className="blob-warm-2 pointer-events-none fixed -left-20 top-1/3 h-64 w-64 rounded-full" />
+      {/* Green gradient background accents */}
+      <div className="pointer-events-none fixed -right-32 -top-32 h-[360px] w-[360px] rounded-full bg-gradient-to-bl from-primary/18 via-primary/8 to-transparent blur-3xl" />
+      <div className="pointer-events-none fixed -left-20 top-1/3 h-[280px] w-[280px] rounded-full bg-gradient-to-tr from-primary/12 via-accent/15 to-transparent blur-3xl" />
 
       {/* Header */}
       <header className="relative z-40 px-5 pb-2 pt-4">
