@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { BankCard, Right } from "@icon-park/react";
-import { Smartphone } from "lucide-react";
+import { BankCard, Right, Iphone, PaymentMethod } from "@icon-park/react";
 import {
   Sheet,
   SheetContent,
