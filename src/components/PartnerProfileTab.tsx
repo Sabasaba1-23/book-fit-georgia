@@ -10,6 +10,7 @@ import EditableTagsField from "@/components/EditableTagsField";
 import { SPORTS } from "@/constants/sports";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
+import PartnerBadgesSection from "@/components/PartnerBadgesSection";
 
 interface PartnerProfile {
   id: string;
