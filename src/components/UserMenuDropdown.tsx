@@ -74,6 +74,15 @@ export default function UserMenuDropdown() {
           <Settings className="h-4 w-4" />
           {t("settings")}
         </DropdownMenuItem>
+        {isPartner && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate("/partner/dashboard")} className="gap-2 cursor-pointer">
+              <LayoutDashboard className="h-4 w-4" />
+              {t("partnerDashboard") || "Partner Dashboard"}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
