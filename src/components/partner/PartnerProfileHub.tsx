@@ -5,13 +5,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
   Camera, ExternalLink, UserPen, ImageIcon, Award, LayoutDashboard,
-  Settings, CreditCard, HelpCircle, LogOut, ChevronRight, ShieldCheck,
+  Settings, CreditCard, HelpCircle, LogOut, ChevronRight, ShieldCheck, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
 import { User } from "@supabase/supabase-js";
 
-export type ProfileSubScreen = "hub" | "edit" | "media" | "badges" | "settings" | "payments";
+export type ProfileSubScreen = "hub" | "edit" | "media" | "badges" | "settings" | "payments" | "trainers";
 
 interface PartnerProfile {
   id: string;
@@ -107,6 +107,13 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
       action: onOpenVerification,
       showChevron: true,
     },
+    ...(profile.partner_type === "gym" ? [{
+      icon: <Users className="h-5 w-5" />,
+      label: "Manage Trainers",
+      subtitle: "Add or remove trainers at your gym",
+      action: () => onNavigate("trainers"),
+      showChevron: true,
+    }] : []),
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
       label: "Sessions & Listings",

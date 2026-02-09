@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Camera } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MediaLightbox from "@/components/partner/MediaLightbox";
 import { useAuth } from "@/contexts/AuthContext";
 import BottomNav from "@/components/BottomNav";
@@ -85,6 +86,31 @@ interface VerificationData {
   social_facebook: string | null;
 }
 
+interface GymTrainerLink {
+  id: string;
+  display_name: string;
+  logo_url: string | null;
+  sports: string[] | null;
+  partner_id: string;
+}
+
+interface GymLink {
+  id: string;
+  display_name: string;
+  logo_url: string | null;
+  partner_id: string;
+}
+
+interface PartnerLocation {
+  id: string;
+  label: string;
+  address: string;
+  description: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  is_primary: boolean;
+}
+
 export default function PartnerProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -103,6 +129,10 @@ export default function PartnerProfile() {
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [gymTrainers, setGymTrainers] = useState<GymTrainerLink[]>([]);
+  const [linkedGyms, setLinkedGyms] = useState<GymLink[]>([]);
+  const [locations, setLocations] = useState<PartnerLocation[]>([]);
+  const [locationExpanded, setLocationExpanded] = useState(false);
   const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
   const { badges } = useBadges(entityType, id);
 
@@ -191,6 +221,64 @@ export default function PartnerProfile() {
         .order("is_featured", { ascending: false })
         .order("sort_order", { ascending: true });
       if (mediaData) setMediaItems(mediaData as MediaItem[]);
+
+      // Fetch locations
+      const { data: locData } = await supabase
+        .from("partner_locations")
+        .select("id, label, address, description, latitude, longitude, is_primary")
+        .eq("partner_id", id)
+        .order("is_primary", { ascending: false })
+        .order("sort_order", { ascending: true });
+      if (locData) setLocations(locData as PartnerLocation[]);
+
+      // For gym profiles: fetch linked trainers
+      if (partnerRes.data && (partnerRes.data as any).partner_type === "gym") {
+        const { data: gtData } = await supabase
+          .from("gym_trainers")
+          .select("trainer_partner_id")
+          .eq("gym_partner_id", id)
+          .eq("status", "active");
+        if (gtData && gtData.length > 0) {
+          const trainerIds = gtData.map((g: any) => g.trainer_partner_id);
+          const { data: trainerProfiles } = await supabase
+            .from("partner_profiles")
+            .select("id, display_name, logo_url, sports")
+            .in("id", trainerIds);
+          if (trainerProfiles) {
+            setGymTrainers(trainerProfiles.map((tp: any) => ({
+              id: tp.id,
+              display_name: tp.display_name,
+              logo_url: tp.logo_url,
+              sports: tp.sports,
+              partner_id: tp.id,
+            })));
+          }
+        }
+      }
+
+      // For individual trainers: fetch linked gyms
+      if (partnerRes.data && (partnerRes.data as any).partner_type === "individual") {
+        const { data: gtData } = await supabase
+          .from("gym_trainers")
+          .select("gym_partner_id")
+          .eq("trainer_partner_id", id)
+          .eq("status", "active");
+        if (gtData && gtData.length > 0) {
+          const gymIds = gtData.map((g: any) => g.gym_partner_id);
+          const { data: gymProfiles } = await supabase
+            .from("partner_profiles")
+            .select("id, display_name, logo_url")
+            .in("id", gymIds);
+          if (gymProfiles) {
+            setLinkedGyms(gymProfiles.map((gp: any) => ({
+              id: gp.id,
+              display_name: gp.display_name,
+              logo_url: gp.logo_url,
+              partner_id: gp.id,
+            })));
+          }
+        }
+      }
 
       setLoading(false);
     }
@@ -310,11 +398,27 @@ export default function PartnerProfile() {
             {roleLabel}
           </p>
 
-          {/* Gym association */}
-          {gymNames.length > 0 && (
+          {/* Gym association — from linked gyms or listing-derived names */}
+          {(linkedGyms.length > 0 || gymNames.length > 0) && (
             <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
               <Building2 className="h-3 w-3" />
-              <span>{gymNames.join(" · ")}</span>
+              {linkedGyms.length > 0 ? (
+                <div className="flex items-center gap-1 flex-wrap">
+                  {linkedGyms.map((gym, i) => (
+                    <span key={gym.id}>
+                      <button
+                        onClick={() => navigate(`/partner/${gym.partner_id}`)}
+                        className="text-primary font-semibold hover:underline"
+                      >
+                        {gym.display_name}
+                      </button>
+                      {i < linkedGyms.length - 1 && <span className="mx-1">·</span>}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span>{gymNames.join(" · ")}</span>
+              )}
             </div>
           )}
 
@@ -337,6 +441,75 @@ export default function PartnerProfile() {
           Book a Session
         </button>
       </div>
+
+      {/* ─────────── LOCATION ─────────── */}
+      {(partner.location || locations.length > 0) && (
+        <section className="mt-6 mx-5">
+          <SectionTitle>Location</SectionTitle>
+          <div className="mt-2.5 space-y-2">
+            {/* Primary / legacy location */}
+            {partner.location && locations.length === 0 && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partner.location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-2xl bg-card border border-border/50 p-4 transition-colors hover:border-primary/30 active:bg-muted/30"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-semibold text-foreground">{partner.location}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Tap to open in Maps</p>
+                </div>
+              </a>
+            )}
+
+            {/* Multi-location entries */}
+            {locations.slice(0, locationExpanded ? undefined : 2).map((loc) => (
+              <a
+                key={loc.id}
+                href={
+                  loc.latitude && loc.longitude
+                    ? `https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address || loc.label)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 rounded-2xl bg-card border border-border/50 p-4 transition-colors hover:border-primary/30 active:bg-muted/30"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-[15px] font-semibold text-foreground">{loc.label || loc.address}</p>
+                    {loc.is_primary && (
+                      <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-primary leading-none">Main</span>
+                    )}
+                  </div>
+                  {loc.address && loc.label && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{loc.address}</p>
+                  )}
+                  {loc.description && (
+                    <p className="text-xs text-muted-foreground/70 mt-1 leading-relaxed">{loc.description}</p>
+                  )}
+                  <p className="text-[10px] text-primary font-medium mt-1">Open in Maps →</p>
+                </div>
+              </a>
+            ))}
+
+            {locations.length > 2 && (
+              <button
+                onClick={() => setLocationExpanded(!locationExpanded)}
+                className="w-full text-center text-xs font-semibold text-primary py-2"
+              >
+                {locationExpanded ? "Show less" : `Show all ${locations.length} locations`}
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ─────────── ABOUT ─────────── */}
       {bioText && (
@@ -568,6 +741,38 @@ export default function PartnerProfile() {
                   <p className="text-[13px] leading-relaxed text-foreground/70 italic">"{review.review_text}"</p>
                 )}
               </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─────────── TRAINER ROSTER (Gym profiles only) ─────────── */}
+      {partner.partner_type === "gym" && gymTrainers.length > 0 && (
+        <section className="mt-6 mx-5">
+          <SectionTitle>Our Trainers</SectionTitle>
+          <div className="mt-2.5 space-y-2">
+            {gymTrainers.map((trainer) => (
+              <button
+                key={trainer.id}
+                onClick={() => navigate(`/partner/${trainer.partner_id}`)}
+                className="flex w-full items-center gap-3 rounded-2xl bg-card border border-border/50 p-3.5 transition-colors hover:border-primary/30 active:scale-[0.99] text-left"
+              >
+                <Avatar className="h-12 w-12">
+                  {trainer.logo_url && <AvatarImage src={trainer.logo_url} />}
+                  <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">
+                    {trainer.display_name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-foreground truncate">{trainer.display_name}</p>
+                  {trainer.sports && trainer.sports.length > 0 && (
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      {trainer.sports.slice(0, 3).join(" · ")}
+                    </p>
+                  )}
+                </div>
+                <ChevronDown className="h-4 w-4 text-muted-foreground/40 shrink-0 -rotate-90" />
+              </button>
             ))}
           </div>
         </section>
