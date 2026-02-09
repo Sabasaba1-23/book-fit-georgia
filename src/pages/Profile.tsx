@@ -20,11 +20,20 @@ import {
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
-const AVAILABLE_INTERESTS = [
+const GOALS = [
+  "Weight Loss", "Muscle Gain", "General Health", "Flexibility",
+  "Speed & Performance", "Endurance", "Stress Relief", "Mobility & Recovery",
+  "Body Toning", "Mental Wellness",
+];
+
+const ACTIVITIES = [
   "Yoga", "Boxing", "HIIT", "Tennis", "Swimming", "CrossFit",
   "Pilates", "Running", "Cycling", "Basketball", "Football", "Martial Arts",
-  "Dance", "Weightlifting", "Stretching", "Meditation",
+  "Dance", "Weightlifting", "Stretching", "Meditation", "Kickboxing", "MMA",
+  "Rock Climbing", "Hiking", "Gymnastics", "Calisthenics", "Zumba", "Padel",
 ];
+
+const ALL_INTERESTS = [...GOALS, ...ACTIVITIES];
 
 interface ProfileData {
   full_name: string | null;
