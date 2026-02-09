@@ -238,7 +238,7 @@ export default function Home() {
       <div className="relative z-30 px-4 md:px-6 pb-3">
         <div className="flex items-center gap-2">
           <div className="flex flex-1 items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5">
-            <Search className="h-4 w-4 text-muted-foreground" />
+            <SearchIcon size={16} fill="hsl(var(--muted-foreground))" />
             <input
               type="text"
               placeholder={t("searchPlaceholder")}
