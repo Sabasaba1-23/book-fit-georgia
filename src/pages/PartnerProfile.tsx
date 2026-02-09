@@ -745,6 +745,38 @@ export default function PartnerProfile() {
         </section>
       )}
 
+      {/* ─────────── TRAINER ROSTER (Gym profiles only) ─────────── */}
+      {partner.partner_type === "gym" && gymTrainers.length > 0 && (
+        <section className="mt-6 mx-5">
+          <SectionTitle>Our Trainers</SectionTitle>
+          <div className="mt-2.5 space-y-2">
+            {gymTrainers.map((trainer) => (
+              <button
+                key={trainer.id}
+                onClick={() => navigate(`/partner/${trainer.partner_id}`)}
+                className="flex w-full items-center gap-3 rounded-2xl bg-card border border-border/50 p-3.5 transition-colors hover:border-primary/30 active:scale-[0.99] text-left"
+              >
+                <Avatar className="h-12 w-12">
+                  {trainer.logo_url && <AvatarImage src={trainer.logo_url} />}
+                  <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">
+                    {trainer.display_name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-foreground truncate">{trainer.display_name}</p>
+                  {trainer.sports && trainer.sports.length > 0 && (
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      {trainer.sports.slice(0, 3).join(" · ")}
+                    </p>
+                  )}
+                </div>
+                <ChevronDown className="h-4 w-4 text-muted-foreground/40 shrink-0 -rotate-90" />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ─────────── AVAILABLE SESSIONS ─────────── */}
       <section id="sessions-section" className="mt-6 mx-5 pb-4">
         <SectionTitle>Available Sessions</SectionTitle>
