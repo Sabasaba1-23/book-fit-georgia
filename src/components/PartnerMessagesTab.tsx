@@ -191,12 +191,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     return (
       <div className="flex flex-col" style={{ height: "calc(100vh - 180px)" }}>
         <div className="flex items-center gap-3 border-b border-border/50 px-4 py-3">
-          <button
-            onClick={() => { setActiveThread(null); setMessages([]); }}
-            className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted transition-colors active:scale-95"
-          >
-            <ArrowLeft className="h-5 w-5 text-foreground" />
-          </button>
+          <BackButton onClick={() => { setActiveThread(null); setMessages([]); }} />
           <Avatar className="h-10 w-10 border border-border/50">
             {activeThread.otherUser?.avatar_url ? <AvatarImage src={activeThread.otherUser.avatar_url} /> : null}
             <AvatarFallback className="bg-primary/10 text-sm font-bold text-primary">
