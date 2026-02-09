@@ -275,6 +275,45 @@ export type Database = {
           },
         ]
       }
+      gym_trainers: {
+        Row: {
+          added_at: string
+          gym_partner_id: string
+          id: string
+          status: string
+          trainer_partner_id: string
+        }
+        Insert: {
+          added_at?: string
+          gym_partner_id: string
+          id?: string
+          status?: string
+          trainer_partner_id: string
+        }
+        Update: {
+          added_at?: string
+          gym_partner_id?: string
+          id?: string
+          status?: string
+          trainer_partner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gym_trainers_gym_partner_id_fkey"
+            columns: ["gym_partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gym_trainers_trainer_partner_id_fkey"
+            columns: ["trainer_partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           content: string
@@ -344,6 +383,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "partner_documents_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_locations: {
+        Row: {
+          address: string
+          created_at: string
+          description: string | null
+          id: string
+          is_primary: boolean
+          label: string
+          latitude: number | null
+          longitude: number | null
+          partner_id: string
+          sort_order: number
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_primary?: boolean
+          label?: string
+          latitude?: number | null
+          longitude?: number | null
+          partner_id: string
+          sort_order?: number
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_primary?: boolean
+          label?: string
+          latitude?: number | null
+          longitude?: number | null
+          partner_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_locations_partner_id_fkey"
             columns: ["partner_id"]
             isOneToOne: false
             referencedRelation: "partner_profiles"
