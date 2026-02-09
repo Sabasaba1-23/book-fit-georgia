@@ -9,12 +9,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings, LogOut, LayoutDashboard } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function UserMenuDropdown() {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+
+  const { data: isPartner } = useQuery({
+    queryKey: ["isPartner", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase
+        .from("partner_profiles")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      return !!data;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const userInitial =
     user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ||
@@ -57,6 +74,15 @@ export default function UserMenuDropdown() {
           <Settings className="h-4 w-4" />
           {t("settings")}
         </DropdownMenuItem>
+        {isPartner && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate("/partner/dashboard")} className="gap-2 cursor-pointer">
+              <LayoutDashboard className="h-4 w-4" />
+              {t("partnerDashboard") || "Partner Dashboard"}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
