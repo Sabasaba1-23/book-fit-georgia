@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ChevronLeft, Eye, EyeOff, Handshake, ArrowRight, User, Building2, Mail, BadgeCheck, ShieldCheck, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import authBgIllustration from "@/assets/auth-bg-illustration.svg";
 
 type AuthMode = "login" | "register-choice" | "register-user" | "register-partner" | "forgot-password";
 
