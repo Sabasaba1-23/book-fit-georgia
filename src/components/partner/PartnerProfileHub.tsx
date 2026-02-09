@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
   Camera, ExternalLink, UserPen, ImageIcon, Award, LayoutDashboard,
-  Settings, CreditCard, HelpCircle, LogOut, ChevronRight, ShieldCheck,
+  Settings, CreditCard, HelpCircle, LogOut, ChevronRight, ShieldCheck, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
