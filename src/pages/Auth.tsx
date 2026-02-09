@@ -221,9 +221,18 @@ export default function Auth() {
   };
 
   const goBack = () => {
-    if (mode === "login") navigate(-1);
-    else if (mode === "register-choice" || mode === "forgot-password") setMode("login");
-    else setMode("register-choice");
+    if (mode === "login") {
+      // If there's browser history, go back; otherwise go home
+      if (window.history.state?.idx > 0) {
+        navigate(-1);
+      } else {
+        navigate("/", { replace: true });
+      }
+    } else if (mode === "register-choice" || mode === "forgot-password") {
+      setMode("login");
+    } else {
+      setMode("register-choice");
+    }
   };
 
   return (
