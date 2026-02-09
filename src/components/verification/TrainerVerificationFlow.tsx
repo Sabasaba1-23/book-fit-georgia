@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Slider } from "@/components/ui/slider";
+
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Upload, Shield, ArrowRight, CheckCircle2, FileText, Trash2, Search, Star } from "lucide-react";
