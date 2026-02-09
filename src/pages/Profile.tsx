@@ -254,7 +254,7 @@ export default function Profile() {
               onClick={() => fileInputRef.current?.click()}
               className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary-foreground text-primary shadow-lg transition-transform active:scale-90"
             >
-              <Camera className="h-3.5 w-3.5" />
+              <CameraIcon size={14} fill="hsl(var(--primary))" />
             </button>
             <input
               ref={fileInputRef}
