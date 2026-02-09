@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
   Camera, ExternalLink, UserPen, ImageIcon, Award, LayoutDashboard,
-  Settings, CreditCard, HelpCircle, LogOut, ChevronRight,
+  Settings, CreditCard, HelpCircle, LogOut, ChevronRight, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
@@ -34,9 +34,10 @@ interface Props {
   onSignOut: () => Promise<void>;
   onNavigate: (screen: ProfileSubScreen) => void;
   onSwitchTab: (tab: string) => void;
+  onOpenVerification: () => void;
 }
 
-export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut, onNavigate, onSwitchTab }: Props) {
+export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut, onNavigate, onSwitchTab, onOpenVerification }: Props) {
   const { toast } = useToast();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +98,13 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
       label: "Badges & Achievements",
       subtitle: "View earned and available badges",
       action: () => onNavigate("badges"),
+      showChevron: true,
+    },
+    {
+      icon: <ShieldCheck className="h-5 w-5" />,
+      label: "Identity Verification",
+      subtitle: profile.verification_status === "verified" ? "Verified" : "Verify your identity",
+      action: onOpenVerification,
       showChevron: true,
     },
     {
