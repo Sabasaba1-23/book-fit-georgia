@@ -142,7 +142,7 @@ export default function PaymentSheet({
                       : "text-muted-foreground"
                   )}
                 >
-                  <Smartphone className="h-3.5 w-3.5" />
+                  <Iphone size={14} fill="currentColor" />
                   Apple Pay
                 </button>
                 <button
