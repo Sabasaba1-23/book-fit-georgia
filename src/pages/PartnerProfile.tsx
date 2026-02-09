@@ -397,11 +397,27 @@ export default function PartnerProfile() {
             {roleLabel}
           </p>
 
-          {/* Gym association */}
-          {gymNames.length > 0 && (
+          {/* Gym association — from linked gyms or listing-derived names */}
+          {(linkedGyms.length > 0 || gymNames.length > 0) && (
             <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
               <Building2 className="h-3 w-3" />
-              <span>{gymNames.join(" · ")}</span>
+              {linkedGyms.length > 0 ? (
+                <div className="flex items-center gap-1 flex-wrap">
+                  {linkedGyms.map((gym, i) => (
+                    <span key={gym.id}>
+                      <button
+                        onClick={() => navigate(`/partner/${gym.partner_id}`)}
+                        className="text-primary font-semibold hover:underline"
+                      >
+                        {gym.display_name}
+                      </button>
+                      {i < linkedGyms.length - 1 && <span className="mx-1">·</span>}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span>{gymNames.join(" · ")}</span>
+              )}
             </div>
           )}
 
