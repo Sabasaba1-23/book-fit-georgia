@@ -282,15 +282,15 @@ export default function PartnerProfile() {
         {/* Top floating actions */}
         <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between">
           <BackButton variant="overlay" />
-          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50">
-            <Share2 className="h-4 w-4 text-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50 active:scale-95">
+              <Bookmark className="h-4 w-4 text-white" />
+            </button>
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 backdrop-blur-md transition-colors hover:bg-black/50 active:scale-95">
+              <Share2 className="h-4 w-4 text-white" />
+            </button>
+          </div>
         </div>
-
-        {/* Bookmark floating button */}
-        <button className="absolute bottom-24 right-5 z-20 flex h-12 w-12 items-center justify-center rounded-full bg-white/15 backdrop-blur-md border border-white/20 shadow-lg transition-all hover:bg-white/25 active:scale-95">
-          <Bookmark className="h-5 w-5 text-white" />
-        </button>
 
         {/* Hero overlay card — anchored to bottom */}
         <div className="absolute bottom-0 left-0 right-0 z-10 px-5 pb-5">
@@ -318,19 +318,6 @@ export default function PartnerProfile() {
             </div>
           )}
 
-          {/* Badge icons row */}
-          {badges.length > 0 && (
-            <BadgesModal badges={badges} name={partner.display_name}>
-              <button className="mt-2 flex items-center gap-1">
-                {badges.slice(0, 5).map((eb) => (
-                  <BadgeIcon key={eb.badge_key} icon={eb.badge.icon} tier={eb.badge.tier} size="sm" />
-                ))}
-                {badges.length > 5 && (
-                  <span className="text-[10px] font-semibold text-muted-foreground ml-1">+{badges.length - 5}</span>
-                )}
-              </button>
-            </BadgesModal>
-          )}
 
           {/* Compact stats row */}
           {statsItems.length > 0 && (
@@ -370,6 +357,27 @@ export default function PartnerProfile() {
             </button>
           )}
         </section>
+      )}
+
+      {/* ─────────── BADGES ─────────── */}
+      {badges.length > 0 && (
+        <div className="mt-6 mx-5 flex items-center gap-2 flex-wrap">
+          {badges.slice(0, 6).map((eb) => (
+            <div key={eb.badge_key} className="group relative">
+              <BadgeIcon icon={eb.badge.icon} tier={eb.badge.tier} size="sm" />
+              <span className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground/75 backdrop-blur-sm px-2 py-1 text-[10px] font-medium text-background opacity-0 transition-opacity group-hover:opacity-100 z-30">
+                {eb.badge.title}
+              </span>
+            </div>
+          ))}
+          {badges.length > 6 && (
+            <BadgesModal badges={badges} name={partner.display_name}>
+              <button className="text-[10px] font-semibold text-muted-foreground hover:text-foreground transition-colors">
+                +{badges.length - 6} more
+              </button>
+            </BadgesModal>
+          )}
+        </div>
       )}
 
       {/* ─────────── PHOTOS & VIDEOS ─────────── */}
