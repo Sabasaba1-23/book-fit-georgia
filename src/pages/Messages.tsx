@@ -383,8 +383,8 @@ export default function Messages() {
           </div>
         )}
 
-        {/* Contact info warning tooltip */}
-        {contactWarningVisible && !hasConfirmedBooking && (
+        {/* Contact info warning — only in post-booking free text */}
+        {contactWarningVisible && hasConfirmedBooking && (
           <div className="flex items-start gap-2.5 border-b border-primary/20 bg-primary/5 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
             <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
             <p className="flex-1 text-[11px] text-foreground/80 leading-snug">
