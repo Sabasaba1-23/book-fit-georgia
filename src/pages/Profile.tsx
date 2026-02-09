@@ -6,6 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNav from "@/components/BottomNav";
+import ClientAchievements from "@/components/badges/ClientAchievements";
 import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
@@ -297,21 +298,10 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Stats card — overlapping the hero */}
+      {/* Achievements */}
       <div className="relative z-10 mx-5 -mt-12 mb-8">
-        <div className="flex rounded-2xl bg-card premium-shadow divide-x divide-border/20 p-1">
-          <div className="flex-1 py-6 text-center">
-            <p className="text-[27px] font-semibold leading-[1.1] text-primary">{stats.sessions}</p>
-            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsSessions")}</p>
-          </div>
-          <div className="flex-1 py-6 text-center">
-            <p className="text-[27px] font-semibold leading-[1.1] text-foreground">{stats.studios}</p>
-            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsStudios")}</p>
-          </div>
-          <div className="flex-1 py-6 text-center">
-            <p className="text-[27px] font-semibold leading-[1.1] text-primary">{stats.hours}</p>
-            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-muted-foreground opacity-55 mt-1">{t("statsHours")}</p>
-          </div>
+        <div className="rounded-2xl bg-card premium-shadow p-5">
+          <ClientAchievements stats={stats} />
         </div>
       </div>
 
