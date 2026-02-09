@@ -149,8 +149,24 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     setSending(true);
     const content = newMessage.trim();
     setNewMessage("");
-    const { error } = await supabase.from("messages").insert({ thread_id: activeThread.id, sender_id: user.id, content });
-    if (error) setNewMessage(content);
+
+    // Optimistic update
+    const optimisticMsg: Message = {
+      id: `optimistic-${Date.now()}`,
+      thread_id: activeThread.id,
+      sender_id: user.id,
+      content,
+      sent_at: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, optimisticMsg]);
+
+    const { data, error } = await supabase.from("messages").insert({ thread_id: activeThread.id, sender_id: user.id, content }).select("*").single();
+    if (error) {
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticMsg.id));
+      setNewMessage(content);
+    } else if (data) {
+      setMessages((prev) => prev.map((m) => (m.id === optimisticMsg.id ? (data as Message) : m)));
+    }
     setSending(false);
   }
 
