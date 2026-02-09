@@ -1,27 +1,40 @@
 
 
-## Fix: Bottom Navigation Safe-Area Spacing for PWA/Native
+## Add IconPark React Icon Library
 
-The core issue is that the bottom navigation's `paddingBottom` uses `env(safe-area-inset-bottom)` via a `style` attribute, but this CSS function doesn't work reliably when set through inline styles in all environments. Additionally, the Bookings page uses a static `pb-24` instead of the dynamic safe-area calculation.
+### What
+Install the `@icon-park/react` package and integrate its icons across the app to elevate the visual style. IconPark offers 2000+ icons with 4 themes (outline, filled, two-tone, multi-color), giving the UI a richer, more distinctive look compared to using only Lucide.
 
-### Changes
+### Steps
 
-**1. `src/index.css` -- Add safe-area bottom padding to `#root`**
+**1. Install the package**
+- Add `@icon-park/react` as a dependency
+- Import IconPark's base stylesheet (`@icon-park/react/styles/index.css`) in `src/main.tsx`
 
-Add `padding-bottom: env(safe-area-inset-bottom, 0px)` to the `#root` element. This ensures the entire app layout respects the home indicator area globally, so the background color fills behind it and no white strip appears.
+**2. Set up a global IconProvider (optional but recommended)**
+- Wrap the app with `IconProvider` in `src/main.tsx` to set default props like `strokeWidth: 3`, `strokeLinecap: 'round'`, and `theme: 'outline'` so all IconPark icons have a consistent style matching the app's rounded aesthetic
 
-**2. `src/components/BottomNav.tsx` -- Use CSS variable for safe-area padding**
+**3. Replace select icons across key components**
+Swap specific Lucide icons for IconPark equivalents where the richer style adds visual value:
 
-Replace the inline `style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}` with `pb-[env(safe-area-inset-bottom,0px)]` as a Tailwind class (or use the CSS custom property `var(--sab)` already defined in the CSS). This ensures the value is properly resolved by the CSS engine rather than potentially being ignored as an inline style.
+| Component | Current (Lucide) | New (IconPark) | Theme |
+|---|---|---|---|
+| **BottomNav** | `Home`, `CalendarCheck`, `MessageSquareMore` | `Home`, `CalendarThirtyTwo`, `ChatDot` | outline |
+| **Home header** | `Search`, `Bell`, `SlidersHorizontal` | `Search`, `BellRing`, `SlidersHorizontal` | outline |
+| **Profile page** | `Pencil`, `CreditCard`, `Bell`, `HelpCircle`, `LogOut`, `Camera`, `Trash2` | `EditTwo`, `BankCard`, `Remind`, `HeadsetOne`, `Logout`, `Camera`, `Delete` | outline |
+| **NotificationsPanel** | `Bell`, `BellOff`, `Calendar`, `MessageCircle`, `Star`, `Megaphone` | `BellRing`, `CloseRemind`, `CalendarThirtyTwo`, `MessageOne`, `Star`, `VolumeNotice` | two-tone |
+| **PaymentMethodsPanel** | `CreditCard`, `Smartphone`, `ChevronRight` | `BankCard`, `PhoneTwo`, `Right` | outline |
 
-**3. `src/pages/Home.tsx` -- Use CSS variable for bottom padding**
+**4. Files to modify**
+- `src/main.tsx` -- add CSS import and IconProvider wrapper
+- `src/components/BottomNav.tsx` -- swap 3 nav icons
+- `src/pages/Home.tsx` -- swap header icons
+- `src/pages/Profile.tsx` -- swap profile menu icons
+- `src/components/NotificationsPanel.tsx` -- swap notification row icons
+- `src/components/PaymentMethodsPanel.tsx` -- swap payment icons
 
-Replace the inline style `paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))'` with `pb-[calc(60px+var(--sab))]` using the existing `--sab` CSS variable, ensuring consistent resolution.
-
-**4. `src/pages/Bookings.tsx` -- Apply same bottom padding pattern**
-
-Replace `pb-24` with the same dynamic `style={{ paddingBottom: 'calc(60px + env(safe-area-inset-bottom, 0px))' }}` (or Tailwind equivalent) so Bookings has the same correct spacing.
-
-### Technical Detail
-
-The CSS variables `--sab`, `--sat`, etc. are already defined in `index.css` `:root`. Using `var(--sab)` through Tailwind arbitrary values is more reliable cross-browser than putting `env()` in inline styles, which some WebKit versions ignore.
+### Technical Notes
+- IconPark icons render as `<span>` wrappers around SVGs, so sizing uses the `size` prop (e.g., `size={22}`) instead of className `h-5 w-5`
+- Color is controlled via the `fill` prop (accepts a string or array for multi-color themes)
+- Lucide will remain installed for any icons not available in IconPark
+- The two-tone theme on notification icons will add visual richness using the app's primary/secondary colors
