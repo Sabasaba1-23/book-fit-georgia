@@ -23,8 +23,7 @@ const TRAINER_TYPES = [
   "Other",
 ];
 
-const EXPERIENCE_LABELS = ["< 1 year", "1–3 years", "3–5 years", "5–10 years", "10+ years"];
-const EXPERIENCE_VALUES = ["less_than_1", "1_3", "3_5", "5_10", "10_plus"];
+// Years of experience is now stored as a plain number string (e.g. "3", "12")
 
 const DOC_TYPES = [
   { value: "id_card", label: "ID Card" },
