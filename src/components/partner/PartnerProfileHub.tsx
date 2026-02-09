@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
 import { User } from "@supabase/supabase-js";
 
-export type ProfileSubScreen = "hub" | "edit" | "media" | "badges" | "settings" | "payments";
+export type ProfileSubScreen = "hub" | "edit" | "media" | "badges" | "settings" | "payments" | "trainers";
 
 interface PartnerProfile {
   id: string;
