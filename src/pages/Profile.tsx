@@ -296,8 +296,8 @@ export default function Profile() {
       </div>
 
       {/* Stats card — overlapping the hero */}
-      <div className="relative z-10 mx-5 -mt-12 mb-6">
-        <div className="flex rounded-2xl bg-card shadow-lg divide-x divide-border">
+      <div className="relative z-10 mx-5 -mt-12 mb-8">
+        <div className="flex rounded-2xl bg-card shadow-md divide-x divide-border/20 p-1">
           <div className="flex-1 py-5 text-center">
             <p className="text-2xl font-bold text-primary">{stats.sessions}</p>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{t("statsSessions")}</p>
