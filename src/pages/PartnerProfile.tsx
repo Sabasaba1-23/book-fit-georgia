@@ -221,6 +221,64 @@ export default function PartnerProfile() {
         .order("sort_order", { ascending: true });
       if (mediaData) setMediaItems(mediaData as MediaItem[]);
 
+      // Fetch locations
+      const { data: locData } = await supabase
+        .from("partner_locations")
+        .select("id, label, address, description, latitude, longitude, is_primary")
+        .eq("partner_id", id)
+        .order("is_primary", { ascending: false })
+        .order("sort_order", { ascending: true });
+      if (locData) setLocations(locData as PartnerLocation[]);
+
+      // For gym profiles: fetch linked trainers
+      if (partnerRes.data && (partnerRes.data as any).partner_type === "gym") {
+        const { data: gtData } = await supabase
+          .from("gym_trainers")
+          .select("trainer_partner_id")
+          .eq("gym_partner_id", id)
+          .eq("status", "active");
+        if (gtData && gtData.length > 0) {
+          const trainerIds = gtData.map((g: any) => g.trainer_partner_id);
+          const { data: trainerProfiles } = await supabase
+            .from("partner_profiles")
+            .select("id, display_name, logo_url, sports")
+            .in("id", trainerIds);
+          if (trainerProfiles) {
+            setGymTrainers(trainerProfiles.map((tp: any) => ({
+              id: tp.id,
+              display_name: tp.display_name,
+              logo_url: tp.logo_url,
+              sports: tp.sports,
+              partner_id: tp.id,
+            })));
+          }
+        }
+      }
+
+      // For individual trainers: fetch linked gyms
+      if (partnerRes.data && (partnerRes.data as any).partner_type === "individual") {
+        const { data: gtData } = await supabase
+          .from("gym_trainers")
+          .select("gym_partner_id")
+          .eq("trainer_partner_id", id)
+          .eq("status", "active");
+        if (gtData && gtData.length > 0) {
+          const gymIds = gtData.map((g: any) => g.gym_partner_id);
+          const { data: gymProfiles } = await supabase
+            .from("partner_profiles")
+            .select("id, display_name, logo_url")
+            .in("id", gymIds);
+          if (gymProfiles) {
+            setLinkedGyms(gymProfiles.map((gp: any) => ({
+              id: gp.id,
+              display_name: gp.display_name,
+              logo_url: gp.logo_url,
+              partner_id: gp.id,
+            })));
+          }
+        }
+      }
+
       setLoading(false);
     }
     load();
