@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { Home, CalendarThirtyTwo, Message } from "@icon-park/react";
+import { Home, CalendarThirtyTwo, Message, User } from "@icon-park/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
