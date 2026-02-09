@@ -226,18 +226,18 @@ export default function Bookings() {
     <div className="relative min-h-screen bg-background pb-[calc(60px+var(--sab))]">
       <div className="pointer-events-none fixed inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-secondary/[0.05]" />
 
-      <header className="relative z-40 px-5 pb-1 pt-4">
+      <header className="relative z-40 px-5 pb-2 pt-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate("/")}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95"
             >
               <ArrowLeft className="h-5 w-5 text-foreground" />
             </button>
-            <h1 className="text-2xl font-extrabold text-foreground">{t("myBookings")}</h1>
+            <h1 className="text-page-title">{t("myBookings")}</h1>
           </div>
-          <button className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/60 transition-transform active:scale-95">
+          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95">
             <Bell className="h-5 w-5 text-foreground" />
           </button>
         </div>
