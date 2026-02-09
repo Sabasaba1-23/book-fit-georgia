@@ -516,7 +516,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
         <div className="flex gap-3">
           {step > 1 && (
             <Button variant="outline" onClick={handleBack} className="h-12 flex-1 rounded-xl font-semibold">
-              <ArrowLeft className="mr-1.5 h-4 w-4" />
+              <Left size={16} className="mr-1.5" />
               Back
             </Button>
           )}
