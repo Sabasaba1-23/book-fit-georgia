@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/select";
 import {
   ArrowRight,
-  ArrowLeft,
   User,
   Users,
   Camera,

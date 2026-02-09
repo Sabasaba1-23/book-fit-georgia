@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Send, MessageCircle, ArrowLeft } from "lucide-react";
+import { Send, MessageCircle } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { format, isToday, isYesterday } from "date-fns";
 
 interface Thread {
