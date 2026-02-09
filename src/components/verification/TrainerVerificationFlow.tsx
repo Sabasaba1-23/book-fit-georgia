@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Slider } from "@/components/ui/slider";
+
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { Upload, Shield, ArrowRight, CheckCircle2, FileText, Trash2, Search, Star } from "lucide-react";
@@ -23,8 +23,7 @@ const TRAINER_TYPES = [
   "Other",
 ];
 
-const EXPERIENCE_LABELS = ["< 1 year", "1–3 years", "3–5 years", "5–10 years", "10+ years"];
-const EXPERIENCE_VALUES = ["less_than_1", "1_3", "3_5", "5_10", "10_plus"];
+// Years of experience is now stored as a plain number string (e.g. "3", "12")
 
 const DOC_TYPES = [
   { value: "id_card", label: "ID Card" },
@@ -67,7 +66,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
 
   // Step 2
   const [trainerType, setTrainerType] = useState("");
-  const [yearsExp, setYearsExp] = useState(0);
+  const [yearsExp, setYearsExp] = useState("");
   const [specializations, setSpecializations] = useState<string[]>([]);
 
   // Step 3
@@ -92,8 +91,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       setCountryCity(d.country_city || d.address || "");
       setDescription(d.professional_description || existingBio || "");
       setTrainerType(d.trainer_type || "");
-      const expIdx = EXPERIENCE_VALUES.indexOf(d.years_experience || "");
-      setYearsExp(expIdx >= 0 ? expIdx : 0);
+      setYearsExp(d.years_experience || "");
       setSpecializations(d.specializations || []);
       if (d.verification_step) setStep(Math.min(d.verification_step, 3));
     }
@@ -116,7 +114,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       country_city: countryCity.trim(),
       professional_description: description.trim(),
       trainer_type: trainerType,
-      years_experience: EXPERIENCE_VALUES[yearsExp],
+      years_experience: yearsExp.trim() || null,
       specializations,
       verification_step: nextStep,
     } as any;
@@ -156,7 +154,7 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
       country_city: countryCity.trim(),
       professional_description: description.trim(),
       trainer_type: trainerType,
-      years_experience: EXPERIENCE_VALUES[yearsExp],
+      years_experience: yearsExp.trim() || null,
       specializations,
       verification_step: 3,
       submitted_at: new Date().toISOString(),
@@ -326,29 +324,21 @@ export default function TrainerVerificationFlow({ partnerId, displayName, existi
 
               <div>
                 <label className="mb-2 block text-xs font-semibold text-foreground">Years of experience</label>
-                <div className="px-1 pt-2 pb-1">
-                  <Slider
-                    value={[yearsExp]}
-                    onValueChange={(v) => setYearsExp(v[0])}
-                    min={0}
-                    max={4}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="mt-2 flex justify-between">
-                    {EXPERIENCE_LABELS.map((label, i) => (
-                      <span
-                        key={label}
-                        className={cn(
-                          "text-[10px] font-medium transition-colors",
-                          yearsExp === i ? "text-primary font-bold" : "text-muted-foreground"
-                        )}
-                      >
-                        {label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                <Input
+                  type="number"
+                  min="0"
+                  max="50"
+                  value={yearsExp}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 2);
+                    setYearsExp(v);
+                  }}
+                  placeholder="e.g. 5"
+                  className="h-12 rounded-xl border-border bg-card"
+                />
+                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                  {yearsExp ? `Will display as "${yearsExp}+ years" on your profile` : "Enter the number of years you've been training"}
+                </p>
               </div>
 
               <div>
