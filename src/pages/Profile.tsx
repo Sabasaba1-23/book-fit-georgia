@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import BottomNav from "@/components/BottomNav";
 import ClientAchievements from "@/components/badges/ClientAchievements";
+import BackButton from "@/components/BackButton";
 import PaymentMethodsPanel from "@/components/PaymentMethodsPanel";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import HelpSupportPanel from "@/components/HelpSupportPanel";
