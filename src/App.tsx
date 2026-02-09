@@ -77,6 +77,7 @@ const App = () => (
                   <Route path="bookings" element={<AdminBookings />} />
                   <Route path="reports" element={<AdminReports />} />
                   <Route path="settings" element={<AdminSettings />} />
+                  <Route path="badges" element={<AdminBadges />} />
                 </Route>
 
                 <Route path="/privacy" element={<PrivacyPolicy />} />

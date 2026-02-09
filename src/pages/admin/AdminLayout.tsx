@@ -19,9 +19,9 @@ import { useState } from "react";
 const bottomTabs = [
   { label: "Queue", icon: LayoutDashboard, to: "/admin" },
   { label: "Partners", icon: Users, to: "/admin/partners" },
+  { label: "Badges", icon: Shield, to: "/admin/badges" },
   { label: "Bookings", icon: Ticket, to: "/admin/bookings" },
   { label: "Reports", icon: BarChart3, to: "/admin/reports" },
-  { label: "Settings", icon: Settings, to: "/admin/settings" },
 ];
 
 export default function AdminLayout() {
