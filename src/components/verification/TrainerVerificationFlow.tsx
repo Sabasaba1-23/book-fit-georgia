@@ -8,7 +8,8 @@ import { Progress } from "@/components/ui/progress";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { Upload, Shield, ArrowLeft, ArrowRight, CheckCircle2, FileText, Trash2, Search, Star } from "lucide-react";
+import { Upload, Shield, ArrowRight, CheckCircle2, FileText, Trash2, Search, Star } from "lucide-react";
+import { Left } from "@icon-park/react";
 import { SPORTS } from "@/constants/sports";
 
 const TRAINER_TYPES = [
