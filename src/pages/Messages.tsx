@@ -316,9 +316,6 @@ export default function Messages() {
     return format(date, "MMM d");
   }
 
-  // Count messages from current user in this thread (for soft limit)
-  const myMessageCount = messages.filter((m) => m.sender_id === user?.id).length;
-  const isNearSoftLimit = !hasConfirmedBooking && myMessageCount >= PRE_BOOKING_MSG_SOFT_LIMIT;
   const showPreBookingBanner = !hasConfirmedBooking && !bookingLoading && !preBookingBannerDismissed;
 
   // ─── Chat View ──────────────────────────────────
