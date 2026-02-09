@@ -441,6 +441,75 @@ export default function PartnerProfile() {
         </button>
       </div>
 
+      {/* ─────────── LOCATION ─────────── */}
+      {(partner.location || locations.length > 0) && (
+        <section className="mt-6 mx-5">
+          <SectionTitle>Location</SectionTitle>
+          <div className="mt-2.5 space-y-2">
+            {/* Primary / legacy location */}
+            {partner.location && locations.length === 0 && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partner.location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-2xl bg-card border border-border/50 p-4 transition-colors hover:border-primary/30 active:bg-muted/30"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-semibold text-foreground">{partner.location}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Tap to open in Maps</p>
+                </div>
+              </a>
+            )}
+
+            {/* Multi-location entries */}
+            {locations.slice(0, locationExpanded ? undefined : 2).map((loc) => (
+              <a
+                key={loc.id}
+                href={
+                  loc.latitude && loc.longitude
+                    ? `https://www.google.com/maps/search/?api=1&query=${loc.latitude},${loc.longitude}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.address || loc.label)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-3 rounded-2xl bg-card border border-border/50 p-4 transition-colors hover:border-primary/30 active:bg-muted/30"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-[15px] font-semibold text-foreground">{loc.label || loc.address}</p>
+                    {loc.is_primary && (
+                      <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-primary leading-none">Main</span>
+                    )}
+                  </div>
+                  {loc.address && loc.label && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{loc.address}</p>
+                  )}
+                  {loc.description && (
+                    <p className="text-xs text-muted-foreground/70 mt-1 leading-relaxed">{loc.description}</p>
+                  )}
+                  <p className="text-[10px] text-primary font-medium mt-1">Open in Maps →</p>
+                </div>
+              </a>
+            ))}
+
+            {locations.length > 2 && (
+              <button
+                onClick={() => setLocationExpanded(!locationExpanded)}
+                className="w-full text-center text-xs font-semibold text-primary py-2"
+              >
+                {locationExpanded ? "Show less" : `Show all ${locations.length} locations`}
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* ─────────── ABOUT ─────────── */}
       {bioText && (
         <section className="mt-6 mx-5">
