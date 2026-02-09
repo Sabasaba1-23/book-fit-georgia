@@ -34,7 +34,7 @@ export default function PaymentMethodsPanel({ open, onOpenChange }: PaymentMetho
           <div className="space-y-3 mb-5">
             {methods.map((m) => (
               <div key={m.id} className="flex items-center gap-3 rounded-2xl bg-muted/40 p-4">
-                <CreditCard className="h-5 w-5 text-primary" />
+                <BankCard size={20} fill="hsl(var(--primary))" />
                 <div className="flex-1">
                   <p className="text-sm font-bold text-foreground">{m.label}</p>
                   {m.last4 && <p className="text-xs text-muted-foreground">•••• {m.last4}</p>}
