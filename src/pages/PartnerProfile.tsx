@@ -113,7 +113,7 @@ export default function PartnerProfile() {
         supabase.from("partner_profiles").select("*").eq("id", id).single(),
         supabase
           .from("training_listings")
-          .select("id, title_en, title_ka, sport, training_type, scheduled_at, duration_minutes, price_gel, max_spots, status, gym_name, location_type")
+          .select("id, title_en, title_ka, sport, training_type, scheduled_at, duration_minutes, price_gel, max_spots, status, gym_name, location_type, background_image_url")
           .eq("partner_id", id)
           .eq("status", "approved")
           .gte("scheduled_at", new Date().toISOString())
