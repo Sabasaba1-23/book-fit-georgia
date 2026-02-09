@@ -13,7 +13,6 @@ import {
   ChevronLeft,
   CalendarDays,
   MoreVertical,
-  ArrowLeft,
   Clock,
   Dumbbell,
   Flame,
