@@ -85,6 +85,31 @@ interface VerificationData {
   social_facebook: string | null;
 }
 
+interface GymTrainerLink {
+  id: string;
+  display_name: string;
+  logo_url: string | null;
+  sports: string[] | null;
+  partner_id: string;
+}
+
+interface GymLink {
+  id: string;
+  display_name: string;
+  logo_url: string | null;
+  partner_id: string;
+}
+
+interface PartnerLocation {
+  id: string;
+  label: string;
+  address: string;
+  description: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  is_primary: boolean;
+}
+
 export default function PartnerProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
