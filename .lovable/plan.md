@@ -1,40 +1,61 @@
 
 
-## Add IconPark React Icon Library
+## Profile Screen Premium Typography and Spacing Overhaul
 
-### What
-Install the `@icon-park/react` package and integrate its icons across the app to elevate the visual style. IconPark offers 2000+ icons with 4 themes (outline, filled, two-tone, multi-color), giving the UI a richer, more distinctive look compared to using only Lucide.
+Only the Profile screen (`src/pages/Profile.tsx`) will be modified. No global theme, color, font, or icon changes.
 
-### Steps
+### Step 1 -- Typography Hierarchy
 
-**1. Install the package**
-- Add `@icon-park/react` as a dependency
-- Import IconPark's base stylesheet (`@icon-park/react/styles/index.css`) in `src/main.tsx`
+Apply a strict type scale to all text on the Profile screen:
 
-**2. Set up a global IconProvider (optional but recommended)**
-- Wrap the app with `IconProvider` in `src/main.tsx` to set default props like `strokeWidth: 3`, `strokeLinecap: 'round'`, and `theme: 'outline'` so all IconPark icons have a consistent style matching the app's rounded aesthetic
+| Element | Current | New |
+|---|---|---|
+| Profile name (H1) | `text-2xl font-bold` | `text-[30px] font-semibold tracking-[-0.3px] leading-[1.15]` |
+| Subtitle ("Member since") | `text-sm text-primary-foreground/70` | `text-[14px] font-normal opacity-65 mt-2` |
+| Section titles (Bookmarked, Fitness Interests, Account Settings) | `text-lg font-bold` | `text-[20px] font-semibold leading-[1.2] mb-4` |
+| Body text / labels | various | `text-[15px] font-normal opacity-80` where applicable |
 
-**3. Replace select icons across key components**
-Swap specific Lucide icons for IconPark equivalents where the richer style adds visual value:
+### Step 2 -- Spacing Rhythm
 
-| Component | Current (Lucide) | New (IconPark) | Theme |
-|---|---|---|---|
-| **BottomNav** | `Home`, `CalendarCheck`, `MessageSquareMore` | `Home`, `CalendarThirtyTwo`, `ChatDot` | outline |
-| **Home header** | `Search`, `Bell`, `SlidersHorizontal` | `Search`, `BellRing`, `SlidersHorizontal` | outline |
-| **Profile page** | `Pencil`, `CreditCard`, `Bell`, `HelpCircle`, `LogOut`, `Camera`, `Trash2` | `EditTwo`, `BankCard`, `Remind`, `HeadsetOne`, `Logout`, `Camera`, `Delete` | outline |
-| **NotificationsPanel** | `Bell`, `BellOff`, `Calendar`, `MessageCircle`, `Star`, `Megaphone` | `BellRing`, `CloseRemind`, `CalendarThirtyTwo`, `MessageOne`, `Star`, `VolumeNotice` | two-tone |
-| **PaymentMethodsPanel** | `CreditCard`, `Smartphone`, `ChevronRight` | `BankCard`, `PhoneTwo`, `Right` | outline |
+- Header area: increase `pt-6` to `pt-10` and `pb-20` to `pb-24` for breathing room
+- Gap between hero bottom and stats card: keep the `-mt-12` overlap but add `mb-8` after stats (was `mb-6`)
+- Gap between major sections (Bookmarked, Fitness Interests, Account Settings): increase from `mb-6` to `mb-10`
+- Section title to content: `mb-4` (16px)
+- Page horizontal padding: ensure consistent `px-5` (20px) everywhere (already done)
 
-**4. Files to modify**
-- `src/main.tsx` -- add CSS import and IconProvider wrapper
-- `src/components/BottomNav.tsx` -- swap 3 nav icons
-- `src/pages/Home.tsx` -- swap header icons
-- `src/pages/Profile.tsx` -- swap profile menu icons
-- `src/components/NotificationsPanel.tsx` -- swap notification row icons
-- `src/components/PaymentMethodsPanel.tsx` -- swap payment icons
+### Step 3 -- Stats Card Polish
 
-### Technical Notes
-- IconPark icons render as `<span>` wrappers around SVGs, so sizing uses the `size` prop (e.g., `size={22}`) instead of className `h-5 w-5`
-- Color is controlled via the `fill` prop (accepts a string or array for multi-color themes)
-- Lucide will remain installed for any icons not available in IconPark
-- The two-tone theme on notification icons will add visual richness using the app's primary/secondary colors
+- Numbers: `text-[27px] font-semibold leading-[1.1]` (was `text-2xl font-bold`)
+- Labels: `text-[12px] font-medium uppercase tracking-[0.08em] opacity-55` (was `text-[10px] font-semibold`)
+- Card: keep `rounded-2xl`, use `shadow-md` (softer), add `p-1` internal breathing room
+- Dividers: add `divide-border/20` (lower contrast, ~0.2 opacity)
+- Cell padding: increase from `py-5` to `py-6`
+
+### Step 4 -- Bookmarked Header Row
+
+- "Bookmarked" uses the new section title style (20px/600)
+- "View all" becomes `text-[14px] font-medium opacity-75` (was `text-sm font-bold`)
+- Row alignment: already flex with `justify-between` -- just update spacing below to `mb-4`
+
+### Step 5 -- Account Settings List Rows
+
+- Row height: increase padding from `py-3.5` to `py-4` (achieving ~62px row height)
+- Left icon container: keep `h-10 w-10 rounded-xl` (already 40px, radius ~12px)
+- Main label: `text-[16px] font-semibold` (was `text-sm font-semibold`)
+- Chevron: add `opacity-50` (was full opacity muted-foreground)
+- Row horizontal padding: increase from `px-4` to `px-[18px]`
+- Card outer padding: add `p-3` wrapper around the list
+- Dividers: already using `divide-y divide-border`, will soften to `divide-border/20`
+
+### Step 6 -- Scope Guard
+
+Only `src/pages/Profile.tsx` is modified. No changes to:
+- Global CSS / index.css
+- tailwind.config.ts
+- Any other page or component
+- Color theme or icon set
+
+### Technical Details
+
+All changes are inline Tailwind classes within `src/pages/Profile.tsx`. The `SettingsRow` sub-component at the bottom of the file will also be updated for row sizing and chevron opacity.
+
