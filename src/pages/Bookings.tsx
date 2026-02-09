@@ -323,9 +323,9 @@ export default function Bookings() {
             const canReview = isCompleted && !myReview;
 
             return (
-              <div
+                <div
                 key={booking.id}
-                className={`relative overflow-hidden rounded-[1.5rem] bg-card ios-shadow transition-all ${
+                className={`relative overflow-hidden rounded-[22px] bg-card premium-shadow transition-all ${
                   isCancelled ? "opacity-60" : ""
                 }`}
               >
