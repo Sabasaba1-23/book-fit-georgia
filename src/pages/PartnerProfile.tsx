@@ -7,7 +7,6 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/BottomNav";
 import {
   Share2,
-  MoreHorizontal,
   Star,
   MapPin,
   Dumbbell,
@@ -22,9 +21,13 @@ import {
   Lock,
   MessageCircle,
   Building2,
+  Award,
+  Globe,
+  ChevronDown,
 } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const LISTING_ICONS = [Zap, Dumbbell, Trophy];
 
@@ -42,6 +45,7 @@ interface PartnerData {
   review_count: number | null;
   completion_rate: number | null;
   phone_number: string | null;
+  verification_status: string;
 }
 
 interface ListingData {
@@ -65,6 +69,13 @@ interface ReviewData {
   reviewer_name: string;
 }
 
+interface VerificationData {
+  date_of_birth: string | null;
+  years_experience: string | null;
+  specializations: string[] | null;
+  trainer_type: string | null;
+}
+
 export default function PartnerProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -74,9 +85,12 @@ export default function PartnerProfile() {
   const [listings, setListings] = useState<ListingData[]>([]);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
   const [gymNames, setGymNames] = useState<string[]>([]);
+  const [verification, setVerification] = useState<VerificationData | null>(null);
   const [age, setAge] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasBooking, setHasBooking] = useState(false);
+  const [bioExpanded, setBioExpanded] = useState(false);
+  const [sessionsCompleted, setSessionsCompleted] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -93,10 +107,9 @@ export default function PartnerProfile() {
       ]);
 
       if (partnerRes.data) setPartner(partnerRes.data as unknown as PartnerData);
-      
+
       if (listingsRes.data) {
         setListings(listingsRes.data as unknown as ListingData[]);
-        // Extract unique gym names
         const gyms = [...new Set(
           (listingsRes.data as any[])
             .filter((l: any) => l.location_type === "gym" && l.gym_name)
@@ -105,17 +118,28 @@ export default function PartnerProfile() {
         setGymNames(gyms);
       }
 
-      // Fetch age from partner_verifications
+      // Fetch verification data (age, experience, specializations)
       if (partnerRes.data) {
-        const { data: verification } = await supabase
+        const { data: vData } = await supabase
           .from("partner_verifications")
-          .select("date_of_birth")
+          .select("date_of_birth, years_experience, specializations, trainer_type")
           .eq("partner_id", id)
           .maybeSingle();
-        if (verification?.date_of_birth) {
-          setAge(differenceInYears(new Date(), new Date(verification.date_of_birth)));
+        if (vData) {
+          setVerification(vData as VerificationData);
+          if (vData.date_of_birth) {
+            setAge(differenceInYears(new Date(), new Date(vData.date_of_birth)));
+          }
         }
       }
+
+      // Count completed sessions
+      const { count: completedCount } = await supabase
+        .from("bookings")
+        .select("id, training_listings!inner(partner_id)", { count: "exact", head: true })
+        .eq("training_listings.partner_id", id)
+        .eq("booking_status", "completed");
+      setSessionsCompleted(completedCount || 0);
 
       // Fetch real reviews
       const { data: reviewsData } = await supabase
@@ -127,7 +151,6 @@ export default function PartnerProfile() {
         const partnerReviews = (reviewsData as any[]).filter(
           (r) => r.bookings?.training_listings?.partner_id === id
         );
-        // We don't have reviewer names easily without another query, so use initials
         setReviews(
           partnerReviews.map((r) => ({
             id: r.id,
@@ -139,7 +162,7 @@ export default function PartnerProfile() {
         );
       }
 
-      // Check if current user has a confirmed booking with this partner
+      // Check if current user has a confirmed booking
       if (user && partnerRes.data) {
         const { data: bookings } = await supabase
           .from("bookings")
@@ -177,192 +200,293 @@ export default function PartnerProfile() {
     ? Number(partner.avg_rating).toFixed(1)
     : null;
   const reviewCount = partner.review_count && partner.review_count > 0 ? partner.review_count : 0;
-  const completionRate = partner.completion_rate ? Number(partner.completion_rate) : null;
+  const isVerified = partner.verification_status === "verified";
 
   const trainingTypeLabel = (tt: string) => {
     switch (tt) {
       case "one_on_one": return "1-on-1";
-      case "group": return "Small Group";
+      case "group": return "Group";
       case "event": return "Event";
       default: return tt;
     }
   };
 
-  return (
-    <div className="relative min-h-screen bg-background pb-24">
-      {/* Hero — simple gradient since no fake cover images */}
-      <div className="relative h-56 w-full bg-gradient-to-br from-primary/20 via-secondary/10 to-primary/5">
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+  const roleLabel = partner.partner_type === "gym"
+    ? "Gym & Studio"
+    : verification?.trainer_type
+      ? verification.trainer_type.charAt(0).toUpperCase() + verification.trainer_type.slice(1) + " Trainer"
+      : (partner.sports?.[0] || "Fitness") + " Specialist";
 
-        <div className="absolute left-3 right-3 z-10 flex items-center justify-between top-3">
-          <BackButton variant="overlay" />
-          <div className="flex items-center gap-2">
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm">
-              <Share2 className="h-4 w-4 text-white" />
-            </button>
-          </div>
+  // Collect unique training types from listings
+  const sessionTypes = [...new Set(listings.map(l => trainingTypeLabel(l.training_type)))];
+  // Collect location types
+  const locationTypes = [...new Set(
+    listings.map(l => {
+      const raw = (l as any).location_type;
+      if (!raw) return null;
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
+    }).filter(Boolean) as string[]
+  )];
+
+  const bioText = partner.bio || "";
+  const bioIsLong = bioText.length > 200;
+
+  return (
+    <div className="relative min-h-screen bg-background pb-28">
+      {/* ─────────── SECTION 1: HERO / IDENTITY ─────────── */}
+      <div className="relative">
+        {/* Gradient hero background */}
+        <div className="h-52 w-full bg-gradient-to-br from-primary/25 via-accent/30 to-secondary/15">
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
         </div>
 
-        {/* Avatar */}
-        <div className="absolute -bottom-12 left-5 z-10">
-          <Avatar className="h-24 w-24 border-4 border-card shadow-xl">
-            {partner.logo_url && <AvatarImage src={partner.logo_url} />}
-            <AvatarFallback className="bg-primary/10 text-2xl font-bold text-primary">
-              {partner.display_name.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
+        {/* Top actions */}
+        <div className="absolute left-4 right-4 top-4 z-20 flex items-center justify-between">
+          <BackButton variant="overlay" />
+          <button className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-sm transition-colors hover:bg-black/40">
+            <Share2 className="h-4 w-4 text-primary-foreground" />
+          </button>
+        </div>
+
+        {/* Avatar — overlapping hero */}
+        <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 z-20">
+          <div className="relative">
+            <Avatar className="h-32 w-32 border-[5px] border-card shadow-2xl">
+              {partner.logo_url && <AvatarImage src={partner.logo_url} className="object-cover" />}
+              <AvatarFallback className="bg-primary/10 text-4xl font-bold text-primary">
+                {partner.display_name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+            {isVerified && (
+              <div className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary shadow-lg">
+                <CheckCircle2 className="h-4 w-4 text-primary-foreground" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Profile info */}
-      <div className="relative pt-16 px-5">
-        <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-2xl font-extrabold text-foreground">{partner.display_name}</h1>
-          {age && <span className="text-lg text-muted-foreground font-medium">{age}</span>}
+      {/* Identity text — centered below avatar */}
+      <div className="pt-20 text-center px-6">
+        <div className="flex items-center justify-center gap-2">
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">{partner.display_name}</h1>
+          {age && <span className="text-base text-muted-foreground">{age}</span>}
         </div>
+        <p className="mt-1 text-sm font-semibold text-primary">{roleLabel}</p>
 
-        <p className="text-[11px] font-bold uppercase tracking-widest text-primary mb-2">
-          {partner.partner_type === "gym" ? "Gym & Studio" : (partner.sports?.join(" & ") || "Fitness")} Specialist
-        </p>
-
-        {/* Gym associations */}
+        {/* Gym association */}
         {gymNames.length > 0 && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-3">
-            <Building2 className="h-4 w-4 text-primary" />
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <Building2 className="h-3.5 w-3.5" />
             <span>{gymNames.join(" · ")}</span>
           </div>
         )}
 
-        {/* Stats — only show real data */}
-        <div className="flex gap-2 mb-5">
-          {rating && (
-            <div className="flex flex-col items-center rounded-2xl bg-muted/50 py-3 px-4">
-              <Star className="h-4 w-4 mb-1 fill-primary text-primary" />
-              <span className="text-base font-extrabold text-foreground">{rating}</span>
-              <span className="text-[10px] text-muted-foreground">{reviewCount} reviews</span>
-            </div>
-          )}
-          {completionRate !== null && (
-            <div className="flex flex-col items-center rounded-2xl bg-muted/50 py-3 px-4">
-              <Trophy className="h-4 w-4 mb-1 text-primary" />
-              <span className="text-base font-extrabold text-foreground">{completionRate}%</span>
-              <span className="text-[10px] text-muted-foreground">Complete</span>
-            </div>
-          )}
-        </div>
-
         {/* Location */}
         {partner.location && (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-5">
-            <MapPin className="h-4 w-4 text-primary" />
+          <div className="mt-1.5 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5" />
             <span>{partner.location}</span>
-            {partner.languages && partner.languages.length > 0 && (
-              <>
-                <span className="mx-1">·</span>
-                <span>{partner.languages.join(", ")}</span>
-              </>
-            )}
           </div>
         )}
+      </div>
 
-        {/* Action buttons */}
-        <div className="flex items-center gap-3 mb-6">
-          <button className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/60 shrink-0">
-            <Bookmark className="h-5 w-5 text-primary" />
-          </button>
-          <button
-            onClick={() => document.getElementById("sessions-section")?.scrollIntoView({ behavior: "smooth" })}
-            className="relative flex-1 rounded-full bg-primary py-3.5 text-center text-sm font-bold uppercase tracking-wider text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]"
-          >
-            Book a Session
-          </button>
+      {/* ─────────── SECTION 2: QUICK STATS ROW ─────────── */}
+      <div className="mt-6 mx-5">
+        <div className="grid grid-cols-3 gap-2.5">
+          {verification?.years_experience && (
+            <StatBlock icon={<Award className="h-4 w-4 text-primary" />} value={`${verification.years_experience}+`} label="Years Exp." />
+          )}
+          {sessionsCompleted > 0 && (
+            <StatBlock icon={<Calendar className="h-4 w-4 text-primary" />} value={String(sessionsCompleted)} label="Sessions" />
+          )}
+          {rating && (
+            <StatBlock icon={<Star className="h-4 w-4 fill-primary text-primary" />} value={rating} label={`${reviewCount} reviews`} />
+          )}
         </div>
+      </div>
 
-        {/* Contact */}
-        <div className="mb-6 rounded-2xl bg-muted/40 p-4">
-          <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2.5">Contact</h3>
+      {/* ─────────── PRIMARY CTA ─────────── */}
+      <div className="mt-8 mx-5 flex items-center gap-3">
+        <button className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted active:scale-95">
+          <Bookmark className="h-5 w-5 text-primary" />
+        </button>
+        <button
+          onClick={() => document.getElementById("sessions-section")?.scrollIntoView({ behavior: "smooth" })}
+          className="relative flex-1 rounded-2xl bg-primary py-4 text-center text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
+        >
+          Book a Session
+        </button>
+        <button
+          onClick={() => navigate(`/messages`)}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted active:scale-95"
+        >
+          <MessageCircle className="h-5 w-5 text-muted-foreground" />
+        </button>
+      </div>
+
+      {/* ─────────── SECTION 3: BIO / ABOUT ─────────── */}
+      {bioText && (
+        <section className="mt-10 mx-5">
+          <SectionTitle>About</SectionTitle>
+          <div className="mt-3 rounded-2xl bg-card border border-border/50 p-5">
+            <p className={cn(
+              "text-[15px] leading-[1.75] text-foreground/80",
+              !bioExpanded && bioIsLong && "line-clamp-4"
+            )}>
+              {bioText}
+            </p>
+            {bioIsLong && (
+              <button
+                onClick={() => setBioExpanded(!bioExpanded)}
+                className="mt-2 flex items-center gap-1 text-xs font-semibold text-primary"
+              >
+                {bioExpanded ? "Show less" : "Read more"}
+                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", bioExpanded && "rotate-180")} />
+              </button>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ─────────── SECTION 4: EXPERIENCE & CREDENTIALS ─────────── */}
+      {(verification?.years_experience || verification?.specializations?.length || verification?.trainer_type) && (
+        <section className="mt-10 mx-5">
+          <SectionTitle>Experience & Credentials</SectionTitle>
+          <div className="mt-3 space-y-3">
+            {verification.years_experience && (
+              <CredentialRow icon={<Award className="h-4 w-4 text-primary" />} label="Experience" value={`${verification.years_experience}+ years`} />
+            )}
+            {verification.trainer_type && (
+              <CredentialRow icon={<Dumbbell className="h-4 w-4 text-primary" />} label="Type" value={verification.trainer_type.charAt(0).toUpperCase() + verification.trainer_type.slice(1)} />
+            )}
+            {isVerified && (
+              <CredentialRow icon={<CheckCircle2 className="h-4 w-4 text-primary" />} label="Verification" value="Identity Verified" />
+            )}
+            {verification.specializations && verification.specializations.length > 0 && (
+              <div className="rounded-2xl bg-card border border-border/50 p-4">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2.5">Specializations</p>
+                <div className="flex flex-wrap gap-2">
+                  {verification.specializations.map(s => (
+                    <span key={s} className="rounded-full bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ─────────── SECTION 5: SPORTS & ACTIVITIES ─────────── */}
+      {partner.sports && partner.sports.length > 0 && (
+        <section className="mt-10 mx-5">
+          <SectionTitle>Sports & Activities</SectionTitle>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {partner.sports.map((s) => (
+              <span key={s} className="rounded-full bg-primary/10 px-4 py-2 text-[13px] font-semibold text-foreground">
+                {s}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─────────── SECTION 6: LANGUAGES & DETAILS ─────────── */}
+      {((partner.languages && partner.languages.length > 0) || sessionTypes.length > 0 || locationTypes.length > 0) && (
+        <section className="mt-10 mx-5">
+          <SectionTitle>Details</SectionTitle>
+          <div className="mt-3 space-y-3">
+            {partner.languages && partner.languages.length > 0 && (
+              <DetailChipRow icon={<Globe className="h-4 w-4 text-primary" />} label="Languages" items={partner.languages} />
+            )}
+            {sessionTypes.length > 0 && (
+              <DetailChipRow icon={<Users className="h-4 w-4 text-primary" />} label="Session Types" items={sessionTypes} />
+            )}
+            {locationTypes.length > 0 && (
+              <DetailChipRow icon={<MapPin className="h-4 w-4 text-primary" />} label="Environments" items={locationTypes} />
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ─────────── SECTION 7: CONTACT ─────────── */}
+      <section className="mt-10 mx-5">
+        <SectionTitle>Contact</SectionTitle>
+        <div className="mt-3 rounded-2xl bg-card border border-border/50 p-5">
           {hasBooking ? (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {partner.phone_number && (
-                <div className="flex items-center gap-2.5">
-                  <Phone className="h-4 w-4 text-primary" />
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                    <Phone className="h-4 w-4 text-primary" />
+                  </div>
                   <a href={`tel:${partner.phone_number}`} className="text-sm font-semibold text-foreground hover:text-primary transition-colors">
                     {partner.phone_number}
                   </a>
                 </div>
               )}
-              <div className="flex items-center gap-2.5">
-                <MessageCircle className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                  <MessageCircle className="h-4 w-4 text-primary" />
+                </div>
                 <span className="text-sm font-semibold text-primary">Chat unlocked</span>
                 <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2.5">
-              <Lock className="h-4 w-4 text-muted-foreground" />
-              <p className="text-[13px] text-muted-foreground">Book a session to unlock contact details</p>
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
+                <Lock className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <p className="text-[13px] text-muted-foreground">Book a session to unlock contact details & chat</p>
             </div>
           )}
         </div>
+      </section>
 
-        {/* About */}
-        {partner.bio && (
-          <div className="mb-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">About</h3>
-            <p className="text-[15px] leading-[1.7] text-foreground/80">{partner.bio}</p>
-          </div>
-        )}
-
-        {/* Sports */}
-        {partner.sports && partner.sports.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Sports & Activities</h3>
-            <div className="flex flex-wrap gap-2">
-              {partner.sports.map((s) => (
-                <span key={s} className="rounded-full bg-primary/10 px-3.5 py-2 text-[12px] font-semibold text-foreground">{s}</span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Reviews — only if real reviews exist */}
-        {reviews.length > 0 && (
-          <div className="mb-6">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Reviews</h3>
-            <div className="space-y-3">
-              {reviews.slice(0, 5).map((review) => (
-                <div key={review.id} className="rounded-2xl bg-muted/40 p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">U</AvatarFallback>
+      {/* ─────────── SECTION 8: REVIEWS ─────────── */}
+      {reviews.length > 0 && (
+        <section className="mt-10 mx-5">
+          <SectionTitle>Reviews ({reviewCount})</SectionTitle>
+          <div className="mt-3 space-y-3">
+            {reviews.slice(0, 5).map((review) => (
+              <div key={review.id} className="rounded-2xl bg-card border border-border/50 p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2.5">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">U</AvatarFallback>
                     </Avatar>
-                    <div className="flex-1">
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: review.rating }).map((_, si) => (
-                          <Star key={si} className="h-3 w-3 fill-primary text-primary" />
-                        ))}
-                      </div>
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: review.rating }).map((_, si) => (
+                        <Star key={si} className="h-3.5 w-3.5 fill-primary text-primary" />
+                      ))}
+                      {Array.from({ length: 5 - review.rating }).map((_, si) => (
+                        <Star key={`e-${si}`} className="h-3.5 w-3.5 text-border" />
+                      ))}
                     </div>
-                    <span className="text-[11px] text-muted-foreground">
-                      {format(new Date(review.created_at), "MMM d, yyyy")}
-                    </span>
                   </div>
-                  {review.review_text && (
-                    <p className="text-[13px] leading-relaxed text-foreground/70 italic">"{review.review_text}"</p>
-                  )}
+                  <span className="text-[11px] text-muted-foreground">
+                    {format(new Date(review.created_at), "MMM d, yyyy")}
+                  </span>
                 </div>
-              ))}
-            </div>
+                {review.review_text && (
+                  <p className="text-[13px] leading-relaxed text-foreground/70 italic">"{review.review_text}"</p>
+                )}
+              </div>
+            ))}
           </div>
-        )}
-      </div>
+        </section>
+      )}
 
-      {/* Sessions */}
-      <div id="sessions-section" className="px-5 pt-2 pb-4">
-        <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-3">Upcoming Sessions</h3>
-        <div className="space-y-3">
+      {/* ─────────── SECTION 9: UPCOMING SESSIONS ─────────── */}
+      <section id="sessions-section" className="mt-10 mx-5 pb-4">
+        <SectionTitle>Upcoming Sessions</SectionTitle>
+        <div className="mt-3 space-y-3">
           {listings.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-6 text-center">No upcoming sessions</p>
+            <div className="rounded-2xl border border-dashed border-border py-10 text-center">
+              <Calendar className="h-8 w-8 mx-auto mb-2 text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">No upcoming sessions scheduled</p>
+            </div>
           ) : (
             listings.map((listing, idx) => {
               const Icon = LISTING_ICONS[idx % LISTING_ICONS.length];
@@ -372,7 +496,7 @@ export default function PartnerProfile() {
               return (
                 <div
                   key={listing.id}
-                  className="flex items-center gap-3 rounded-2xl bg-card ios-shadow p-4 cursor-pointer transition-all hover:scale-[1.01] active:scale-[0.99]"
+                  className="flex items-center gap-3.5 rounded-2xl bg-card border border-border/50 p-4 cursor-pointer transition-all hover:border-primary/30 active:scale-[0.99]"
                   onClick={() => navigate("/")}
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10">
@@ -380,7 +504,7 @@ export default function PartnerProfile() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground truncate">{title}</p>
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-1">
                       <span className="flex items-center gap-0.5"><Calendar className="h-3 w-3" /> {format(nextDate, "MMM d")}</span>
                       <span className="flex items-center gap-0.5"><Clock className="h-3 w-3" /> {listing.duration_minutes} min</span>
                       <span className="flex items-center gap-0.5"><Users className="h-3 w-3" /> {trainingTypeLabel(listing.training_type)}</span>
@@ -399,9 +523,75 @@ export default function PartnerProfile() {
             })
           )}
         </div>
+      </section>
+
+      {/* ─────────── STICKY BOTTOM CTA ─────────── */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-card/95 backdrop-blur-lg px-5 py-3 safe-area-pb">
+        <div className="flex items-center gap-3 max-w-lg mx-auto">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-foreground truncate">{partner.display_name}</p>
+            {listings.length > 0 && (
+              <p className="text-xs text-muted-foreground">From {Math.min(...listings.map(l => l.price_gel))}₾ per session</p>
+            )}
+          </div>
+          <button
+            onClick={() => document.getElementById("sessions-section")?.scrollIntoView({ behavior: "smooth" })}
+            className="rounded-2xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.97]"
+          >
+            Book Now
+          </button>
+        </div>
       </div>
 
       <BottomNav />
+    </div>
+  );
+}
+
+/* ─── Sub-components ─── */
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+      {children}
+    </h2>
+  );
+}
+
+function StatBlock({ icon, value, label }: { icon: React.ReactNode; value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center rounded-2xl bg-card border border-border/50 py-4 px-2">
+      {icon}
+      <span className="mt-1.5 text-lg font-extrabold text-foreground">{value}</span>
+      <span className="mt-0.5 text-[10px] text-muted-foreground font-medium">{label}</span>
+    </div>
+  );
+}
+
+function CredentialRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-card border border-border/50 p-4">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10">{icon}</div>
+      <div className="min-w-0">
+        <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
+        <p className="text-sm font-semibold text-foreground">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function DetailChipRow({ icon, label, items }: { icon: React.ReactNode; label: string; items: string[] }) {
+  return (
+    <div className="rounded-2xl bg-card border border-border/50 p-4">
+      <div className="flex items-center gap-2 mb-2.5">
+        {icon}
+        <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {items.map(item => (
+          <span key={item} className="rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">{item}</span>
+        ))}
+      </div>
     </div>
   );
 }
