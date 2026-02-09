@@ -1,61 +1,116 @@
 
 
-## Profile Screen Premium Typography and Spacing Overhaul
+## Home / Discovery Feed — Premium Card Redesign
 
-Only the Profile screen (`src/pages/Profile.tsx`) will be modified. No global theme, color, font, or icon changes.
+Only `ListingCard.tsx`, `PackageCard.tsx`, `Home.tsx`, and `FilterChips.tsx` will be modified. No global theme, color, or component changes.
 
-### Step 1 -- Typography Hierarchy
+---
 
-Apply a strict type scale to all text on the Profile screen:
+### Step 1 — Card Layout: Image-First, Immersive
 
-| Element | Current | New |
-|---|---|---|
-| Profile name (H1) | `text-2xl font-bold` | `text-[30px] font-semibold tracking-[-0.3px] leading-[1.15]` |
-| Subtitle ("Member since") | `text-sm text-primary-foreground/70` | `text-[14px] font-normal opacity-65 mt-2` |
-| Section titles (Bookmarked, Fitness Interests, Account Settings) | `text-lg font-bold` | `text-[20px] font-semibold leading-[1.2] mb-4` |
-| Body text / labels | various | `text-[15px] font-normal opacity-80` where applicable |
+Redesign both `ListingCard` and `PackageCard` to be image-dominant:
 
-### Step 2 -- Spacing Rhythm
+- Image takes ~65% of card height (change from fixed `200px` to `clamp(220px, 55vw, 320px)`)
+- Add a bottom gradient overlay on the image: `linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 40%)`
+- Move the **title** and **category pill** onto the image, positioned at the bottom inside the gradient
+- Remove the partner avatar row from below the image (move partner name as subtle text on the image, above the title)
+- Below the image: only a slim content strip with one meta line + price + book button
+- Card border-radius: `rounded-[22px]`
+- Card gap in grid: `gap-7` (28px)
+- No white background directly under image — use `bg-card` with minimal height
 
-- Header area: increase `pt-6` to `pt-10` and `pb-20` to `pb-24` for breathing room
-- Gap between hero bottom and stats card: keep the `-mt-12` overlap but add `mb-8` after stats (was `mb-6`)
-- Gap between major sections (Bookmarked, Fitness Interests, Account Settings): increase from `mb-6` to `mb-10`
-- Section title to content: `mb-4` (16px)
-- Page horizontal padding: ensure consistent `px-5` (20px) everywhere (already done)
+### Step 2 — Image Gradient Overlay
 
-### Step 3 -- Stats Card Polish
+Add a `div` overlay inside the image container:
 
-- Numbers: `text-[27px] font-semibold leading-[1.1]` (was `text-2xl font-bold`)
-- Labels: `text-[12px] font-medium uppercase tracking-[0.08em] opacity-55` (was `text-[10px] font-semibold`)
-- Card: keep `rounded-2xl`, use `shadow-md` (softer), add `p-1` internal breathing room
-- Dividers: add `divide-border/20` (lower contrast, ~0.2 opacity)
-- Cell padding: increase from `py-5` to `py-6`
+```
+<div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+```
 
-### Step 4 -- Bookmarked Header Row
+All text on the image uses `text-white` with appropriate drop-shadow for readability.
 
-- "Bookmarked" uses the new section title style (20px/600)
-- "View all" becomes `text-[14px] font-medium opacity-75` (was `text-sm font-bold`)
-- Row alignment: already flex with `justify-between` -- just update spacing below to `mb-4`
+### Step 3 — Card Typography Hierarchy
 
-### Step 5 -- Account Settings List Rows
+**On the image (inside gradient):**
 
-- Row height: increase padding from `py-3.5` to `py-4` (achieving ~62px row height)
-- Left icon container: keep `h-10 w-10 rounded-xl` (already 40px, radius ~12px)
-- Main label: `text-[16px] font-semibold` (was `text-sm font-semibold`)
-- Chevron: add `opacity-50` (was full opacity muted-foreground)
-- Row horizontal padding: increase from `px-4` to `px-[18px]`
-- Card outer padding: add `p-3` wrapper around the list
-- Dividers: already using `divide-y divide-border`, will soften to `divide-border/20`
+| Element | Style |
+|---|---|
+| Category pill | `text-[11px] font-semibold uppercase tracking-wide`, white/90 bg with backdrop-blur, positioned top-left |
+| Title | `text-[22px] font-semibold leading-tight text-white line-clamp-2`, positioned bottom-left inside gradient |
+| Partner name | `text-[13px] font-medium text-white/80`, just above the title |
 
-### Step 6 -- Scope Guard
+**Below the image (slim strip):**
 
-Only `src/pages/Profile.tsx` is modified. No changes to:
-- Global CSS / index.css
-- tailwind.config.ts
-- Any other page or component
+| Element | Style |
+|---|---|
+| One meta line | `text-[13px] font-normal text-muted-foreground opacity-80` — show only duration OR date, not both |
+| Price | `text-[19px] font-semibold text-foreground` — visual anchor |
+| Book button | Pill shape, `text-[14px] font-semibold`, secondary feel |
+
+### Step 4 — Information Reduction
+
+Per card, show ONLY:
+- Category (pill on image)
+- Title (on image)
+- Partner name (on image, subtle)
+- One meta detail below image (duration for packages, date for listings)
+- Price
+- Book button
+
+Remove from collapsed card view:
+- Location row
+- Spots left indicator
+- Star rating row
+- Multiple meta items (clock + calendar + map)
+- Partner avatar (keep name only)
+
+All removed info remains in the expanded detail panel (no data loss).
+
+### Step 5 — Spacing and Padding
+
+- Card `rounded-[22px]` (was `rounded-2xl` / 16px)
+- Feed grid gap: `gap-7` (was `gap-4`)
+- Below-image content padding: `px-5 py-4` (generous, not tight)
+- Section header ("Recommended") top spacing: `pt-5 pb-3`
+
+### Step 6 — CTA Button Fix
+
+- Book button: `rounded-full` pill shape (was `rounded-xl`)
+- Size: `px-5 py-2.5 text-[14px] font-semibold`
+- Visually secondary — not larger than the title
+- Subtle hover: `hover:bg-primary/90`
+
+### Step 7 — Top Area (Search + Filters) Cleanup
+
+In `Home.tsx`:
+- Increase header top padding: `pt-6` (was `pt-4`)
+- Search bar: lighter border `border-border/40`, smaller height, `rounded-full` pill shape
+- "Recommended" heading: `text-[17px] font-semibold` (slightly smaller, calmer)
+
+In `FilterChips.tsx`:
+- Smaller chips: `py-1 px-3.5 text-[12px]` (was `py-1.5 px-4 text-[13px]`)
+- `rounded-full` (was `rounded-lg`)
+- Selected state: keep primary bg but at `bg-primary/90`
+
+### Step 8 — Scope Guard
+
+Only these files are modified:
+- `src/components/ListingCard.tsx` — card layout, gradient, typography, info reduction
+- `src/components/PackageCard.tsx` — same treatment as ListingCard
+- `src/pages/Home.tsx` — grid gap, header/search styling
+- `src/components/FilterChips.tsx` — chip sizing
+
+No changes to:
+- Global CSS / tailwind.config.ts
 - Color theme or icon set
+- Any other page or component
+- Expanded detail panel content (all info preserved there)
 
-### Technical Details
+### Technical Notes
 
-All changes are inline Tailwind classes within `src/pages/Profile.tsx`. The `SettingsRow` sub-component at the bottom of the file will also be updated for row sizing and chevron opacity.
+- The gradient overlay is a positioned `div` inside the existing image container — no new components
+- `line-clamp-2` on title uses Tailwind's built-in utility
+- Image height uses CSS `clamp()` via inline style for responsive scaling
+- Partner avatar removed from collapsed view only; still visible in expanded panel
+- Rating star moved to expanded panel only (shown when verified reviews exist)
 
