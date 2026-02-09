@@ -60,6 +60,7 @@ interface ListingData {
   price_gel: number;
   max_spots: number;
   status: string;
+  background_image_url: string | null;
 }
 
 interface ReviewData {
