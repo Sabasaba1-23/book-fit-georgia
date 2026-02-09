@@ -230,7 +230,7 @@ export default function Bookings() {
       <header className="relative z-40 px-5 pb-2 pt-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BackButton onClick={() => navigate("/")} />
+            <BackButton />
             <h1 className="text-page-title">{t("myBookings")}</h1>
           </div>
           <button className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 transition-transform active:scale-95">
