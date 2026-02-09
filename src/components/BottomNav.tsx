@@ -1,5 +1,5 @@
 import { memo, useCallback } from "react";
-import { Home, CalendarCheck, MessageSquareMore } from "lucide-react";
+import { Home, CalendarThirtyTwo, ChatDot } from "@icon-park/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
-  { key: "home" as const, labelKey: "navExplore" as const, icon: Home, path: "/", requiresAuth: false },
-  { key: "bookings" as const, labelKey: "navBookings" as const, icon: CalendarCheck, path: "/bookings", requiresAuth: true },
-  { key: "messages" as const, labelKey: "navChat" as const, icon: MessageSquareMore, path: "/messages", requiresAuth: true },
+  { key: "home" as const, labelKey: "navExplore" as const, Icon: Home, path: "/", requiresAuth: false },
+  { key: "bookings" as const, labelKey: "navBookings" as const, Icon: CalendarThirtyTwo, path: "/bookings", requiresAuth: true },
+  { key: "messages" as const, labelKey: "navChat" as const, Icon: ChatDot, path: "/messages", requiresAuth: true },
 ];
 
 export default memo(function BottomNav() {
