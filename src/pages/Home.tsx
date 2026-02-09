@@ -11,7 +11,7 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import UserMenuDropdown from "@/components/UserMenuDropdown";
-import { Search as SearchIcon, BellRing } from "@icon-park/react";
+import { Search as SearchIcon, Alarm } from "@icon-park/react";
 import { SlidersHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
