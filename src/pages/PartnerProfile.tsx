@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import BottomNav from "@/components/BottomNav";
 import {
-  ArrowLeft,
   Share2,
   MoreHorizontal,
   Star,
@@ -24,6 +23,7 @@ import {
   MessageCircle,
   Building2,
 } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
 
 const LISTING_ICONS = [Zap, Dumbbell, Trophy];
