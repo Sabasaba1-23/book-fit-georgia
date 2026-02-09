@@ -228,9 +228,12 @@ export default function Auth() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Background blobs */}
-      <div className="blob-warm-1 absolute -top-20 -right-20 h-64 w-64 rounded-full" />
-      <div className="blob-warm-2 absolute top-1/3 -left-32 h-72 w-72 rounded-full" />
+      {/* Green gradient background accents */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 -right-24 h-[340px] w-[340px] rounded-full bg-gradient-to-br from-primary/20 via-primary/10 to-transparent blur-3xl" />
+        <div className="absolute top-1/3 -left-32 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-primary/15 via-accent/20 to-transparent blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[200px] w-[600px] rounded-full bg-gradient-to-t from-primary/8 via-transparent to-transparent blur-2xl" />
+      </div>
 
       {/* ─── LOGIN ─── */}
       {mode === "login" && (

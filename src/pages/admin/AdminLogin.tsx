@@ -43,7 +43,9 @@ export default function AdminLogin({ onSuccess }: AdminLoginProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-background px-4 overflow-hidden">
+      <div className="pointer-events-none absolute -top-20 -right-20 h-[300px] w-[300px] rounded-full bg-gradient-to-br from-primary/15 via-primary/8 to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 -left-20 h-[250px] w-[250px] rounded-full bg-gradient-to-tr from-primary/10 via-accent/12 to-transparent blur-3xl" />
       <form onSubmit={handleLogin} className="w-full max-w-sm space-y-5">
         <div className="flex flex-col items-center gap-2 mb-2">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
