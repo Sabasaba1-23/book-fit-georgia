@@ -233,6 +233,15 @@ export default function Auth() {
       <div className="blob-warm-1 absolute -top-20 -right-20 h-64 w-64 rounded-full" />
       <div className="blob-warm-2 absolute top-1/3 -left-32 h-72 w-72 rounded-full" />
 
+      {/* Decorative SVG illustration */}
+      <img
+        src={authBgIllustration}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 right-0 w-[70%] max-w-[420px] opacity-[0.06] select-none"
+        style={{ transform: 'translateY(10%) translateX(15%)' }}
+      />
+
       {/* ─── LOGIN ─── */}
       {mode === "login" && (
         <div className="relative z-10 flex flex-1 flex-col">
