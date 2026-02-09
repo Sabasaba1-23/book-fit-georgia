@@ -288,7 +288,7 @@ export default function Profile() {
               className="mt-3 flex items-center gap-1.5 group"
             >
               <h1 className="text-2xl font-bold text-primary-foreground">{displayName}</h1>
-              <Pencil className="h-3.5 w-3.5 text-primary-foreground/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <EditTwo size={14} fill="hsl(var(--primary-foreground) / 0.5)" className="opacity-0 group-hover:opacity-100 transition-opacity" />
             </button>
           )}
           <p className="text-sm text-primary-foreground/70">{t("memberSince")} {memberSince}</p>
