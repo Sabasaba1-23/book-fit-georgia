@@ -61,16 +61,15 @@ export default function BookingTicket({ open, onClose, booking }: BookingTicketP
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/40 backdrop-blur-sm animate-in fade-in duration-200 p-5">
-      <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-300 max-h-[90vh] overflow-y-auto">
-        <button
-          onClick={onClose}
-          className="absolute -top-3 -right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card shadow-lg"
-        >
-          <X className="h-4 w-4 text-muted-foreground" />
-        </button>
-
-        <div className="overflow-hidden rounded-3xl bg-card shadow-2xl">
-          <div className="bg-gradient-to-br from-primary to-secondary px-6 py-8 text-center">
+      <div className="relative w-full max-w-sm animate-in zoom-in-95 fade-in duration-300 max-h-[90vh] overflow-hidden rounded-3xl bg-card shadow-2xl">
+        <div className="overflow-y-auto max-h-[90vh]">
+          <div className="relative bg-gradient-to-br from-primary to-secondary px-6 py-8 text-center">
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm"
+            >
+              <X className="h-4 w-4 text-white" />
+            </button>
             <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
               <CheckCircle2 className="h-8 w-8 text-white" />
             </div>
