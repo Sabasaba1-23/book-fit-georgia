@@ -115,7 +115,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [booking, setBooking] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
