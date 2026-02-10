@@ -6,7 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Calendar, Clock, Users, CheckCircle2, MessageCircle, Star,
-  MapPin, BarChart3, ChevronUp, Bookmark, ChevronDown, Dumbbell, Target, ShoppingBag,
+  MapPin, BarChart3, ChevronUp, Bookmark, ChevronDown, Dumbbell, Target, ShoppingBag, Landmark,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
