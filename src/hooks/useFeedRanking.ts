@@ -73,12 +73,13 @@ function computeScore(
   sport: string,
   avgRating: number | null,
   reviewCount: number | null,
-  referenceDate: string | undefined, // scheduled_at or created_at
-  interests: string[]
+  referenceDate: string | undefined,
+  interests: string[],
+  isPro: boolean
 ): number {
   let score = 0;
 
-  // 1. Interest match (exact sport or goal match)
+  // 1. Interest match
   const sportLower = sport.toLowerCase();
   if (interests.length > 0 && interests.some((tag) => sportLower.includes(tag) || tag.includes(sportLower))) {
     score += WEIGHTS.interestMatch;
@@ -110,6 +111,11 @@ function computeScore(
     if (hoursSince <= 48) {
       score += WEIGHTS.freshness;
     }
+  }
+
+  // 6. Pro subscription boost — modest bump, not dominant
+  if (isPro) {
+    score += WEIGHTS.proSubscription;
   }
 
   return score;
