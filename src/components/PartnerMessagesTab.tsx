@@ -262,8 +262,8 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-3" />
-        <p className="text-sm font-medium text-muted-foreground">No messages yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">Clients will message you after booking</p>
+        <p className="text-sm font-medium text-muted-foreground">{t("msgNoMessages")}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t("msgNoMessagesDesc")}</p>
       </div>
     );
   }
