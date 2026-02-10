@@ -391,8 +391,8 @@ export default function Auth() {
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight text-foreground">Join<br /><span className="text-primary">FitBook</span></h1>
-              <p className="mt-2 text-sm text-muted-foreground">How do you want to use FitBook?</p>
+              <h1 className="text-3xl font-extrabold leading-tight text-foreground">{t("joinFitBook")}<br /><span className="text-primary">FitBook</span></h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("howToUseFitBook")}</p>
             </div>
             <div className="space-y-3">
               <Button onClick={() => setMode("register-user")} variant="outline" className="h-16 w-full rounded-2xl border-border bg-card text-base font-semibold shadow-sm">
