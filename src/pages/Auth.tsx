@@ -505,7 +505,7 @@ export default function Auth() {
 
             {/* Partner type selector */}
             <div className="mb-6">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">I am a...</p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("iAmA")}</p>
               <div className="flex rounded-2xl border border-border bg-card overflow-hidden">
                 <button
                   type="button"
