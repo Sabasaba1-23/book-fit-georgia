@@ -278,10 +278,17 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
         {/* Price + Book row */}
         <div className="flex items-center justify-between">
-          <p className="text-[19px] font-semibold text-foreground">
-            {listing.price_gel}₾
-            <span className="text-[12px] font-normal text-muted-foreground ml-1">/ session</span>
-          </p>
+          <div>
+            <p className="text-[19px] font-semibold text-foreground">
+              {listing.price_gel}₾
+              <span className="text-[12px] font-normal text-muted-foreground ml-1">/ session</span>
+            </p>
+            {hasVenueFee && (
+              <p className="text-[11px] font-medium text-primary mt-0.5">
+                + {listing.venue_fee_gel}₾ venue fee at location
+              </p>
+            )}
+          </div>
           <button
             onClick={handleBookClick}
             className="rounded-full bg-primary px-5 py-2.5 text-[14px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
