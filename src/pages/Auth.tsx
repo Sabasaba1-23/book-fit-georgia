@@ -146,19 +146,19 @@ export default function Auth() {
     setError("");
 
     if (!partnerName.trim()) {
-      setError("Please enter your name or gym name.");
+      setError(t("enterNameOrGym"));
       return;
     }
     if (!partnerEmail.trim()) {
-      setError("Please enter your professional email.");
+      setError(t("enterProfessionalEmail"));
       return;
     }
     if (!partnerPhone.trim()) {
-      setError("Please enter your phone number.");
+      setError(t("enterPhoneNumber"));
       return;
     }
     if (!password || password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t("passwordMinLength"));
       return;
     }
 
