@@ -623,6 +623,31 @@ export const translations = {
     payoutHistoryDesc: "Track your earnings",
     noPayoutsYet: "No payouts yet",
     payoutHistoryHere: "Your payout history will appear here",
+
+    // Schedule Tab
+    schedCompleted: "Completed",
+    schedInProgress: "In Progress",
+    schedStartingSoon: "Starting Soon",
+    schedUpcoming: "Upcoming",
+    schedPast: "Past",
+    schedNoUpcoming: "No upcoming sessions",
+    schedNoPast: "No past sessions",
+    schedAttendees: "Attendees",
+    schedNoBookings: "No bookings yet",
+    schedAnonymous: "Anonymous",
+    schedTotalRevenue: "Total Revenue",
+    schedSpot: "spot",
+    schedSpots: "spots",
+    schedToday: "Today",
+    schedTomorrow: "Tomorrow",
+
+    // Messages Tab
+    msgNoMessages: "No messages yet",
+    msgNoMessagesDesc: "Clients will message you after booking",
+    msgStartConversation: "Start the conversation!",
+    msgTypePlaceholder: "Type a message...",
+    msgClient: "Client",
+    msgYesterday: "Yesterday",
   },
 
   ka: {
@@ -1249,6 +1274,31 @@ export const translations = {
     payoutHistoryDesc: "თვალი ადევნე შემოსავლებს",
     noPayoutsYet: "ჯერ არ არის გადახდები",
     payoutHistoryHere: "შენი გადახდების ისტორია აქ გამოჩნდება",
+
+    // Schedule Tab
+    schedCompleted: "დასრულებული",
+    schedInProgress: "მიმდინარე",
+    schedStartingSoon: "მალე იწყება",
+    schedUpcoming: "მომავალი",
+    schedPast: "წარსული",
+    schedNoUpcoming: "მომავალი სესიები არ არის",
+    schedNoPast: "წარსული სესიები არ არის",
+    schedAttendees: "მონაწილეები",
+    schedNoBookings: "ჯერ არ არის ჯავშნები",
+    schedAnonymous: "ანონიმური",
+    schedTotalRevenue: "სულ შემოსავალი",
+    schedSpot: "ადგილი",
+    schedSpots: "ადგილი",
+    schedToday: "დღეს",
+    schedTomorrow: "ხვალ",
+
+    // Messages Tab
+    msgNoMessages: "შეტყობინებები ჯერ არ არის",
+    msgNoMessagesDesc: "კლიენტები დაგიწერენ დაჯავშნის შემდეგ",
+    msgStartConversation: "დაიწყე საუბარი!",
+    msgTypePlaceholder: "დაწერე შეტყობინება...",
+    msgClient: "კლიენტი",
+    msgYesterday: "გუშინ",
   },
 
   ru: {
@@ -1875,6 +1925,31 @@ export const translations = {
     payoutHistoryDesc: "Отслеживайте свои доходы",
     noPayoutsYet: "Пока нет выплат",
     payoutHistoryHere: "Ваша история выплат появится здесь",
+
+    // Schedule Tab
+    schedCompleted: "Завершено",
+    schedInProgress: "В процессе",
+    schedStartingSoon: "Скоро начнётся",
+    schedUpcoming: "Предстоящие",
+    schedPast: "Прошедшие",
+    schedNoUpcoming: "Нет предстоящих сессий",
+    schedNoPast: "Нет прошедших сессий",
+    schedAttendees: "Участники",
+    schedNoBookings: "Пока нет бронирований",
+    schedAnonymous: "Аноним",
+    schedTotalRevenue: "Общий доход",
+    schedSpot: "место",
+    schedSpots: "мест",
+    schedToday: "Сегодня",
+    schedTomorrow: "Завтра",
+
+    // Messages Tab
+    msgNoMessages: "Пока нет сообщений",
+    msgNoMessagesDesc: "Клиенты напишут вам после бронирования",
+    msgStartConversation: "Начните разговор!",
+    msgTypePlaceholder: "Введите сообщение...",
+    msgClient: "Клиент",
+    msgYesterday: "Вчера",
   },
 } as const;
 

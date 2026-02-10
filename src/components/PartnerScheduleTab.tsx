@@ -5,6 +5,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Calendar, Clock, Users, ChevronDown, ChevronUp, MessageCircle, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, isPast, isToday, isTomorrow, differenceInHours, addMinutes } from "date-fns";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { TranslationKey } from "@/i18n/translations";
 
 interface BookingAttendee {
   id: string;
@@ -29,20 +31,20 @@ interface ScheduleListing {
   bookings: BookingAttendee[];
 }
 
-function getTimeLabel(scheduledAt: string, durationMinutes: number): { text: string; color: string } {
+function getTimeLabel(scheduledAt: string, durationMinutes: number, t: (key: TranslationKey) => string): { text: string; color: string } {
   const start = new Date(scheduledAt);
   const end = addMinutes(start, durationMinutes);
   const now = new Date();
 
-  if (isPast(end)) return { text: "Completed", color: "text-muted-foreground bg-muted" };
+  if (isPast(end)) return { text: t("schedCompleted"), color: "text-muted-foreground bg-muted" };
 
   const hoursUntil = differenceInHours(start, now);
-  if (isPast(start) && !isPast(end)) return { text: "In Progress", color: "text-primary bg-primary/10" };
+  if (isPast(start) && !isPast(end)) return { text: t("schedInProgress"), color: "text-primary bg-primary/10" };
   if (isToday(start)) {
-    if (hoursUntil <= 1) return { text: "Starting Soon", color: "text-destructive bg-destructive/10" };
-    return { text: `Today · ${format(start, "HH:mm")}`, color: "text-primary bg-primary/10" };
+    if (hoursUntil <= 1) return { text: t("schedStartingSoon"), color: "text-destructive bg-destructive/10" };
+    return { text: `${t("schedToday")} · ${format(start, "HH:mm")}`, color: "text-primary bg-primary/10" };
   }
-  if (isTomorrow(start)) return { text: `Tomorrow · ${format(start, "HH:mm")}`, color: "text-amber-600 bg-amber-50" };
+  if (isTomorrow(start)) return { text: `${t("schedTomorrow")} · ${format(start, "HH:mm")}`, color: "text-amber-600 bg-amber-50" };
   return { text: format(start, "EEE, MMM d · HH:mm"), color: "text-foreground/70 bg-muted" };
 }
 
@@ -51,6 +53,7 @@ interface PartnerScheduleTabProps {
 }
 
 export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProps) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<ScheduleListing[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +151,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
             filter === "upcoming" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
           )}
         >
-          Upcoming
+          {t("schedUpcoming")}
         </button>
         <button
           onClick={() => setFilter("past")}
@@ -157,7 +160,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
             filter === "past" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
           )}
         >
-          Past
+          {t("schedPast")}
         </button>
       </div>
 
@@ -165,13 +168,13 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
         <div className="rounded-2xl bg-muted/40 py-10 text-center">
           <Calendar className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
-            {filter === "upcoming" ? "No upcoming sessions" : "No past sessions"}
+            {filter === "upcoming" ? t("schedNoUpcoming") : t("schedNoPast")}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
           {sorted.map((session) => {
-            const { text: timeLabel, color: timeLabelColor } = getTimeLabel(session.scheduled_at, session.duration_minutes);
+            const { text: timeLabel, color: timeLabelColor } = getTimeLabel(session.scheduled_at, session.duration_minutes, t);
             const activeBookings = session.bookings.filter((b) => b.booking_status !== "cancelled");
             const totalSpots = activeBookings.reduce((sum, b) => sum + b.spots, 0);
             const isExpanded = expandedId === session.id;
@@ -229,10 +232,10 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
                 {isExpanded && (
                   <div className="border-t border-border/50 bg-muted/10 px-4 py-3">
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                      Attendees ({totalSpots})
+                      {t("schedAttendees")} ({totalSpots})
                     </p>
                     {activeBookings.length === 0 ? (
-                      <p className="text-sm text-muted-foreground py-2">No bookings yet</p>
+                      <p className="text-sm text-muted-foreground py-2">{t("schedNoBookings")}</p>
                     ) : (
                       <div className="space-y-2">
                         {activeBookings.map((booking) => (
@@ -247,10 +250,10 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-foreground truncate">
-                                {booking.profile?.full_name || "Anonymous"}
+                                {booking.profile?.full_name || t("schedAnonymous")}
                               </p>
                               <p className="text-[11px] text-muted-foreground">
-                                {booking.spots} spot{booking.spots > 1 ? "s" : ""} · {Number(booking.total_price)}₾
+                                {booking.spots} {booking.spots > 1 ? t("schedSpots") : t("schedSpot")} · {Number(booking.total_price)}₾
                               </p>
                             </div>
                             <span className={cn(
@@ -269,7 +272,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
                     {/* Revenue summary */}
                     {activeBookings.length > 0 && (
                       <div className="mt-3 flex items-center justify-between rounded-xl bg-primary/5 p-3">
-                        <span className="text-xs font-bold text-muted-foreground uppercase">Total Revenue</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase">{t("schedTotalRevenue")}</span>
                         <span className="text-sm font-extrabold text-primary">
                           {activeBookings.reduce((sum, b) => sum + Number(b.total_price), 0)}₾
                         </span>

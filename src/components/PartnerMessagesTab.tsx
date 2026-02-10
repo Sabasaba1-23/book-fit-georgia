@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Send, MessageCircle } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { format, isToday, isYesterday } from "date-fns";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Thread {
   id: string;
@@ -30,6 +31,7 @@ interface PartnerMessagesTabProps {
 }
 
 export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTabProps) {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
@@ -96,7 +98,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
       let otherUser: Thread["otherUser"];
       if (otherUserId) {
         const profile = profileMap.get(otherUserId);
-        if (profile) otherUser = { display_name: profile.full_name || "Client", avatar_url: profile.avatar_url };
+        if (profile) otherUser = { display_name: profile.full_name || t("msgClient"), avatar_url: profile.avatar_url };
       }
       const lastMsg = lastMsgMap.get(thread.id);
       return {
@@ -174,7 +176,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
   function formatTime(dateStr: string) {
     const d = new Date(dateStr);
     if (isToday(d)) return format(d, "h:mm a");
-    if (isYesterday(d)) return "Yesterday " + format(d, "h:mm a");
+    if (isYesterday(d)) return t("msgYesterday") + " " + format(d, "h:mm a");
     return format(d, "MMM d, h:mm a");
   }
 
@@ -182,7 +184,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     if (!dateStr) return "";
     const d = new Date(dateStr);
     if (isToday(d)) return format(d, "h:mm a");
-    if (isYesterday(d)) return "Yesterday";
+    if (isYesterday(d)) return t("msgYesterday");
     return format(d, "MMM d");
   }
 
@@ -199,7 +201,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate">{activeThread.otherUser?.display_name || "Client"}</p>
+            <p className="text-sm font-bold text-foreground truncate">{activeThread.otherUser?.display_name || t("msgClient")}</p>
             {activeThread.listingTitle && <p className="text-[11px] text-muted-foreground truncate">{activeThread.listingTitle}</p>}
           </div>
         </div>
@@ -208,7 +210,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Start the conversation!</p>
+              <p className="text-sm text-muted-foreground">{t("msgStartConversation")}</p>
             </div>
           )}
           {messages.map((msg) => {
@@ -228,7 +230,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
         <div className="border-t border-border/50 px-4 py-3">
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Type a message..."
+              placeholder={t("msgTypePlaceholder")}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
@@ -260,8 +262,8 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <MessageCircle className="h-12 w-12 text-muted-foreground/30 mb-3" />
-        <p className="text-sm font-medium text-muted-foreground">No messages yet</p>
-        <p className="mt-1 text-xs text-muted-foreground">Clients will message you after booking</p>
+        <p className="text-sm font-medium text-muted-foreground">{t("msgNoMessages")}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t("msgNoMessagesDesc")}</p>
       </div>
     );
   }
@@ -282,11 +284,11 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-bold text-foreground truncate">{thread.otherUser?.display_name || "Client"}</p>
+              <p className="text-sm font-bold text-foreground truncate">{thread.otherUser?.display_name || t("msgClient")}</p>
               <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{formatThreadTime(thread.lastMessageAt || thread.created_at)}</span>
             </div>
             {thread.listingTitle && <p className="text-[11px] text-primary font-medium truncate">{thread.listingTitle}</p>}
-            <p className="text-xs text-muted-foreground truncate mt-0.5">{thread.lastMessage || "No messages yet"}</p>
+            <p className="text-xs text-muted-foreground truncate mt-0.5">{thread.lastMessage || t("msgNoMessages")}</p>
           </div>
         </button>
       ))}
