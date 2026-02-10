@@ -583,6 +583,7 @@ function StepDetails({
   totalPriceGel, setTotalPriceGel,
   additionalImages, setAdditionalImages,
   additionalPreviews, setAdditionalPreviews,
+  venueFee, setVenueFee,
 }: {
   serviceType: ServiceType;
   imagePreview: string | null;
@@ -599,6 +600,7 @@ function StepDetails({
   totalPriceGel: string; setTotalPriceGel: (v: string) => void;
   additionalImages: File[]; setAdditionalImages: (v: File[]) => void;
   additionalPreviews: string[]; setAdditionalPreviews: (v: string[]) => void;
+  venueFee: string; setVenueFee: (v: string) => void;
 }) {
   const sessions = parseInt(sessionsCount) || 0;
   const total = parseFloat(totalPriceGel) || 0;
