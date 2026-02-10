@@ -59,6 +59,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <NetworkStatus />
+          <InAppBrowserBanner />
           <BrowserRouter>
             <Suspense fallback={<SuspenseFallback />}>
               <Routes>
