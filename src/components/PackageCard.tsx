@@ -109,35 +109,6 @@ export default function PackageCard({ pkg }: PackageCardProps) {
     navigate("/payment", { state: paymentState });
   };
 
-  const handlePaymentSuccess = async (method: string) => {
-    setBooking(true);
-    try {
-      const { data, error } = await supabase.from("bookings").insert({
-        user_id: user!.id,
-        listing_id: pkg.id,
-        spots: pkg.sessions_count,
-        total_price: pkg.total_price_gel,
-        payment_status: "paid",
-        booking_status: "confirmed",
-        stripe_payment_id: `demo_${method}_pkg_${Date.now()}`,
-      }).select("id").single();
-      if (error) {
-        const msg = error.code === "23505"
-          ? "You've already booked this package."
-          : "Booking failed. Please try again.";
-        toast({ title: msg, variant: "destructive" });
-      } else {
-        setShowPayment(false);
-        setConfirmedBookingId(data.id);
-        setShowTicket(true);
-      }
-    } catch {
-      toast({ title: "Something went wrong", variant: "destructive" });
-    } finally {
-      setBooking(false);
-    }
-  };
-
   const handleBookmark = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
