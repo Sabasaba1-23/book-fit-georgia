@@ -168,7 +168,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
         <div className="rounded-2xl bg-muted/40 py-10 text-center">
           <Calendar className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
-            {filter === "upcoming" ? "No upcoming sessions" : "No past sessions"}
+            {filter === "upcoming" ? t("schedNoUpcoming") : t("schedNoPast")}
           </p>
         </div>
       ) : (
