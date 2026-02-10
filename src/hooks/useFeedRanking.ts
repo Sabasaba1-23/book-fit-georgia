@@ -22,6 +22,7 @@ const WEIGHTS = {
   popularity: 20,
   recency: 10,
   freshness: 5,
+  proSubscription: 8,
 } as const;
 
 const RECENCY_DECAY_DAYS = 30;
@@ -51,7 +52,9 @@ interface ScoredItem<T> {
 
 interface Scorable {
   sport: string;
+  partner_id?: string;
   partner_profiles: {
+    id?: string;
     avg_rating: number | null;
     review_count: number | null;
   };
@@ -70,12 +73,13 @@ function computeScore(
   sport: string,
   avgRating: number | null,
   reviewCount: number | null,
-  referenceDate: string | undefined, // scheduled_at or created_at
-  interests: string[]
+  referenceDate: string | undefined,
+  interests: string[],
+  isPro: boolean
 ): number {
   let score = 0;
 
-  // 1. Interest match (exact sport or goal match)
+  // 1. Interest match
   const sportLower = sport.toLowerCase();
   if (interests.length > 0 && interests.some((tag) => sportLower.includes(tag) || tag.includes(sportLower))) {
     score += WEIGHTS.interestMatch;
@@ -109,7 +113,27 @@ function computeScore(
     }
   }
 
+  // 6. Pro subscription boost — modest bump, not dominant
+  if (isPro) {
+    score += WEIGHTS.proSubscription;
+  }
+
   return score;
+}
+
+function useProPartnerIds() {
+  return useQuery({
+    queryKey: ["proPartnerIds"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("partner_subscriptions")
+        .select("partner_id")
+        .eq("plan", "pro")
+        .eq("status", "active");
+      return new Set((data ?? []).map((r) => r.partner_id));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 }
 
 export function useFeedRanking<L extends ScorableListing, P extends ScorablePackage>(
@@ -117,6 +141,9 @@ export function useFeedRanking<L extends ScorableListing, P extends ScorablePack
   packages: P[]
 ): { rankedListings: L[]; rankedPackages: P[]; interestsLoading: boolean } {
   const { data: interests = [], isLoading: interestsLoading } = useUserInterests();
+  const { data: proIds = new Set<string>() } = useProPartnerIds();
+
+  const getPartnerId = (item: Scorable) => item.partner_id || item.partner_profiles?.id || "";
 
   const rankedListings = useMemo(() => {
     const scored: ScoredItem<L>[] = listings.map((l) => ({
@@ -126,12 +153,13 @@ export function useFeedRanking<L extends ScorableListing, P extends ScorablePack
         l.partner_profiles?.avg_rating,
         l.partner_profiles?.review_count,
         l.scheduled_at,
-        interests
+        interests,
+        proIds.has(getPartnerId(l))
       ),
     }));
     scored.sort((a, b) => b.score - a.score);
     return scored.map((s) => s.item);
-  }, [listings, interests]);
+  }, [listings, interests, proIds]);
 
   const rankedPackages = useMemo(() => {
     const scored: ScoredItem<P>[] = packages.map((p) => ({
@@ -141,12 +169,13 @@ export function useFeedRanking<L extends ScorableListing, P extends ScorablePack
         p.partner_profiles?.avg_rating,
         p.partner_profiles?.review_count,
         p.created_at,
-        interests
+        interests,
+        proIds.has(getPartnerId(p))
       ),
     }));
     scored.sort((a, b) => b.score - a.score);
     return scored.map((s) => s.item);
-  }, [packages, interests]);
+  }, [packages, interests, proIds]);
 
   return { rankedListings, rankedPackages, interestsLoading };
 }
