@@ -131,8 +131,9 @@ interface PartnerLocation {
 export default function PartnerProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [partner, setPartner] = useState<PartnerData | null>(null);
   const [listings, setListings] = useState<ListingData[]>([]);
   const [reviews, setReviews] = useState<ReviewData[]>([]);
