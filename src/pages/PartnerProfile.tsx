@@ -30,8 +30,8 @@ import {
   Target,
   ShoppingBag,
 } from "lucide-react";
-import PaymentSheet from "@/components/PaymentSheet";
 import BookingTicket from "@/components/BookingTicket";
+import type { PaymentLocationState } from "@/pages/Payment";
 import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
 import { cn } from "@/lib/utils";
