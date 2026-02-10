@@ -1,7 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import "@icon-park/react/styles/index.css";
 import { IconProvider, DEFAULT_ICON_CONFIGS } from "@icon-park/react";
 import { initNativePlugins } from "./lib/native";
 import { Capacitor } from "@capacitor/core";
