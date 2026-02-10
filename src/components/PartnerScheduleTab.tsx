@@ -272,7 +272,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
                     {/* Revenue summary */}
                     {activeBookings.length > 0 && (
                       <div className="mt-3 flex items-center justify-between rounded-xl bg-primary/5 p-3">
-                        <span className="text-xs font-bold text-muted-foreground uppercase">Total Revenue</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase">{t("schedTotalRevenue")}</span>
                         <span className="text-sm font-extrabold text-primary">
                           {activeBookings.reduce((sum, b) => sum + Number(b.total_price), 0)}₾
                         </span>
