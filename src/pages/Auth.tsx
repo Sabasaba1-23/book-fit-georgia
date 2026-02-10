@@ -213,9 +213,15 @@ export default function Auth() {
   };
 
   const handleGoogleSignIn = async () => {
+    // On native iOS/Android, redirect back to the app via its custom URL scheme
+    const { isNative } = await import("@/lib/platform");
+    const redirectTo = isNative()
+      ? "com.bookfit.georgia://callback"
+      : window.location.origin;
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo },
     });
     if (error) setError(error.message);
   };
