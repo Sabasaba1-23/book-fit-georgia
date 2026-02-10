@@ -357,8 +357,8 @@ export default function Auth() {
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight text-foreground">Reset Your<br /><span className="text-primary">Password</span></h1>
-              <p className="mt-2 text-sm text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+              <h1 className="text-3xl font-extrabold leading-tight text-foreground">{t("resetYourPassword")}<br /><span className="text-primary">{t("password")}</span></h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("resetDescription")}</p>
             </div>
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div>
