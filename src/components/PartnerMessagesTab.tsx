@@ -284,7 +284,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-bold text-foreground truncate">{thread.otherUser?.display_name || "Client"}</p>
+              <p className="text-sm font-bold text-foreground truncate">{thread.otherUser?.display_name || t("msgClient")}</p>
               <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{formatThreadTime(thread.lastMessageAt || thread.created_at)}</span>
             </div>
             {thread.listingTitle && <p className="text-[11px] text-primary font-medium truncate">{thread.listingTitle}</p>}
