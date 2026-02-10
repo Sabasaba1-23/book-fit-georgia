@@ -57,6 +57,9 @@ export const translations = {
     confirmEmailFirst: "Please check your email and confirm your account first.",
     alreadyRegistered: "This email is already registered. Try logging in instead.",
     passwordMinLength: "Password must be at least 6 characters.",
+    genderLabel: "Gender",
+    male: "Male",
+    female: "Female",
 
     // Partner Registration
     partner: "Partner",
