@@ -250,10 +250,10 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold text-foreground truncate">
-                                {booking.profile?.full_name || "Anonymous"}
+                                {booking.profile?.full_name || t("schedAnonymous")}
                               </p>
                               <p className="text-[11px] text-muted-foreground">
-                                {booking.spots} spot{booking.spots > 1 ? "s" : ""} · {Number(booking.total_price)}₾
+                                {booking.spots} {booking.spots > 1 ? t("schedSpots") : t("schedSpot")} · {Number(booking.total_price)}₾
                               </p>
                             </div>
                             <span className={cn(
