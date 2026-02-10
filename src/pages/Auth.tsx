@@ -450,9 +450,9 @@ export default function Auth() {
                 <Input placeholder={t("enterEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Password</label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("password")}</label>
                 <div className="relative">
-                  <Input placeholder="Create a password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 pr-12 text-sm shadow-none" />
+                  <Input placeholder={t("createPassword")} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 pr-12 text-sm shadow-none" />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
