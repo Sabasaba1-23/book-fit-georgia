@@ -184,7 +184,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
     if (!dateStr) return "";
     const d = new Date(dateStr);
     if (isToday(d)) return format(d, "h:mm a");
-    if (isYesterday(d)) return "Yesterday";
+    if (isYesterday(d)) return t("msgYesterday");
     return format(d, "MMM d");
   }
 
