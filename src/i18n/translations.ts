@@ -42,6 +42,8 @@ export const translations = {
     resetDescription: "Enter your email and we'll send you a reset link.",
     sendResetLink: "Send Reset Link",
     rememberPassword: "Remember your password?",
+    resetLinkSent: "Reset link sent",
+    resetLinkDescription: "Check your email for a password reset link.",
     joinFitBook: "Join",
     howToUseFitBook: "How do you want to use FitBook?",
     createYourAccount: "Create Your",
