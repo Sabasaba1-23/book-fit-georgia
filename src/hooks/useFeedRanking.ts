@@ -52,7 +52,9 @@ interface ScoredItem<T> {
 
 interface Scorable {
   sport: string;
+  partner_id?: string;
   partner_profiles: {
+    id?: string;
     avg_rating: number | null;
     review_count: number | null;
   };
