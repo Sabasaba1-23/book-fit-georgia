@@ -867,50 +867,169 @@ export default function PartnerProfile() {
             </div>
           ) : (
             listings.map((listing, idx) => {
-              const title = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
+              const lTitle = lang === "ka" && listing.title_ka ? listing.title_ka : listing.title_en;
               const nextDate = new Date(listing.scheduled_at);
               const isNext = idx === 0;
               const isLimitedSpots = listing.max_spots <= 3;
+              const isExpanded = expandedListingId === listing.id;
+              const description = (lang === "ka" ? listing.description_ka : listing.description_en) || "";
+              const equipment = getEquipment(listing);
+              const rentalInfo = lang === "ka" ? listing.rental_info_ka : listing.rental_info_en;
+              const spotsLeft = listing.max_spots;
+
               return (
                 <div
                   key={listing.id}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl bg-card border p-3 cursor-pointer transition-all hover:border-primary/30 active:scale-[0.99]",
+                    "overflow-hidden rounded-2xl bg-card border transition-all",
                     isNext ? "border-primary/40" : "border-border/50"
                   )}
-                  onClick={() => navigate("/")}
                 >
-                  {listing.background_image_url ? (
-                    <img
-                      src={listing.background_image_url}
-                      alt=""
-                      className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                      <Dumbbell className="h-5 w-5 text-primary" />
+                  {/* Collapsed row */}
+                  <div
+                    className="flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-muted/30 active:scale-[0.99]"
+                    onClick={() => setExpandedListingId(isExpanded ? null : listing.id)}
+                  >
+                    {listing.background_image_url ? (
+                      <img
+                        src={listing.background_image_url}
+                        alt=""
+                        className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                        <Dumbbell className="h-5 w-5 text-primary" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="text-[13px] font-bold text-foreground truncate max-w-[140px]">{lTitle}</p>
+                        {isNext && (
+                          <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-primary leading-none">Next</span>
+                        )}
+                        {isLimitedSpots && !isNext && (
+                          <span className="shrink-0 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-destructive leading-none">Limited</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 flex-wrap">
+                        <span>{format(nextDate, "MMM d, hh:mm a")}</span>
+                        <span>·</span>
+                        <span>{listing.duration_minutes}min</span>
+                        <span>·</span>
+                        <span>{trainingTypeLabel(listing.training_type)}</span>
+                      </div>
+                      <span className="mt-0.5 inline-block rounded-full bg-muted px-2 py-0.5 text-[9px] font-medium text-muted-foreground">{listing.sport}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <p className="text-base font-extrabold text-primary">{listing.price_gel}₾</p>
+                      <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", isExpanded && "rotate-180")} />
+                    </div>
+                  </div>
+
+                  {/* Expanded details */}
+                  {isExpanded && (
+                    <div className="border-t border-border/60 animate-in slide-in-from-top-2 fade-in duration-300">
+                      {/* Info pills */}
+                      <div className="flex gap-2 px-4 py-3 overflow-x-auto hide-scrollbar">
+                        <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+                          <Clock className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-[12px] font-medium text-foreground">{listing.duration_minutes} min</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+                          <Users className="h-3.5 w-3.5 text-primary" />
+                          <span className="text-[12px] font-medium text-foreground">{trainingTypeLabel(listing.training_type)}</span>
+                        </div>
+                        {listing.location && (
+                          <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+                            <MapPin className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-[12px] font-medium text-foreground">{listing.location}</span>
+                          </div>
+                        )}
+                        {listing.difficulty_level && (
+                          <div className="flex items-center gap-1.5 rounded-lg bg-muted/60 px-3 py-1.5 shrink-0">
+                            <BarChart3 className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-[12px] font-medium text-foreground capitalize">{listing.difficulty_level}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Gym name */}
+                      {listing.gym_name && (
+                        <div className="px-4 pb-3 flex items-center gap-1.5">
+                          <Dumbbell className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-[13px] text-muted-foreground">{listing.gym_name}</span>
+                        </div>
+                      )}
+
+                      {/* Spots left */}
+                      {listing.max_spots > 1 && spotsLeft <= 5 && spotsLeft > 0 && (
+                        <p className="text-[12px] text-muted-foreground px-4 pb-3">
+                          {spotsLeft} spots left · {trainingTypeLabel(listing.training_type)}
+                        </p>
+                      )}
+
+                      {/* Description */}
+                      {description && (
+                        <div className="px-4 pb-4">
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">About</p>
+                          <p className="text-[14px] leading-relaxed text-muted-foreground">{description}</p>
+                        </div>
+                      )}
+
+                      {/* Goals */}
+                      {listing.goals && listing.goals.length > 0 && (
+                        <div className="px-4 pb-4">
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Goals</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {listing.goals.map((goal) => (
+                              <span key={goal} className="flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[12px] font-medium text-foreground">
+                                <Target className="h-3 w-3 text-primary" />
+                                {goal}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* What to bring */}
+                      {equipment.length > 0 && (
+                        <div className="px-4 pb-4">
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">What to Bring</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {equipment.map((item) => (
+                              <span key={item} className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-[12px] font-medium text-foreground">
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Rental info */}
+                      {rentalInfo && (
+                        <div className="px-4 pb-4">
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Rental Info</p>
+                          <div className="flex items-start gap-1.5">
+                            <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground mt-0.5" />
+                            <p className="text-[13px] leading-relaxed text-muted-foreground">{rentalInfo}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Book button */}
+                      <div className="px-4 pb-4 pt-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSessionBookClick(listing.id);
+                          }}
+                          className="w-full rounded-2xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
+                        >
+                          Book Now · {listing.price_gel}₾
+                        </button>
+                      </div>
                     </div>
                   )}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <p className="text-[13px] font-bold text-foreground truncate max-w-[140px]">{title}</p>
-                      {isNext && (
-                        <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-primary leading-none">Next</span>
-                      )}
-                      {isLimitedSpots && !isNext && (
-                        <span className="shrink-0 rounded-full bg-destructive/10 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-destructive leading-none">Limited</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 flex-wrap">
-                      <span>{format(nextDate, "MMM d, hh:mm a")}</span>
-                      <span>·</span>
-                      <span>{listing.duration_minutes}min</span>
-                      <span>·</span>
-                      <span>{trainingTypeLabel(listing.training_type)}</span>
-                    </div>
-                    <span className="mt-0.5 inline-block rounded-full bg-muted px-2 py-0.5 text-[9px] font-medium text-muted-foreground">{listing.sport}</span>
-                  </div>
-                  <p className="text-base font-extrabold text-primary shrink-0">{listing.price_gel}₾</p>
                 </div>
               );
             })
