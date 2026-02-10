@@ -28,6 +28,7 @@ const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminBadges = lazy(() => import("./pages/admin/AdminBadges"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsConditions = lazy(() => import("./pages/TermsConditions"));
+const Payment = lazy(() => import("./pages/Payment"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
