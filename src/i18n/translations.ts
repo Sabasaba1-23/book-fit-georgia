@@ -1289,6 +1289,8 @@ export const translations = {
     schedTotalRevenue: "სულ შემოსავალი",
     schedSpot: "ადგილი",
     schedSpots: "ადგილი",
+    schedToday: "დღეს",
+    schedTomorrow: "ხვალ",
 
     // Messages Tab
     msgNoMessages: "შეტყობინებები ჯერ არ არის",
