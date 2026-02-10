@@ -53,6 +53,7 @@ interface PartnerScheduleTabProps {
 }
 
 export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProps) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState<ScheduleListing[]>([]);
   const [loading, setLoading] = useState(true);
