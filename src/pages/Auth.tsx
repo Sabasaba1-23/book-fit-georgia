@@ -128,14 +128,14 @@ export default function Auth() {
     });
     if (error) {
       if (error.message.includes("already registered")) {
-        setError("This email is already registered. Try logging in instead.");
+        setError(t("alreadyRegistered"));
       } else {
         setError(error.message);
       }
     } else {
       toast({
-        title: "Check your email",
-        description: "We sent you a confirmation link to verify your account.",
+        title: t("checkYourEmail"),
+        description: t("confirmationLinkSent"),
       });
     }
     setLoading(false);
