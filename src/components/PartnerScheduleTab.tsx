@@ -42,9 +42,9 @@ function getTimeLabel(scheduledAt: string, durationMinutes: number, t: (key: Tra
   if (isPast(start) && !isPast(end)) return { text: t("schedInProgress"), color: "text-primary bg-primary/10" };
   if (isToday(start)) {
     if (hoursUntil <= 1) return { text: t("schedStartingSoon"), color: "text-destructive bg-destructive/10" };
-    return { text: `${t("schedUpcoming")} · ${format(start, "HH:mm")}`, color: "text-primary bg-primary/10" };
+    return { text: `${t("schedToday")} · ${format(start, "HH:mm")}`, color: "text-primary bg-primary/10" };
   }
-  if (isTomorrow(start)) return { text: `${t("msgYesterday").replace(/.*/, format(start, "EEE"))} · ${format(start, "HH:mm")}`, color: "text-amber-600 bg-amber-50" };
+  if (isTomorrow(start)) return { text: `${t("schedTomorrow")} · ${format(start, "HH:mm")}`, color: "text-amber-600 bg-amber-50" };
   return { text: format(start, "EEE, MMM d · HH:mm"), color: "text-foreground/70 bg-muted" };
 }
 
