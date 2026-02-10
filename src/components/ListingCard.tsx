@@ -6,7 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Calendar, Clock, Users, CheckCircle2, MessageCircle, Star,
-  MapPin, BarChart3, ChevronUp, Bookmark, ChevronDown, Dumbbell, Target, ShoppingBag,
+  MapPin, BarChart3, ChevronUp, Bookmark, ChevronDown, Dumbbell, Target, ShoppingBag, Landmark,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -92,6 +92,7 @@ interface ListingCardProps {
     goals?: string[] | null;
     gym_name?: string | null;
     location_type?: string | null;
+    venue_fee_gel?: number | null;
     status: string;
     booked_spots?: number;
     partner_id?: string;
@@ -128,6 +129,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const rentalInfo = lang === "ka" ? listing.rental_info_ka : listing.rental_info_en;
   const imageUrl = listing.background_image_url || SPORT_FALLBACK_IMAGES[listing.sport] || SPORT_FALLBACK_IMAGES.HIIT;
   const hasRating = !!(listing.partner.avg_rating && listing.partner.review_count && listing.partner.review_count > 0);
+  const hasVenueFee = !!(listing.venue_fee_gel && listing.venue_fee_gel > 0);
 
   const handleBookClick = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -276,10 +278,17 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
         {/* Price + Book row */}
         <div className="flex items-center justify-between">
-          <p className="text-[19px] font-semibold text-foreground">
-            {listing.price_gel}₾
-            <span className="text-[12px] font-normal text-muted-foreground ml-1">/ session</span>
-          </p>
+          <div>
+            <p className="text-[19px] font-semibold text-foreground">
+              {listing.price_gel}₾
+              <span className="text-[12px] font-normal text-muted-foreground ml-1">/ session</span>
+            </p>
+            {hasVenueFee && (
+              <p className="text-[11px] font-medium text-primary mt-0.5">
+                + {listing.venue_fee_gel}₾ venue fee at location
+              </p>
+            )}
+          </div>
           <button
             onClick={handleBookClick}
             className="rounded-full bg-primary px-5 py-2.5 text-[14px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
@@ -359,6 +368,28 @@ export default function ListingCard({ listing }: ListingCardProps) {
             <p className="text-[12px] text-muted-foreground px-5 pb-3">
               {spotsLeft} {t("spotsLeftLabel")} · {getTrainingTypeLabel(listing.training_type)}
             </p>
+          )}
+
+          {/* Venue Fee callout */}
+          {hasVenueFee && (
+            <div className="mx-5 mb-4 rounded-2xl border-2 border-primary/20 bg-primary/5 p-4">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-5 w-5 text-primary" />
+                  <span className="text-[15px] font-bold text-foreground">Venue Entry Fee</span>
+                </div>
+                <span className="text-[20px] font-bold text-primary">{listing.venue_fee_gel}₾</span>
+              </div>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                Paid directly at the venue desk · Not included in session price
+              </p>
+              <div className="mt-2 flex items-center justify-between rounded-xl bg-background/60 px-3 py-2">
+                <span className="text-[13px] text-muted-foreground">Total cost</span>
+                <span className="text-[16px] font-bold text-foreground">
+                  {listing.price_gel + (listing.venue_fee_gel || 0)}₾
+                </span>
+              </div>
+            </div>
           )}
 
           {/* Description */}

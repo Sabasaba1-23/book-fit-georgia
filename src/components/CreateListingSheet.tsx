@@ -100,6 +100,7 @@ export default function CreateListingSheet({
   const [durationMinutes, setDurationMinutes] = useState("60");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [recurring, setRecurring] = useState<"none" | "weekly" | "biweekly" | "monthly">("none");
+  const [venueFee, setVenueFee] = useState("");
 
   const totalSteps = 3;
 
@@ -137,6 +138,7 @@ export default function CreateListingSheet({
     setDurationMinutes("60");
     setSelectedGoals([]);
     setRecurring("none");
+    setVenueFee("");
   };
 
   const handleClose = () => {
@@ -207,6 +209,7 @@ export default function CreateListingSheet({
       rental_info_en: rentalInfo.trim() || null,
       rental_info_ka: rentalInfoKa.trim() || null,
       goals: selectedGoals.length > 0 ? selectedGoals : null,
+      venue_fee_gel: venueFee ? parseFloat(venueFee) : null,
       status: "pending" as const,
     };
 
@@ -308,6 +311,7 @@ export default function CreateListingSheet({
                 totalPriceGel={totalPriceGel} setTotalPriceGel={setTotalPriceGel}
                 additionalImages={additionalImages} setAdditionalImages={setAdditionalImages}
                 additionalPreviews={additionalPreviews} setAdditionalPreviews={setAdditionalPreviews}
+                venueFee={venueFee} setVenueFee={setVenueFee}
               />
             )}
             {step === 3 && (
@@ -579,6 +583,7 @@ function StepDetails({
   totalPriceGel, setTotalPriceGel,
   additionalImages, setAdditionalImages,
   additionalPreviews, setAdditionalPreviews,
+  venueFee, setVenueFee,
 }: {
   serviceType: ServiceType;
   imagePreview: string | null;
@@ -595,6 +600,7 @@ function StepDetails({
   totalPriceGel: string; setTotalPriceGel: (v: string) => void;
   additionalImages: File[]; setAdditionalImages: (v: File[]) => void;
   additionalPreviews: string[]; setAdditionalPreviews: (v: string[]) => void;
+  venueFee: string; setVenueFee: (v: string) => void;
 }) {
   const sessions = parseInt(sessionsCount) || 0;
   const total = parseFloat(totalPriceGel) || 0;
@@ -768,7 +774,30 @@ function StepDetails({
         </>
       )}
 
-      {/* Additional Photos */}
+      {/* Venue Fee (optional) */}
+      <div className="rounded-2xl border border-border/50 bg-muted/20 p-4 space-y-3">
+        <label className="flex items-center gap-1.5 text-base font-bold text-foreground">
+          <Building2 className="h-4 w-4 text-primary" />
+          Venue / Entry Fee
+          <span className="ml-1 text-[11px] font-normal text-muted-foreground">(optional)</span>
+        </label>
+        <p className="text-[13px] text-muted-foreground leading-relaxed">
+          If the venue charges an entry fee (e.g. pool, court), clients will pay it directly at the venue desk.
+        </p>
+        <Input
+          type="number" min={0} step={0.5}
+          value={venueFee}
+          onChange={(e) => setVenueFee(e.target.value)}
+          placeholder="e.g., 10"
+          className="h-14 rounded-2xl border-0 bg-background px-4 text-[15px] font-medium shadow-none placeholder:text-muted-foreground/60"
+        />
+        {venueFee && parseFloat(venueFee) > 0 && (
+          <p className="text-[12px] font-medium text-primary">
+            💡 {parseFloat(venueFee)}₾ venue fee will be shown to clients — paid at venue
+          </p>
+        )}
+      </div>
+
       <div>
         <label className="mb-1 block text-base font-bold text-foreground">Additional Photos / Videos</label>
         <p className="mb-3 text-[13px] text-muted-foreground">Add more media to showcase your training (optional).</p>
