@@ -1050,20 +1050,6 @@ export default function PartnerProfile() {
         />
       )}
 
-      {/* Payment & Ticket for session booking from profile */}
-      {paymentListingId && (() => {
-        const pl = listings.find(l => l.id === paymentListingId);
-        return pl ? (
-          <PaymentSheet
-            open={true}
-            onOpenChange={(o) => { if (!o) setPaymentListingId(null); }}
-            amount={pl.price_gel}
-            title={pl.title_en}
-            onPaymentSuccess={handleSessionPaymentSuccess}
-            loading={bookingListing}
-          />
-        ) : null;
-      })()}
 
       {showTicket && ticketListing && (
         <BookingTicket
