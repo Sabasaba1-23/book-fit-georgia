@@ -23,6 +23,8 @@ import PartnerPhotosMedia from "@/components/partner/PartnerPhotosMedia";
 import PartnerBadgesScreen from "@/components/partner/PartnerBadgesScreen";
 import PartnerSettings from "@/components/partner/PartnerSettings";
 import GymTrainerManager from "@/components/partner/GymTrainerManager";
+import { usePartnerSubscription } from "@/hooks/usePartnerSubscription";
+import SubscriptionBanner from "@/components/SubscriptionBanner";
 
 interface PartnerListing {
   id: string;
