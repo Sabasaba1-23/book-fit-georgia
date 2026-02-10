@@ -518,7 +518,7 @@ export default function Auth() {
                   )}
                 >
                   <User className="h-4 w-4" />
-                  Individual Trainer
+                  {t("individualTrainer")}
                 </button>
                 <button
                   type="button"
