@@ -362,8 +362,8 @@ export default function Auth() {
             </div>
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
-                <Input placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("email")}</label>
+                <Input placeholder={t("enterEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
