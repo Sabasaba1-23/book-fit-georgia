@@ -110,7 +110,7 @@ export default function Auth() {
     e.preventDefault();
     setError("");
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t("passwordMinLength"));
       return;
     }
     if (!phoneNumber.trim()) {
