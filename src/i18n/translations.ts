@@ -1272,6 +1272,29 @@ export const translations = {
     payoutHistoryDesc: "თვალი ადევნე შემოსავლებს",
     noPayoutsYet: "ჯერ არ არის გადახდები",
     payoutHistoryHere: "შენი გადახდების ისტორია აქ გამოჩნდება",
+
+    // Schedule Tab
+    schedCompleted: "დასრულებული",
+    schedInProgress: "მიმდინარე",
+    schedStartingSoon: "მალე იწყება",
+    schedUpcoming: "მომავალი",
+    schedPast: "წარსული",
+    schedNoUpcoming: "მომავალი სესიები არ არის",
+    schedNoPast: "წარსული სესიები არ არის",
+    schedAttendees: "მონაწილეები",
+    schedNoBookings: "ჯერ არ არის ჯავშნები",
+    schedAnonymous: "ანონიმური",
+    schedTotalRevenue: "სულ შემოსავალი",
+    schedSpot: "ადგილი",
+    schedSpots: "ადგილი",
+
+    // Messages Tab
+    msgNoMessages: "შეტყობინებები ჯერ არ არის",
+    msgNoMessagesDesc: "კლიენტები დაგიწერენ დაჯავშნის შემდეგ",
+    msgStartConversation: "დაიწყე საუბარი!",
+    msgTypePlaceholder: "დაწერე შეტყობინება...",
+    msgClient: "კლიენტი",
+    msgYesterday: "გუშინ",
   },
 
   ru: {
