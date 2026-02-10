@@ -626,10 +626,10 @@ export default function Auth() {
               {error && <p className="text-sm text-destructive">{error}</p>}
 
               <p className="text-xs text-muted-foreground text-center">
-                By creating a partner account, you agree to our{" "}
-                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
-                {" "}and{" "}
-                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+                {t("byCreatingPartner")}{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">{t("termsAndConditions")}</button>
+                {" "}{t("and")}{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">{t("privacyPolicy")}</button>.
               </p>
 
               {/* Submit */}
