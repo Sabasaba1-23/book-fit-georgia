@@ -83,6 +83,7 @@ const App = () => (
                   <Route path="badges" element={<AdminBadges />} />
                 </Route>
 
+                <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsConditions />} />
                 <Route path="*" element={<NotFound />} />
