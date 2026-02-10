@@ -495,11 +495,11 @@ export default function Auth() {
             {/* Hero */}
             <div className="mb-8">
               <h1 className="text-[32px] font-extrabold leading-[1.1] text-foreground">
-                Start Training{"\n"}<br />
-                <span className="text-primary">with Us</span>
+                {t("startTrainingWithUs")}{"\n"}<br />
+                <span className="text-primary">{t("withUs")}</span>
               </h1>
               <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-                Join the elite network of fitness professionals and grow your sports business.
+                {t("joinEliteNetwork")}
               </p>
             </div>
 
