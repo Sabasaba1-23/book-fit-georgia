@@ -870,6 +870,7 @@ export type Database = {
           title_ka: string | null
           training_type: Database["public"]["Enums"]["training_type"]
           updated_at: string
+          venue_fee_gel: number | null
         }
         Insert: {
           admin_notes?: string | null
@@ -901,6 +902,7 @@ export type Database = {
           title_ka?: string | null
           training_type?: Database["public"]["Enums"]["training_type"]
           updated_at?: string
+          venue_fee_gel?: number | null
         }
         Update: {
           admin_notes?: string | null
@@ -932,6 +934,7 @@ export type Database = {
           title_ka?: string | null
           training_type?: Database["public"]["Enums"]["training_type"]
           updated_at?: string
+          venue_fee_gel?: number | null
         }
         Relationships: [
           {
@@ -971,6 +974,7 @@ export type Database = {
           total_price_gel: number
           training_type: Database["public"]["Enums"]["training_type"]
           updated_at: string
+          venue_fee_gel: number | null
         }
         Insert: {
           background_image_url?: string | null
@@ -999,6 +1003,7 @@ export type Database = {
           total_price_gel: number
           training_type?: Database["public"]["Enums"]["training_type"]
           updated_at?: string
+          venue_fee_gel?: number | null
         }
         Update: {
           background_image_url?: string | null
@@ -1027,6 +1032,7 @@ export type Database = {
           total_price_gel?: number
           training_type?: Database["public"]["Enums"]["training_type"]
           updated_at?: string
+          venue_fee_gel?: number | null
         }
         Relationships: [
           {
