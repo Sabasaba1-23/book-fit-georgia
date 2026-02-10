@@ -309,7 +309,60 @@ export default function PartnerProfile() {
     load();
   }, [id, user]);
 
-  if (loading) {
+  const handleSessionBookClick = (listingId: string) => {
+    if (!user) {
+      toast({ title: t("loginToBook"), variant: "destructive" });
+      navigate("/auth");
+      return;
+    }
+    setPaymentListingId(listingId);
+  };
+
+  const handleSessionPaymentSuccess = async (method: string) => {
+    const listing = listings.find(l => l.id === paymentListingId);
+    if (!listing || !user) return;
+    setBookingListing(true);
+    try {
+      const { data, error } = await supabase.from("bookings").insert({
+        user_id: user.id,
+        listing_id: listing.id,
+        spots: 1,
+        total_price: listing.price_gel,
+        payment_status: "paid",
+        booking_status: "confirmed",
+        stripe_payment_id: `demo_${method}_${Date.now()}`,
+      }).select("id").single();
+      if (error) {
+        const msg = error.code === "23505"
+          ? "You've already booked this session."
+          : "Booking failed. Please try again.";
+        toast({ title: msg, variant: "destructive" });
+      } else {
+        setPaymentListingId(null);
+        setTicketListing(listing);
+        setConfirmedBookingId(data.id);
+        setShowTicket(true);
+      }
+    } catch {
+      toast({ title: "Something went wrong", variant: "destructive" });
+    } finally {
+      setBookingListing(false);
+    }
+  };
+
+  const getEquipment = (l: ListingData): string[] => {
+    const notes = lang === "ka" ? l.equipment_notes_ka : l.equipment_notes_en;
+    if (notes) return notes.split(",").map(s => s.trim());
+    const defaults: Record<string, string[]> = {
+      Yoga: ["Yoga Mat", "Water", "Towel"],
+      HIIT: ["Training Shoes", "Water", "Towel"],
+      Boxing: ["Boxing Gloves", "Hand Wraps", "Water"],
+      Tennis: ["Racket", "Tennis Shoes", "Water"],
+    };
+    return defaults[l.sport] || ["Comfortable Clothing", "Water"];
+  };
+
+
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
