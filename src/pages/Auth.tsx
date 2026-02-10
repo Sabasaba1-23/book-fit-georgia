@@ -14,6 +14,7 @@ type AuthMode = "login" | "register-choice" | "register-user" | "register-partne
 function ContactPopover() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!open) return;
@@ -27,7 +28,7 @@ function ContactPopover() {
   return (
     <div className="relative inline-block" ref={ref}>
       <button type="button" onClick={() => setOpen(!open)} className="underline text-primary">
-        Contact Us
+        {t("contactUs")}
       </button>
       {open && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-48 rounded-2xl bg-card border border-border shadow-lg p-3 space-y-2 animate-in fade-in zoom-in-95 duration-150">
@@ -36,7 +37,7 @@ function ContactPopover() {
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
           >
             <Mail className="h-3.5 w-3.5 text-primary" />
-            Email Us
+            {t("emailUs")}
           </a>
           <a
             href="https://wa.me/995511102916"
@@ -45,7 +46,7 @@ function ContactPopover() {
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
           >
             <MessageCircle className="h-3.5 w-3.5 text-green-500" />
-            WhatsApp
+            {t("whatsApp")}
           </a>
         </div>
       )}
