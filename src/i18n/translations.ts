@@ -1940,6 +1940,8 @@ export const translations = {
     schedTotalRevenue: "Общий доход",
     schedSpot: "место",
     schedSpots: "мест",
+    schedToday: "Сегодня",
+    schedTomorrow: "Завтра",
 
     // Messages Tab
     msgNoMessages: "Пока нет сообщений",
