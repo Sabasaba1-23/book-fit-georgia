@@ -174,7 +174,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
       ) : (
         <div className="space-y-3">
           {sorted.map((session) => {
-            const { text: timeLabel, color: timeLabelColor } = getTimeLabel(session.scheduled_at, session.duration_minutes);
+            const { text: timeLabel, color: timeLabelColor } = getTimeLabel(session.scheduled_at, session.duration_minutes, t);
             const activeBookings = session.bookings.filter((b) => b.booking_status !== "cancelled");
             const totalSpots = activeBookings.reduce((sum, b) => sum + b.spots, 0);
             const isExpanded = expandedId === session.id;
