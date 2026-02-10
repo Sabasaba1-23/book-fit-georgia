@@ -232,10 +232,10 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
                 {isExpanded && (
                   <div className="border-t border-border/50 bg-muted/10 px-4 py-3">
                     <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
-                      Attendees ({totalSpots})
+                      {t("schedAttendees")} ({totalSpots})
                     </p>
                     {activeBookings.length === 0 ? (
-                      <p className="text-sm text-muted-foreground py-2">No bookings yet</p>
+                      <p className="text-sm text-muted-foreground py-2">{t("schedNoBookings")}</p>
                     ) : (
                       <div className="space-y-2">
                         {activeBookings.map((booking) => (
