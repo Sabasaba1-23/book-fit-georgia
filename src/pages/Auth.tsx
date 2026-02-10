@@ -352,7 +352,7 @@ export default function Auth() {
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
-            <span className="text-base font-semibold text-foreground">Reset Password</span>
+            <span className="text-base font-semibold text-foreground">{t("resetPassword")}</span>
             <div className="w-11" />
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
