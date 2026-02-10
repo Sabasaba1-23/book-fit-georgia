@@ -432,14 +432,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </div>
       )}
 
-      <PaymentSheet
-        open={showPayment}
-        onOpenChange={setShowPayment}
-        amount={listing.price_gel}
-        title={listing.title_en}
-        onPaymentSuccess={handlePaymentSuccess}
-        loading={booking}
-      />
       <BookingTicket
         open={showTicket}
         onClose={() => {

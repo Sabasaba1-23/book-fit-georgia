@@ -9,8 +9,8 @@ import {
   Layers, Bookmark,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import PaymentSheet from "@/components/PaymentSheet";
 import BookingTicket from "@/components/BookingTicket";
+import type { PaymentLocationState } from "@/pages/Payment";
 
 const SPORT_IMAGES: Record<string, string> = {
   "Personal Trainer": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80",
