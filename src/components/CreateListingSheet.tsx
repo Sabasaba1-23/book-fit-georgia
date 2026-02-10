@@ -209,6 +209,7 @@ export default function CreateListingSheet({
       rental_info_en: rentalInfo.trim() || null,
       rental_info_ka: rentalInfoKa.trim() || null,
       goals: selectedGoals.length > 0 ? selectedGoals : null,
+      venue_fee_gel: venueFee ? parseFloat(venueFee) : null,
       status: "pending" as const,
     };
 
