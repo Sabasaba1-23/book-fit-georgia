@@ -269,7 +269,7 @@ export default function Auth() {
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
-            <span className="text-base font-semibold text-foreground">Sign In</span>
+            <span className="text-base font-semibold text-foreground">{t("signIn")}</span>
             <div className="w-11" />
           </div>
 
