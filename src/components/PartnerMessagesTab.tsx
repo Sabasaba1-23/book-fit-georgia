@@ -230,7 +230,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
         <div className="border-t border-border/50 px-4 py-3">
           <div className="flex items-center gap-2">
             <Input
-              placeholder="Type a message..."
+              placeholder={t("msgTypePlaceholder")}
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
