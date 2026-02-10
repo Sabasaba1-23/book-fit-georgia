@@ -109,8 +109,10 @@ export default function Home() {
     refetchOnWindowFocus: true,
   });
 
-  const listings = data?.listings ?? [];
-  const packages = data?.packages ?? [];
+  const rawListings = data?.listings ?? [];
+  const rawPackages = data?.packages ?? [];
+
+  const { rankedListings: listings, rankedPackages: packages } = useFeedRanking(rawListings, rawPackages);
 
   const handleSportChange = useCallback((v: string) => setActiveSport(v), []);
   const handleFiltersApply = useCallback((f: FilterState) => setFilters(f), []);
