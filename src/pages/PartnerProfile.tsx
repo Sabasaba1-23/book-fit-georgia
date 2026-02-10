@@ -30,8 +30,8 @@ import {
   Target,
   ShoppingBag,
 } from "lucide-react";
-import PaymentSheet from "@/components/PaymentSheet";
 import BookingTicket from "@/components/BookingTicket";
+import type { PaymentLocationState } from "@/pages/Payment";
 import BackButton from "@/components/BackButton";
 import { format, differenceInYears } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -152,8 +152,6 @@ export default function PartnerProfile() {
   const [locations, setLocations] = useState<PartnerLocation[]>([]);
   const [locationExpanded, setLocationExpanded] = useState(false);
   const [expandedListingId, setExpandedListingId] = useState<string | null>(null);
-  const [paymentListingId, setPaymentListingId] = useState<string | null>(null);
-  const [bookingListing, setBookingListing] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
   const [ticketListing, setTicketListing] = useState<ListingData | null>(null);
@@ -315,39 +313,18 @@ export default function PartnerProfile() {
       navigate("/auth");
       return;
     }
-    setPaymentListingId(listingId);
-  };
-
-  const handleSessionPaymentSuccess = async (method: string) => {
-    const listing = listings.find(l => l.id === paymentListingId);
-    if (!listing || !user) return;
-    setBookingListing(true);
-    try {
-      const { data, error } = await supabase.from("bookings").insert({
-        user_id: user.id,
-        listing_id: listing.id,
-        spots: 1,
-        total_price: listing.price_gel,
-        payment_status: "paid",
-        booking_status: "confirmed",
-        stripe_payment_id: `demo_${method}_${Date.now()}`,
-      }).select("id").single();
-      if (error) {
-        const msg = error.code === "23505"
-          ? "You've already booked this session."
-          : "Booking failed. Please try again.";
-        toast({ title: msg, variant: "destructive" });
-      } else {
-        setPaymentListingId(null);
-        setTicketListing(listing);
-        setConfirmedBookingId(data.id);
-        setShowTicket(true);
-      }
-    } catch {
-      toast({ title: "Something went wrong", variant: "destructive" });
-    } finally {
-      setBookingListing(false);
-    }
+    const listing = listings.find(l => l.id === listingId);
+    if (!listing || !partner) return;
+    const paymentState: PaymentLocationState = {
+      amount: listing.price_gel,
+      title: listing.title_en,
+      listingId: listing.id,
+      sport: listing.sport,
+      scheduledAt: listing.scheduled_at,
+      durationMinutes: listing.duration_minutes,
+      trainerName: partner.display_name,
+    };
+    navigate("/payment", { state: paymentState });
   };
 
   const getEquipment = (l: ListingData): string[] => {
@@ -1073,20 +1050,6 @@ export default function PartnerProfile() {
         />
       )}
 
-      {/* Payment & Ticket for session booking from profile */}
-      {paymentListingId && (() => {
-        const pl = listings.find(l => l.id === paymentListingId);
-        return pl ? (
-          <PaymentSheet
-            open={true}
-            onOpenChange={(o) => { if (!o) setPaymentListingId(null); }}
-            amount={pl.price_gel}
-            title={pl.title_en}
-            onPaymentSuccess={handleSessionPaymentSuccess}
-            loading={bookingListing}
-          />
-        ) : null;
-      })()}
 
       {showTicket && ticketListing && (
         <BookingTicket

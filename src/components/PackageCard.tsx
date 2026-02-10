@@ -9,8 +9,8 @@ import {
   Layers, Bookmark,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import PaymentSheet from "@/components/PaymentSheet";
 import BookingTicket from "@/components/BookingTicket";
+import type { PaymentLocationState } from "@/pages/Payment";
 
 const SPORT_IMAGES: Record<string, string> = {
   "Personal Trainer": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80",
@@ -76,7 +76,6 @@ export default function PackageCard({ pkg }: PackageCardProps) {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [booking, setBooking] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
@@ -95,36 +94,19 @@ export default function PackageCard({ pkg }: PackageCardProps) {
       navigate("/auth");
       return;
     }
-    setShowPayment(true);
-  };
-
-  const handlePaymentSuccess = async (method: string) => {
-    setBooking(true);
-    try {
-      const { data, error } = await supabase.from("bookings").insert({
-        user_id: user!.id,
-        listing_id: pkg.id,
-        spots: pkg.sessions_count,
-        total_price: pkg.total_price_gel,
-        payment_status: "paid",
-        booking_status: "confirmed",
-        stripe_payment_id: `demo_${method}_pkg_${Date.now()}`,
-      }).select("id").single();
-      if (error) {
-        const msg = error.code === "23505"
-          ? "You've already booked this package."
-          : "Booking failed. Please try again.";
-        toast({ title: msg, variant: "destructive" });
-      } else {
-        setShowPayment(false);
-        setConfirmedBookingId(data.id);
-        setShowTicket(true);
-      }
-    } catch {
-      toast({ title: "Something went wrong", variant: "destructive" });
-    } finally {
-      setBooking(false);
-    }
+    const paymentState: PaymentLocationState = {
+      amount: pkg.total_price_gel,
+      title: `${pkg.title_en} (${pkg.sessions_count} sessions)`,
+      listingId: pkg.id,
+      sport: pkg.sport,
+      scheduledAt: new Date().toISOString(),
+      durationMinutes: pkg.duration_minutes * pkg.sessions_count,
+      trainerName: pkg.partner_profiles.display_name,
+      spots: pkg.sessions_count,
+      isPackage: true,
+      sessionsCount: pkg.sessions_count,
+    };
+    navigate("/payment", { state: paymentState });
   };
 
   const handleBookmark = async (e: React.MouseEvent) => {
@@ -329,14 +311,6 @@ export default function PackageCard({ pkg }: PackageCardProps) {
         </div>
       )}
 
-      <PaymentSheet
-        open={showPayment}
-        onOpenChange={setShowPayment}
-        amount={pkg.total_price_gel}
-        title={`${title} (${pkg.sessions_count} sessions)`}
-        onPaymentSuccess={handlePaymentSuccess}
-        loading={booking}
-      />
       <BookingTicket
         open={showTicket}
         onClose={() => {

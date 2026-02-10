@@ -28,6 +28,7 @@ const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminBadges = lazy(() => import("./pages/admin/AdminBadges"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsConditions = lazy(() => import("./pages/TermsConditions"));
+const Payment = lazy(() => import("./pages/Payment"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,6 +83,7 @@ const App = () => (
                   <Route path="badges" element={<AdminBadges />} />
                 </Route>
 
+                <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsConditions />} />
                 <Route path="*" element={<NotFound />} />
