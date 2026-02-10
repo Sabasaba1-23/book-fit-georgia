@@ -14,6 +14,7 @@ type AuthMode = "login" | "register-choice" | "register-user" | "register-partne
 function ContactPopover() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!open) return;
@@ -27,7 +28,7 @@ function ContactPopover() {
   return (
     <div className="relative inline-block" ref={ref}>
       <button type="button" onClick={() => setOpen(!open)} className="underline text-primary">
-        Contact Us
+        {t("contactUs")}
       </button>
       {open && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 w-48 rounded-2xl bg-card border border-border shadow-lg p-3 space-y-2 animate-in fade-in zoom-in-95 duration-150">
@@ -36,7 +37,7 @@ function ContactPopover() {
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
           >
             <Mail className="h-3.5 w-3.5 text-primary" />
-            Email Us
+            {t("emailUs")}
           </a>
           <a
             href="https://wa.me/995511102916"
@@ -45,7 +46,7 @@ function ContactPopover() {
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-foreground hover:bg-muted/50 transition-colors"
           >
             <MessageCircle className="h-3.5 w-3.5 text-green-500" />
-            WhatsApp
+            {t("whatsApp")}
           </a>
         </div>
       )}
@@ -269,26 +270,26 @@ export default function Auth() {
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
-            <span className="text-base font-semibold text-foreground">Sign In</span>
+            <span className="text-base font-semibold text-foreground">{t("signIn")}</span>
             <div className="w-11" />
           </div>
 
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
               <h1 className="text-3xl font-extrabold leading-tight text-foreground">
-                Get Moving in<br />
-                <span className="text-primary">Georgia</span>
+                {t("getMovingIn")}<br />
+                <span className="text-primary">{t("georgia")}</span>
               </h1>
-              <p className="mt-2 text-sm text-muted-foreground">Access top trainers and facilities near you.</p>
+              <p className="mt-2 text-sm text-muted-foreground">{t("accessTopTrainers")}</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
-                <Input placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("email")}</label>
+                <Input placeholder={t("enterEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Password</label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("password")}</label>
                 <div className="relative">
                   <Input placeholder="••••••••" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 pr-12 text-sm shadow-none" />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -296,23 +297,23 @@ export default function Auth() {
                   </button>
                 </div>
                 <div className="mt-1.5 text-right">
-                  <button type="button" onClick={() => setMode("forgot-password")} className="text-sm font-medium text-primary">Forgot Password?</button>
+                  <button type="button" onClick={() => setMode("forgot-password")} className="text-sm font-medium text-primary">{t("forgotPassword")}</button>
                 </div>
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
-                {loading ? t("loading") : "Log In"}
+                {loading ? t("loading") : t("login")}
               </Button>
             </form>
 
             <Button variant="outline" onClick={() => setMode("register-partner")} className="mt-3 h-14 w-full rounded-2xl border-primary/30 bg-primary/5 text-base font-semibold text-primary hover:bg-primary/10">
               <Handshake className="mr-2 h-5 w-5" />
-              Join as a Partner
+              {t("joinAsPartner")}
             </Button>
 
             <div className="my-6 flex items-center gap-3">
               <div className="h-px flex-1 bg-border" />
-              <span className="text-xs text-muted-foreground">Or continue with</span>
+              <span className="text-xs text-muted-foreground">{t("orContinueWith")}</span>
               <div className="h-px flex-1 bg-border" />
             </div>
 
@@ -323,24 +324,24 @@ export default function Auth() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              Continue with Google
+              {t("continueWithGoogle")}
             </button>
 
             <div className="mt-4 flex items-center justify-center gap-1.5 flex-wrap text-[11px] text-muted-foreground">
-              <span>By continuing, you agree to our</span>
-              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms</button>
+              <span>{t("byContacting")}</span>
+              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">{t("terms")}</button>
               <span>&</span>
-              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy</button>
+              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">{t("privacy")}</button>
               <span>·</span>
               <ContactPopover />
             </div>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              {t("noAccount")}{" "}
               <button type="button" onClick={() => setMode("register-choice")} className="font-semibold text-primary">{t("signUp")}</button>
             </p>
 
-            <p className="mt-4 pb-8 text-center text-[11px] text-muted-foreground/60">© 2026 Fitbook Georgia. All rights reserved.</p>
+            <p className="mt-4 pb-8 text-center text-[11px] text-muted-foreground/60">{t("copyright")}</p>
           </div>
         </div>
       )}
@@ -352,27 +353,27 @@ export default function Auth() {
             <button onClick={goBack} className="flex h-11 w-11 items-center justify-center rounded-full bg-card shadow-sm">
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
-            <span className="text-base font-semibold text-foreground">Reset Password</span>
+            <span className="text-base font-semibold text-foreground">{t("resetPassword")}</span>
             <div className="w-11" />
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight text-foreground">Reset Your<br /><span className="text-primary">Password</span></h1>
-              <p className="mt-2 text-sm text-muted-foreground">Enter your email and we'll send you a reset link.</p>
+              <h1 className="text-3xl font-extrabold leading-tight text-foreground">{t("resetYourPassword")}<br /><span className="text-primary">{t("password")}</span></h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("resetDescription")}</p>
             </div>
             <form onSubmit={handleForgotPassword} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
-                <Input placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("email")}</label>
+                <Input placeholder={t("enterEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
-                {loading ? t("loading") : "Send Reset Link"}
+                {loading ? t("loading") : t("sendResetLink")}
               </Button>
             </form>
             <p className="mt-6 pb-8 text-center text-sm text-muted-foreground">
-              Remember your password?{" "}
-              <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary">Log In</button>
+              {t("rememberPassword")}{" "}
+              <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary">{t("login")}</button>
             </p>
           </div>
         </div>
@@ -422,37 +423,37 @@ export default function Auth() {
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight text-foreground">Create Your<br /><span className="text-primary">Account</span></h1>
-              <p className="mt-2 text-sm text-muted-foreground">Start your fitness journey today.</p>
+              <h1 className="text-3xl font-extrabold leading-tight text-foreground">{t("createYourAccount")}<br /><span className="text-primary">{t("account")}</span></h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("startFitnessJourney")}</p>
             </div>
             <form onSubmit={handleRegisterUser} className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">{t("fullName")}</label>
-                <Input placeholder="Enter your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+                <Input placeholder={t("enterFullName")} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("phoneNumber")} <span className="text-destructive">*</span></label>
                 <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Gender</label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("genderLabel")}</label>
                 <div className="flex gap-2">
-                  {["Male", "Female"].map((g) => (
-                    <button key={g} type="button" onClick={() => setGender(g.toLowerCase())}
-                      className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-all ${gender === g.toLowerCase() ? "bg-foreground text-background shadow-lg" : "border border-border bg-card text-muted-foreground"}`}>
-                      {g}
+                  {([{ key: "male", label: t("male") }, { key: "female", label: t("female") }]).map((g) => (
+                    <button key={g.key} type="button" onClick={() => setGender(g.key)}
+                      className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-all ${gender === g.key ? "bg-foreground text-background shadow-lg" : "border border-border bg-card text-muted-foreground"}`}>
+                      {g.label}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
-                <Input placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("email")}</label>
+                <Input placeholder={t("enterEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Password</label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("password")}</label>
                 <div className="relative">
-                  <Input placeholder="Create a password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 pr-12 text-sm shadow-none" />
+                  <Input placeholder={t("createPassword")} type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 pr-12 text-sm shadow-none" />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
@@ -460,10 +461,10 @@ export default function Auth() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <p className="text-xs text-muted-foreground text-center">
-                By signing up, you agree to our{" "}
-                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
-                {" "}and{" "}
-                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+                {t("bySigningUp")}{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">{t("termsAndConditions")}</button>
+                {" "}{t("and")}{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">{t("privacyPolicy")}</button>.
               </p>
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
                 {loading ? t("loading") : t("signUp")}
@@ -486,7 +487,7 @@ export default function Auth() {
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
             <span className="rounded-full border border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
-              Partner
+              {t("partner")}
             </span>
             <div className="w-11" />
           </div>
@@ -495,17 +496,17 @@ export default function Auth() {
             {/* Hero */}
             <div className="mb-8">
               <h1 className="text-[32px] font-extrabold leading-[1.1] text-foreground">
-                Start Training{"\n"}<br />
-                <span className="text-primary">with Us</span>
+                {t("startTrainingWithUs")}{"\n"}<br />
+                <span className="text-primary">{t("withUs")}</span>
               </h1>
               <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-                Join the elite network of fitness professionals and grow your sports business.
+                {t("joinEliteNetwork")}
               </p>
             </div>
 
             {/* Partner type selector */}
             <div className="mb-6">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">I am a...</p>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">{t("iAmA")}</p>
               <div className="flex rounded-2xl border border-border bg-card overflow-hidden">
                 <button
                   type="button"
@@ -518,7 +519,7 @@ export default function Auth() {
                   )}
                 >
                   <User className="h-4 w-4" />
-                  Individual Trainer
+                  {t("individualTrainer")}
                 </button>
                 <button
                   type="button"
@@ -531,7 +532,7 @@ export default function Auth() {
                   )}
                 >
                   <Building2 className="h-4 w-4" />
-                  Gym / Place
+                  {t("gymPlace")}
                 </button>
               </div>
             </div>
@@ -540,7 +541,7 @@ export default function Auth() {
               {/* Name */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Name / Gym Name
+                  {t("nameGymName")}
                 </label>
                 <div className="relative">
                   <Input
@@ -557,7 +558,7 @@ export default function Auth() {
               {/* Email */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Professional Email
+                  {t("professionalEmail")}
                 </label>
                 <div className="relative">
                   <Input
@@ -575,7 +576,7 @@ export default function Auth() {
               {/* Phone Number */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Phone Number <span className="text-destructive">*</span>
+                  {t("phoneNumber")} <span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <Input
@@ -592,11 +593,11 @@ export default function Auth() {
               {/* Password */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Password
+                  {t("password")}
                 </label>
                 <div className="relative">
                   <Input
-                    placeholder="Create a secure password"
+                    placeholder={t("createSecurePassword")}
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -616,9 +617,9 @@ export default function Auth() {
                   <ShieldCheck className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">Premium Verification</p>
+                  <p className="text-sm font-bold text-foreground">{t("premiumVerification")}</p>
                   <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">
-                    All partners undergo a brief screening to ensure the highest quality of service for our community.
+                    {t("verificationDescription")}
                   </p>
                 </div>
               </div>
@@ -626,10 +627,10 @@ export default function Auth() {
               {error && <p className="text-sm text-destructive">{error}</p>}
 
               <p className="text-xs text-muted-foreground text-center">
-                By creating a partner account, you agree to our{" "}
-                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms & Conditions</button>
-                {" "}and{" "}
-                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy Policy</button>.
+                {t("byCreatingPartner")}{" "}
+                <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">{t("termsAndConditions")}</button>
+                {" "}{t("and")}{" "}
+                <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">{t("privacyPolicy")}</button>.
               </p>
 
               {/* Submit */}
@@ -640,7 +641,7 @@ export default function Auth() {
               >
                 {loading ? t("loading") : (
                   <span className="flex items-center gap-2">
-                    Create Partner Account
+                    {t("createPartnerAccount")}
                     <ArrowRight className="h-5 w-5" />
                   </span>
                 )}
@@ -648,9 +649,9 @@ export default function Auth() {
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Already a partner?{" "}
+              {t("alreadyPartner")}{" "}
               <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary">
-                Log in
+                {t("login")}
               </button>
             </p>
           </div>

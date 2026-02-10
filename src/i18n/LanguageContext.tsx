@@ -9,10 +9,27 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+function detectDeviceLanguage(): Language {
+  const saved = localStorage.getItem("fitbook-lang") as Language | null;
+  if (saved && saved in translations) return saved;
+
+  // Check navigator languages (works on iOS, Android WebView, and browsers)
+  const languages = navigator.languages?.length
+    ? navigator.languages
+    : [navigator.language];
+
+  for (const locale of languages) {
+    const code = locale.toLowerCase().split("-")[0];
+    if (code === "ka") return "ka";
+    if (code === "ru") return "ru";
+    if (code === "en") return "en";
+  }
+
+  return "en"; // default fallback
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Language>(
-    () => (localStorage.getItem("fitbook-lang") as Language) || "en"
-  );
+  const [lang, setLangState] = useState<Language>(detectDeviceLanguage);
 
   const setLang = useCallback((newLang: Language) => {
     setLangState(newLang);

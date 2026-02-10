@@ -57,6 +57,9 @@ export const translations = {
     confirmEmailFirst: "Please check your email and confirm your account first.",
     alreadyRegistered: "This email is already registered. Try logging in instead.",
     passwordMinLength: "Password must be at least 6 characters.",
+    genderLabel: "Gender",
+    male: "Male",
+    female: "Female",
 
     // Partner Registration
     partner: "Partner",
@@ -708,6 +711,9 @@ export const translations = {
     confirmEmailFirst: "გთხოვთ შეამოწმოთ ელფოსტა და დაადასტუროთ ანგარიში.",
     alreadyRegistered: "ეს ელფოსტა უკვე რეგისტრირებულია. სცადეთ შესვლა.",
     passwordMinLength: "პაროლი მინიმუმ 6 სიმბოლოიანი უნდა იყოს.",
+    genderLabel: "სქესი",
+    male: "მამრობითი",
+    female: "მდედრობითი",
 
     // Partner Registration
     partner: "პარტნიორი",
@@ -1359,6 +1365,9 @@ export const translations = {
     confirmEmailFirst: "Пожалуйста, проверьте почту и подтвердите аккаунт.",
     alreadyRegistered: "Эта почта уже зарегистрирована. Попробуйте войти.",
     passwordMinLength: "Пароль должен быть не менее 6 символов.",
+    genderLabel: "Пол",
+    male: "Мужской",
+    female: "Женский",
 
     // Partner Registration
     partner: "Партнёр",
