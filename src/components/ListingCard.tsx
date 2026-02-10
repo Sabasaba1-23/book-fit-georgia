@@ -363,6 +363,28 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </p>
           )}
 
+          {/* Venue Fee callout */}
+          {hasVenueFee && (
+            <div className="mx-5 mb-4 rounded-2xl border-2 border-primary/20 bg-primary/5 p-4">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-2">
+                  <Landmark className="h-5 w-5 text-primary" />
+                  <span className="text-[15px] font-bold text-foreground">Venue Entry Fee</span>
+                </div>
+                <span className="text-[20px] font-bold text-primary">{listing.venue_fee_gel}₾</span>
+              </div>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">
+                Paid directly at the venue desk · Not included in session price
+              </p>
+              <div className="mt-2 flex items-center justify-between rounded-xl bg-background/60 px-3 py-2">
+                <span className="text-[13px] text-muted-foreground">Total cost</span>
+                <span className="text-[16px] font-bold text-foreground">
+                  {listing.price_gel + (listing.venue_fee_gel || 0)}₾
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Description */}
           <div className="px-5 pb-4">
             <p className="text-label mb-2">{t("aboutSession") || "About"}</p>
