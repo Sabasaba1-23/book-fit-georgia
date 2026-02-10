@@ -31,6 +31,7 @@ interface PartnerMessagesTabProps {
 }
 
 export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTabProps) {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
