@@ -431,7 +431,7 @@ export default function Auth() {
                 <Input placeholder={t("enterFullName")} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("phoneNumber")} <span className="text-destructive">*</span></label>
                 <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
