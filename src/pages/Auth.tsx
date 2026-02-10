@@ -187,8 +187,8 @@ export default function Auth() {
     }
 
     toast({
-      title: "Partner account created! 🎉",
-      description: "Check your email for verification. Our team will review your profile shortly.",
+      title: t("partnerAccountCreated"),
+      description: t("partnerCreatedDescription"),
     });
     setLoading(false);
     setMode("login");
