@@ -900,17 +900,17 @@ export default function PartnerProfile() {
                     className="flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-muted/30 active:scale-[0.99]"
                     onClick={() => setExpandedListingId(isExpanded ? null : listing.id)}
                   >
-                    {listing.background_image_url ? (
-                      <img
-                        src={listing.background_image_url}
-                        alt=""
-                        className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                        <Dumbbell className="h-5 w-5 text-primary" />
-                      </div>
-                    )}
+                    {(() => {
+                      const imgUrl = listing.background_image_url || SPORT_FALLBACK_IMAGES[listing.sport] || SPORT_FALLBACK_IMAGES.HIIT;
+                      return (
+                        <img
+                          src={imgUrl}
+                          alt=""
+                          className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                          loading="lazy"
+                        />
+                      );
+                    })()}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="text-[13px] font-bold text-foreground truncate max-w-[140px]">{lTitle}</p>
