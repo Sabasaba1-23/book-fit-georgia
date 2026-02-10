@@ -198,7 +198,7 @@ export default function Auth() {
     e.preventDefault();
     setError("");
     if (!email) {
-      setError("Please enter your email address.");
+      setError(t("enterEmail"));
       return;
     }
     setLoading(true);
