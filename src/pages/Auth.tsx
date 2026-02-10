@@ -340,7 +340,7 @@ export default function Auth() {
               <button type="button" onClick={() => setMode("register-choice")} className="font-semibold text-primary">{t("signUp")}</button>
             </p>
 
-            <p className="mt-4 pb-8 text-center text-[11px] text-muted-foreground/60">© 2026 Fitbook Georgia. All rights reserved.</p>
+            <p className="mt-4 pb-8 text-center text-[11px] text-muted-foreground/60">{t("copyright")}</p>
           </div>
         </div>
       )}
