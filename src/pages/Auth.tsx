@@ -284,7 +284,7 @@ export default function Auth() {
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Email</label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("email")}</label>
                 <Input placeholder="Enter your email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
