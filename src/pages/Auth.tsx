@@ -207,7 +207,7 @@ export default function Auth() {
     });
     if (error) setError(error.message);
     else {
-      toast({ title: "Reset link sent", description: "Check your email for a password reset link." });
+      toast({ title: t("resetLinkSent"), description: t("resetLinkDescription") });
       setMode("login");
     }
     setLoading(false);
