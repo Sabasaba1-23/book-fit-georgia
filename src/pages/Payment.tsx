@@ -293,7 +293,7 @@ export default function Payment() {
 
         {/* Security note */}
         <div className="flex items-center gap-2.5 rounded-2xl bg-muted/30 px-4 py-3">
-          <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
+          <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
           <p className="text-[11px] text-muted-foreground leading-relaxed">
             {t("demoModeNote")}
           </p>
