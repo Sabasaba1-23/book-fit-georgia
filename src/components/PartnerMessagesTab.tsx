@@ -210,7 +210,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <MessageCircle className="h-10 w-10 text-muted-foreground/30 mb-3" />
-              <p className="text-sm text-muted-foreground">Start the conversation!</p>
+              <p className="text-sm text-muted-foreground">{t("msgStartConversation")}</p>
             </div>
           )}
           {messages.map((msg) => {
