@@ -22,6 +22,7 @@ const WEIGHTS = {
   popularity: 20,
   recency: 10,
   freshness: 5,
+  proSubscription: 8,
 } as const;
 
 const RECENCY_DECAY_DAYS = 30;
