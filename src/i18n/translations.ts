@@ -638,6 +638,8 @@ export const translations = {
     schedTotalRevenue: "Total Revenue",
     schedSpot: "spot",
     schedSpots: "spots",
+    schedToday: "Today",
+    schedTomorrow: "Tomorrow",
 
     // Messages Tab
     msgNoMessages: "No messages yet",
