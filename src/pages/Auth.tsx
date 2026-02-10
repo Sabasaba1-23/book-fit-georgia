@@ -648,9 +648,9 @@ export default function Auth() {
             </form>
 
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Already a partner?{" "}
+              {t("alreadyPartner")}{" "}
               <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary">
-                Log in
+                {t("login")}
               </button>
             </p>
           </div>
