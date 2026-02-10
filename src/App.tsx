@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import Home from "./pages/Home";
+import InAppBrowserBanner from "@/components/InAppBrowserBanner";
 
 // Lazy-loaded routes for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
