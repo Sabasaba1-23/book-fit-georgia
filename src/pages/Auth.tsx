@@ -307,7 +307,7 @@ export default function Auth() {
 
             <Button variant="outline" onClick={() => setMode("register-partner")} className="mt-3 h-14 w-full rounded-2xl border-primary/30 bg-primary/5 text-base font-semibold text-primary hover:bg-primary/10">
               <Handshake className="mr-2 h-5 w-5" />
-              Join as a Partner
+              {t("joinAsPartner")}
             </Button>
 
             <div className="my-6 flex items-center gap-3">
