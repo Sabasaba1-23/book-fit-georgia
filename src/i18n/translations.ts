@@ -711,6 +711,9 @@ export const translations = {
     confirmEmailFirst: "გთხოვთ შეამოწმოთ ელფოსტა და დაადასტუროთ ანგარიში.",
     alreadyRegistered: "ეს ელფოსტა უკვე რეგისტრირებულია. სცადეთ შესვლა.",
     passwordMinLength: "პაროლი მინიმუმ 6 სიმბოლოიანი უნდა იყოს.",
+    genderLabel: "სქესი",
+    male: "მამრობითი",
+    female: "მდედრობითი",
 
     // Partner Registration
     partner: "პარტნიორი",
