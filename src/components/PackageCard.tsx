@@ -311,14 +311,6 @@ export default function PackageCard({ pkg }: PackageCardProps) {
         </div>
       )}
 
-      <PaymentSheet
-        open={showPayment}
-        onOpenChange={setShowPayment}
-        amount={pkg.total_price_gel}
-        title={`${title} (${pkg.sessions_count} sessions)`}
-        onPaymentSuccess={handlePaymentSuccess}
-        loading={booking}
-      />
       <BookingTicket
         open={showTicket}
         onClose={() => {
