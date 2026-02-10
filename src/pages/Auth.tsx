@@ -422,8 +422,8 @@ export default function Auth() {
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight text-foreground">Create Your<br /><span className="text-primary">Account</span></h1>
-              <p className="mt-2 text-sm text-muted-foreground">Start your fitness journey today.</p>
+              <h1 className="text-3xl font-extrabold leading-tight text-foreground">{t("createYourAccount")}<br /><span className="text-primary">{t("account")}</span></h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("startFitnessJourney")}</p>
             </div>
             <form onSubmit={handleRegisterUser} className="space-y-4">
               <div>
