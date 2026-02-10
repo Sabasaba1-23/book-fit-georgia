@@ -281,6 +281,14 @@ export default function PartnerDashboard() {
             onGetVerified={() => setShowVerification(true)}
           />
 
+          {/* Subscription Banner */}
+          <SubscriptionBanner
+            bookingsLast30Days={bookingsLast30Days}
+            isOverFreeLimit={isOverFreeLimit}
+            isPro={isPro}
+            onUpgrade={upgradeToPro}
+          />
+
           {/* Create New Listing button */}
           <button
             onClick={() => setShowCreate(true)}
