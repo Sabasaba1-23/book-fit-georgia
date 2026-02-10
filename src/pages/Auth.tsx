@@ -575,7 +575,7 @@ export default function Auth() {
               {/* Phone Number */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Phone Number <span className="text-destructive">*</span>
+                  {t("phoneNumber")} <span className="text-destructive">*</span>
                 </label>
                 <div className="relative">
                   <Input
