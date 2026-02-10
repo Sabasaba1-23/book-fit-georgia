@@ -64,6 +64,7 @@ export default function PartnerDashboard() {
   const { profile, loading: profileLoading, refetch: refetchProfile } = usePartnerProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { bookingsLast30Days, isOverFreeLimit, isPro, upgradeToPro } = usePartnerSubscription(profile?.id);
 
   const [listings, setListings] = useState<PartnerListing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
