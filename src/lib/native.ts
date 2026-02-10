@@ -55,12 +55,24 @@ export async function initNativePlugins() {
     }
   }
 
-  // Deep link handling
+  // Deep link handling (including OAuth callbacks)
   try {
     const { App: CapApp } = await import('@capacitor/app');
     CapApp.addListener('appUrlOpen', ({ url }) => {
       try {
         const parsed = new URL(url);
+
+        // Handle OAuth / auth callback tokens from Supabase
+        const fragment = parsed.hash?.startsWith('#') ? parsed.hash.substring(1) : '';
+        const params = new URLSearchParams(fragment || parsed.search);
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          supabase.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+          return;
+        }
+
         const path = parsed.pathname + parsed.search + parsed.hash;
         if (path && path !== '/') {
           window.location.href = path;
