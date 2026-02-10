@@ -92,6 +92,7 @@ interface ListingCardProps {
     goals?: string[] | null;
     gym_name?: string | null;
     location_type?: string | null;
+    venue_fee_gel?: number | null;
     status: string;
     booked_spots?: number;
     partner_id?: string;
