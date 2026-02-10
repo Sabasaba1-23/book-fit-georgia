@@ -486,7 +486,7 @@ export default function Auth() {
               <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
             <span className="rounded-full border border-primary/30 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-primary">
-              Partner
+              {t("partner")}
             </span>
             <div className="w-11" />
           </div>
