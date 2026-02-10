@@ -327,10 +327,10 @@ export default function Auth() {
             </button>
 
             <div className="mt-4 flex items-center justify-center gap-1.5 flex-wrap text-[11px] text-muted-foreground">
-              <span>By continuing, you agree to our</span>
-              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">Terms</button>
+              <span>{t("byContacting")}</span>
+              <button type="button" onClick={() => navigate("/terms")} className="underline text-primary">{t("terms")}</button>
               <span>&</span>
-              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">Privacy</button>
+              <button type="button" onClick={() => navigate("/privacy")} className="underline text-primary">{t("privacy")}</button>
               <span>·</span>
               <ContactPopover />
             </div>
