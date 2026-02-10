@@ -435,12 +435,12 @@ export default function Auth() {
                 <Input placeholder="+995 5XX XXX XXX" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-foreground">Gender</label>
+                <label className="mb-1.5 block text-sm font-medium text-foreground">{t("genderLabel")}</label>
                 <div className="flex gap-2">
-                  {["Male", "Female"].map((g) => (
-                    <button key={g} type="button" onClick={() => setGender(g.toLowerCase())}
-                      className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-all ${gender === g.toLowerCase() ? "bg-foreground text-background shadow-lg" : "border border-border bg-card text-muted-foreground"}`}>
-                      {g}
+                  {([{ key: "male", label: t("male") }, { key: "female", label: t("female") }]).map((g) => (
+                    <button key={g.key} type="button" onClick={() => setGender(g.key)}
+                      className={`flex-1 rounded-2xl py-3 text-sm font-semibold transition-all ${gender === g.key ? "bg-foreground text-background shadow-lg" : "border border-border bg-card text-muted-foreground"}`}>
+                      {g.label}
                     </button>
                   ))}
                 </div>
