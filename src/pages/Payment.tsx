@@ -141,8 +141,8 @@ export default function Payment() {
   if (success) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background animate-in fade-in duration-300 p-6">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 mb-4">
-          <CheckCircle2 className="h-10 w-10 text-emerald-600" />
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-4">
+          <CheckCircle2 className="h-10 w-10 text-primary" />
         </div>
         <h3 className="text-xl font-extrabold text-foreground">
           {t("paymentSuccessful")}
