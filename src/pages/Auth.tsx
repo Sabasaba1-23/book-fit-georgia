@@ -114,7 +114,7 @@ export default function Auth() {
       return;
     }
     if (!phoneNumber.trim()) {
-      setError("Please enter your phone number.");
+      setError(t("enterPhoneNumber"));
       return;
     }
     setLoading(true);
