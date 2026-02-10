@@ -557,7 +557,7 @@ export default function Auth() {
               {/* Email */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Professional Email
+                  {t("professionalEmail")}
                 </label>
                 <div className="relative">
                   <Input
