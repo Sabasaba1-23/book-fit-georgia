@@ -153,7 +153,6 @@ export default function PartnerProfile() {
   const [locationExpanded, setLocationExpanded] = useState(false);
   const [expandedListingId, setExpandedListingId] = useState<string | null>(null);
   const [showTicket, setShowTicket] = useState(false);
-  const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
   const [ticketListing, setTicketListing] = useState<ListingData | null>(null);
   const entityType = partner?.partner_type === "gym" ? "studio" as const : "trainer" as const;
