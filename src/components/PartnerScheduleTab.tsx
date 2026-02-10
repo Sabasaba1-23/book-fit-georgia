@@ -151,7 +151,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
             filter === "upcoming" ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
           )}
         >
-          Upcoming
+          {t("schedUpcoming")}
         </button>
         <button
           onClick={() => setFilter("past")}
@@ -160,7 +160,7 @@ export default function PartnerScheduleTab({ partnerId }: PartnerScheduleTabProp
             filter === "past" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
           )}
         >
-          Past
+          {t("schedPast")}
         </button>
       </div>
 
