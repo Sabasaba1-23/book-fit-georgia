@@ -62,6 +62,17 @@ interface ListingData {
   max_spots: number;
   status: string;
   background_image_url: string | null;
+  description_en: string | null;
+  description_ka: string | null;
+  equipment_notes_en: string | null;
+  equipment_notes_ka: string | null;
+  rental_info_en: string | null;
+  rental_info_ka: string | null;
+  difficulty_level: string | null;
+  goals: string[] | null;
+  gym_name: string | null;
+  location_type: string | null;
+  location: string | null;
 }
 
 interface ReviewData {
