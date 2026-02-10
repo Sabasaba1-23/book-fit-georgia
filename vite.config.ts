@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "placeholder.svg"],
+      includeAssets: ["logo.svg", "placeholder.svg"],
       manifest: {
         name: "FitBook Georgia",
         short_name: "FitBook",
@@ -31,6 +31,12 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         icons: [
           {
+            src: "/logo.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any maskable",
+          },
+          {
             src: "/pwa-192x192.png",
             sizes: "192x192",
             type: "image/png",
@@ -39,7 +45,6 @@ export default defineConfig(({ mode }) => ({
             src: "/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
           },
         ],
       },
