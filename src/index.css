@@ -100,12 +100,11 @@
 
   html {
     touch-action: pan-x pan-y;
-    overflow-x: hidden;
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     text-size-adjust: 100%;
     height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   body {
@@ -117,13 +116,13 @@
     overscroll-behavior: none;
     -webkit-overscroll-behavior: none;
     height: 100%;
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
   #root {
     min-height: 100%;
-    overflow-x: hidden;
     padding-top: var(--sat);
     padding-bottom: var(--sab);
     background: hsl(var(--background));

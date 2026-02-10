@@ -201,7 +201,7 @@ export default function Home() {
   const firstName = user?.user_metadata?.full_name?.split(" ")[0] || null;
 
   return (
-    <div className="relative min-h-screen bg-background overflow-x-hidden overscroll-none mx-auto max-w-7xl pb-[calc(60px+var(--sab))]">
+    <div className="relative min-h-screen bg-background overscroll-none mx-auto max-w-7xl pb-[calc(60px+var(--sab))]">
 
       {/* Header */}
       <header className="relative z-40 px-5 md:px-6 pt-8 pb-4">
