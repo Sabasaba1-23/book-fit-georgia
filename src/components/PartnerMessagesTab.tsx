@@ -288,7 +288,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
               <span className="text-[10px] text-muted-foreground shrink-0 ml-2">{formatThreadTime(thread.lastMessageAt || thread.created_at)}</span>
             </div>
             {thread.listingTitle && <p className="text-[11px] text-primary font-medium truncate">{thread.listingTitle}</p>}
-            <p className="text-xs text-muted-foreground truncate mt-0.5">{thread.lastMessage || "No messages yet"}</p>
+            <p className="text-xs text-muted-foreground truncate mt-0.5">{thread.lastMessage || t("msgNoMessages")}</p>
           </div>
         </button>
       ))}
