@@ -1365,6 +1365,9 @@ export const translations = {
     confirmEmailFirst: "Пожалуйста, проверьте почту и подтвердите аккаунт.",
     alreadyRegistered: "Эта почта уже зарегистрирована. Попробуйте войти.",
     passwordMinLength: "Пароль должен быть не менее 6 символов.",
+    genderLabel: "Пол",
+    male: "Мужской",
+    female: "Женский",
 
     // Partner Registration
     partner: "Партнёр",
