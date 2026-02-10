@@ -96,9 +96,9 @@ export default function Auth() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       if (error.message === "Invalid login credentials") {
-        setError("Incorrect email or password. Please try again.");
+        setError(t("incorrectCredentials"));
       } else if (error.message.includes("Email not confirmed")) {
-        setError("Please check your email and confirm your account first.");
+        setError(t("confirmEmailFirst"));
       } else {
         setError(error.message);
       }
@@ -110,11 +110,11 @@ export default function Auth() {
     e.preventDefault();
     setError("");
     if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t("passwordMinLength"));
       return;
     }
     if (!phoneNumber.trim()) {
-      setError("Please enter your phone number.");
+      setError(t("enterPhoneNumber"));
       return;
     }
     setLoading(true);
@@ -128,14 +128,14 @@ export default function Auth() {
     });
     if (error) {
       if (error.message.includes("already registered")) {
-        setError("This email is already registered. Try logging in instead.");
+        setError(t("alreadyRegistered"));
       } else {
         setError(error.message);
       }
     } else {
       toast({
-        title: "Check your email",
-        description: "We sent you a confirmation link to verify your account.",
+        title: t("checkYourEmail"),
+        description: t("confirmationLinkSent"),
       });
     }
     setLoading(false);
@@ -146,19 +146,19 @@ export default function Auth() {
     setError("");
 
     if (!partnerName.trim()) {
-      setError("Please enter your name or gym name.");
+      setError(t("enterNameOrGym"));
       return;
     }
     if (!partnerEmail.trim()) {
-      setError("Please enter your professional email.");
+      setError(t("enterProfessionalEmail"));
       return;
     }
     if (!partnerPhone.trim()) {
-      setError("Please enter your phone number.");
+      setError(t("enterPhoneNumber"));
       return;
     }
     if (!password || password.length < 6) {
-      setError("Password must be at least 6 characters.");
+      setError(t("passwordMinLength"));
       return;
     }
 
@@ -187,8 +187,8 @@ export default function Auth() {
     }
 
     toast({
-      title: "Partner account created! 🎉",
-      description: "Check your email for verification. Our team will review your profile shortly.",
+      title: t("partnerAccountCreated"),
+      description: t("partnerCreatedDescription"),
     });
     setLoading(false);
     setMode("login");
@@ -198,7 +198,7 @@ export default function Auth() {
     e.preventDefault();
     setError("");
     if (!email) {
-      setError("Please enter your email address.");
+      setError(t("enterEmail"));
       return;
     }
     setLoading(true);
@@ -207,7 +207,7 @@ export default function Auth() {
     });
     if (error) setError(error.message);
     else {
-      toast({ title: "Reset link sent", description: "Check your email for a password reset link." });
+      toast({ title: t("resetLinkSent"), description: t("resetLinkDescription") });
       setMode("login");
     }
     setLoading(false);
@@ -391,8 +391,8 @@ export default function Auth() {
           </div>
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
-              <h1 className="text-3xl font-extrabold leading-tight text-foreground">Join<br /><span className="text-primary">FitBook</span></h1>
-              <p className="mt-2 text-sm text-muted-foreground">How do you want to use FitBook?</p>
+              <h1 className="text-3xl font-extrabold leading-tight text-foreground">{t("joinFitBook")}<br /><span className="text-primary">FitBook</span></h1>
+              <p className="mt-2 text-sm text-muted-foreground">{t("howToUseFitBook")}</p>
             </div>
             <div className="space-y-3">
               <Button onClick={() => setMode("register-user")} variant="outline" className="h-16 w-full rounded-2xl border-border bg-card text-base font-semibold shadow-sm">
