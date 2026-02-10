@@ -336,7 +336,7 @@ export default function Auth() {
             </div>
 
             <p className="mt-4 text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
+              {t("noAccount")}{" "}
               <button type="button" onClick={() => setMode("register-choice")} className="font-semibold text-primary">{t("signUp")}</button>
             </p>
 
