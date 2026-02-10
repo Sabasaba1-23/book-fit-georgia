@@ -1921,6 +1921,29 @@ export const translations = {
     payoutHistoryDesc: "Отслеживайте свои доходы",
     noPayoutsYet: "Пока нет выплат",
     payoutHistoryHere: "Ваша история выплат появится здесь",
+
+    // Schedule Tab
+    schedCompleted: "Завершено",
+    schedInProgress: "В процессе",
+    schedStartingSoon: "Скоро начнётся",
+    schedUpcoming: "Предстоящие",
+    schedPast: "Прошедшие",
+    schedNoUpcoming: "Нет предстоящих сессий",
+    schedNoPast: "Нет прошедших сессий",
+    schedAttendees: "Участники",
+    schedNoBookings: "Пока нет бронирований",
+    schedAnonymous: "Аноним",
+    schedTotalRevenue: "Общий доход",
+    schedSpot: "место",
+    schedSpots: "мест",
+
+    // Messages Tab
+    msgNoMessages: "Пока нет сообщений",
+    msgNoMessagesDesc: "Клиенты напишут вам после бронирования",
+    msgStartConversation: "Начните разговор!",
+    msgTypePlaceholder: "Введите сообщение...",
+    msgClient: "Клиент",
+    msgYesterday: "Вчера",
   },
 } as const;
 
