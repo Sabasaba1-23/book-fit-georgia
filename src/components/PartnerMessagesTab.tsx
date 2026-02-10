@@ -201,7 +201,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground truncate">{activeThread.otherUser?.display_name || "Client"}</p>
+            <p className="text-sm font-bold text-foreground truncate">{activeThread.otherUser?.display_name || t("msgClient")}</p>
             {activeThread.listingTitle && <p className="text-[11px] text-muted-foreground truncate">{activeThread.listingTitle}</p>}
           </div>
         </div>
