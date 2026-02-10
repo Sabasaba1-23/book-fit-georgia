@@ -100,6 +100,7 @@ export default function CreateListingSheet({
   const [durationMinutes, setDurationMinutes] = useState("60");
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
   const [recurring, setRecurring] = useState<"none" | "weekly" | "biweekly" | "monthly">("none");
+  const [venueFee, setVenueFee] = useState("");
 
   const totalSteps = 3;
 
