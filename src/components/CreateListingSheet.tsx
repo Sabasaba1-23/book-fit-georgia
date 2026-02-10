@@ -138,6 +138,7 @@ export default function CreateListingSheet({
     setDurationMinutes("60");
     setSelectedGoals([]);
     setRecurring("none");
+    setVenueFee("");
   };
 
   const handleClose = () => {
