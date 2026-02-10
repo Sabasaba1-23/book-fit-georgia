@@ -540,7 +540,7 @@ export default function Auth() {
               {/* Name */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Name / Gym Name
+                  {t("nameGymName")}
                 </label>
                 <div className="relative">
                   <Input
