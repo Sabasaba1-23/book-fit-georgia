@@ -301,7 +301,7 @@ export default function Auth() {
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
-                {loading ? t("loading") : "Log In"}
+                {loading ? t("loading") : t("login")}
               </Button>
             </form>
 
