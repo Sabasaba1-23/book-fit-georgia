@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { Banknote, CreditCard, History, Save, CheckCircle2 } from "lucide-react";
 
 interface PayoutRecord {
@@ -14,6 +15,7 @@ interface PayoutRecord {
 
 export default function PartnerPaymentsTab({ partnerId }: { partnerId: string }) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [bankName, setBankName] = useState("");
@@ -59,9 +61,9 @@ export default function PartnerPaymentsTab({ partnerId }: { partnerId: string })
     }
 
     if (error) {
-      toast({ title: "Failed to save", description: error.message, variant: "destructive" });
+      toast({ title: t("failedToSave"), description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Bank details saved ✓" });
+      toast({ title: t("bankDetailsSaved") });
     }
     setSaving(false);
   };
@@ -76,92 +78,66 @@ export default function PartnerPaymentsTab({ partnerId }: { partnerId: string })
 
   return (
     <div className="space-y-6">
-      {/* Bank Account Details */}
       <div className="rounded-2xl border border-border/50 bg-card p-5">
         <div className="flex items-center gap-2.5 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
             <Banknote className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-foreground">Bank Account</h3>
-            <p className="text-[12px] text-muted-foreground">Receive payouts to your bank</p>
+            <h3 className="text-base font-bold text-foreground">{t("bankAccount")}</h3>
+            <p className="text-[12px] text-muted-foreground">{t("bankAccountDesc")}</p>
           </div>
-          {existingId && (
-            <CheckCircle2 className="ml-auto h-5 w-5 text-primary" />
-          )}
+          {existingId && <CheckCircle2 className="ml-auto h-5 w-5 text-primary" />}
         </div>
         <div className="space-y-3">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Bank Name</label>
-            <Input
-              placeholder="e.g., Bank of Georgia"
-              value={bankName}
-              onChange={(e) => setBankName(e.target.value)}
-              className="h-12 rounded-xl border-0 bg-muted/60 text-sm"
-            />
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("bankNameLabel")}</label>
+            <Input placeholder={t("bankNamePlaceholder")} value={bankName} onChange={(e) => setBankName(e.target.value)} className="h-12 rounded-xl border-0 bg-muted/60 text-sm" />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Account Holder Name</label>
-            <Input
-              placeholder="Full name on account"
-              value={accountHolder}
-              onChange={(e) => setAccountHolder(e.target.value)}
-              className="h-12 rounded-xl border-0 bg-muted/60 text-sm"
-            />
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("accountHolderLabel")}</label>
+            <Input placeholder={t("accountHolderPlaceholder")} value={accountHolder} onChange={(e) => setAccountHolder(e.target.value)} className="h-12 rounded-xl border-0 bg-muted/60 text-sm" />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">IBAN / Account Number</label>
-            <Input
-              placeholder="GE00TB0000000000000000"
-              value={iban}
-              onChange={(e) => setIban(e.target.value)}
-              className="h-12 rounded-xl border-0 bg-muted/60 text-sm font-mono"
-            />
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("ibanLabel")}</label>
+            <Input placeholder={t("ibanPlaceholder")} value={iban} onChange={(e) => setIban(e.target.value)} className="h-12 rounded-xl border-0 bg-muted/60 text-sm font-mono" />
           </div>
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            className="w-full h-12 rounded-xl bg-primary text-sm font-bold"
-          >
+          <Button onClick={handleSave} disabled={saving} className="w-full h-12 rounded-xl bg-primary text-sm font-bold">
             <Save className="h-4 w-4 mr-2" />
-            {saving ? "Saving..." : existingId ? "Update Details" : "Save Details"}
+            {saving ? t("savingLabel") : existingId ? t("updateDetails") : t("saveDetails")}
           </Button>
         </div>
       </div>
 
-      {/* Card for Payouts — Coming Soon */}
       <div className="rounded-2xl border border-border/50 bg-card p-5 opacity-60">
         <div className="flex items-center gap-2.5 mb-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
             <CreditCard className="h-5 w-5 text-muted-foreground" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-foreground">Card Payouts</h3>
-            <p className="text-[12px] text-muted-foreground">Receive payouts to your card</p>
+            <h3 className="text-base font-bold text-foreground">{t("cardPayouts")}</h3>
+            <p className="text-[12px] text-muted-foreground">{t("cardPayoutsDesc")}</p>
           </div>
           <span className="ml-auto rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
-            Coming Soon
+            {t("comingSoon")}
           </span>
         </div>
-        <p className="text-[13px] text-muted-foreground">
-          Card-based payouts via Stripe Connect will be available soon.
-        </p>
+        <p className="text-[13px] text-muted-foreground">{t("cardPayoutsComingSoon")}</p>
       </div>
 
-      {/* Payout History */}
       <div className="rounded-2xl border border-border/50 bg-card p-5">
         <div className="flex items-center gap-2.5 mb-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
             <History className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-foreground">Payout History</h3>
-            <p className="text-[12px] text-muted-foreground">Track your earnings</p>
+            <h3 className="text-base font-bold text-foreground">{t("payoutHistory")}</h3>
+            <p className="text-[12px] text-muted-foreground">{t("payoutHistoryDesc")}</p>
           </div>
         </div>
         <div className="rounded-xl bg-muted/40 py-8 text-center">
-          <p className="text-sm text-muted-foreground">No payouts yet</p>
-          <p className="text-[12px] text-muted-foreground/60 mt-1">Your payout history will appear here</p>
+          <p className="text-sm text-muted-foreground">{t("noPayoutsYet")}</p>
+          <p className="text-[12px] text-muted-foreground/60 mt-1">{t("payoutHistoryHere")}</p>
         </div>
       </div>
     </div>
