@@ -576,6 +576,47 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          partner_id: string
+          period_end: string | null
+          period_start: string | null
+          plan: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          partner_id: string
+          period_end?: string | null
+          period_start?: string | null
+          plan?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          partner_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          plan?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_subscriptions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: true
+            referencedRelation: "partner_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       partner_verifications: {
         Row: {
           address: string | null

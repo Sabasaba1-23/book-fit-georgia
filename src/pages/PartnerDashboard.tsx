@@ -23,6 +23,8 @@ import PartnerPhotosMedia from "@/components/partner/PartnerPhotosMedia";
 import PartnerBadgesScreen from "@/components/partner/PartnerBadgesScreen";
 import PartnerSettings from "@/components/partner/PartnerSettings";
 import GymTrainerManager from "@/components/partner/GymTrainerManager";
+import { usePartnerSubscription } from "@/hooks/usePartnerSubscription";
+import SubscriptionBanner from "@/components/SubscriptionBanner";
 
 interface PartnerListing {
   id: string;
@@ -62,6 +64,7 @@ export default function PartnerDashboard() {
   const { profile, loading: profileLoading, refetch: refetchProfile } = usePartnerProfile();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { bookingsLast30Days, isOverFreeLimit, isPro, upgradeToPro } = usePartnerSubscription(profile?.id);
 
   const [listings, setListings] = useState<PartnerListing[]>([]);
   const [loadingListings, setLoadingListings] = useState(true);
@@ -276,6 +279,14 @@ export default function PartnerDashboard() {
             verificationStatus={profile.verification_status || "unverified"}
             partnerType={profile.partner_type as "individual" | "gym"}
             onGetVerified={() => setShowVerification(true)}
+          />
+
+          {/* Subscription Banner */}
+          <SubscriptionBanner
+            bookingsLast30Days={bookingsLast30Days}
+            isOverFreeLimit={isOverFreeLimit}
+            isPro={isPro}
+            onUpgrade={upgradeToPro}
           />
 
           {/* Create New Listing button */}
