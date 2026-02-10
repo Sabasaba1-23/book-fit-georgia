@@ -152,8 +152,7 @@ export default function PartnerProfile() {
   const [locations, setLocations] = useState<PartnerLocation[]>([]);
   const [locationExpanded, setLocationExpanded] = useState(false);
   const [expandedListingId, setExpandedListingId] = useState<string | null>(null);
-  const [paymentListingId, setPaymentListingId] = useState<string | null>(null);
-  const [bookingListing, setBookingListing] = useState(false);
+  const [showTicket, setShowTicket] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
   const [ticketListing, setTicketListing] = useState<ListingData | null>(null);
