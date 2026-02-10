@@ -121,11 +121,29 @@ function computeScore(
   return score;
 }
 
+function useProPartnerIds() {
+  return useQuery({
+    queryKey: ["proPartnerIds"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("partner_subscriptions")
+        .select("partner_id")
+        .eq("plan", "pro")
+        .eq("status", "active");
+      return new Set((data ?? []).map((r) => r.partner_id));
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useFeedRanking<L extends ScorableListing, P extends ScorablePackage>(
   listings: L[],
   packages: P[]
 ): { rankedListings: L[]; rankedPackages: P[]; interestsLoading: boolean } {
   const { data: interests = [], isLoading: interestsLoading } = useUserInterests();
+  const { data: proIds = new Set<string>() } = useProPartnerIds();
+
+  const getPartnerId = (item: Scorable) => item.partner_id || item.partner_profiles?.id || "";
 
   const rankedListings = useMemo(() => {
     const scored: ScoredItem<L>[] = listings.map((l) => ({
@@ -135,12 +153,13 @@ export function useFeedRanking<L extends ScorableListing, P extends ScorablePack
         l.partner_profiles?.avg_rating,
         l.partner_profiles?.review_count,
         l.scheduled_at,
-        interests
+        interests,
+        proIds.has(getPartnerId(l))
       ),
     }));
     scored.sort((a, b) => b.score - a.score);
     return scored.map((s) => s.item);
-  }, [listings, interests]);
+  }, [listings, interests, proIds]);
 
   const rankedPackages = useMemo(() => {
     const scored: ScoredItem<P>[] = packages.map((p) => ({
@@ -150,12 +169,13 @@ export function useFeedRanking<L extends ScorableListing, P extends ScorablePack
         p.partner_profiles?.avg_rating,
         p.partner_profiles?.review_count,
         p.created_at,
-        interests
+        interests,
+        proIds.has(getPartnerId(p))
       ),
     }));
     scored.sort((a, b) => b.score - a.score);
     return scored.map((s) => s.item);
-  }, [packages, interests]);
+  }, [packages, interests, proIds]);
 
   return { rankedListings, rankedPackages, interestsLoading };
 }
