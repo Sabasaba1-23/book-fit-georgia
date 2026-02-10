@@ -1354,6 +1354,8 @@ export const translations = {
     resetDescription: "Введите эл. почту, и мы отправим ссылку для сброса.",
     sendResetLink: "Отправить ссылку",
     rememberPassword: "Помните пароль?",
+    resetLinkSent: "Ссылка отправлена",
+    resetLinkDescription: "Проверьте почту для ссылки на сброс пароля.",
     joinFitBook: "Присоединяйтесь к",
     howToUseFitBook: "Как вы хотите использовать FitBook?",
     createYourAccount: "Создайте свой",
