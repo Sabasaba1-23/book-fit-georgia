@@ -592,7 +592,7 @@ export default function Auth() {
               {/* Password */}
               <div>
                 <label className="mb-2 block text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">
-                  Password
+                  {t("password")}
                 </label>
                 <div className="relative">
                   <Input
