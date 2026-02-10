@@ -623,6 +623,29 @@ export const translations = {
     payoutHistoryDesc: "Track your earnings",
     noPayoutsYet: "No payouts yet",
     payoutHistoryHere: "Your payout history will appear here",
+
+    // Schedule Tab
+    schedCompleted: "Completed",
+    schedInProgress: "In Progress",
+    schedStartingSoon: "Starting Soon",
+    schedUpcoming: "Upcoming",
+    schedPast: "Past",
+    schedNoUpcoming: "No upcoming sessions",
+    schedNoPast: "No past sessions",
+    schedAttendees: "Attendees",
+    schedNoBookings: "No bookings yet",
+    schedAnonymous: "Anonymous",
+    schedTotalRevenue: "Total Revenue",
+    schedSpot: "spot",
+    schedSpots: "spots",
+
+    // Messages Tab
+    msgNoMessages: "No messages yet",
+    msgNoMessagesDesc: "Clients will message you after booking",
+    msgStartConversation: "Start the conversation!",
+    msgTypePlaceholder: "Type a message...",
+    msgClient: "Client",
+    msgYesterday: "Yesterday",
   },
 
   ka: {
