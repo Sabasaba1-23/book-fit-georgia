@@ -100,8 +100,8 @@ export default function Payment() {
 
       if (error) {
         const msg = error.code === "23505"
-          ? t("alreadyBooked") || "You've already booked this session."
-          : t("bookingFailed") || "Booking failed. Please try again.";
+          ? "You've already booked this session."
+          : "Booking failed. Please try again.";
         toast({ title: msg, variant: "destructive" });
         setBooking(false);
         return;
