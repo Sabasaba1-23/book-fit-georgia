@@ -176,7 +176,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
   function formatTime(dateStr: string) {
     const d = new Date(dateStr);
     if (isToday(d)) return format(d, "h:mm a");
-    if (isYesterday(d)) return "Yesterday " + format(d, "h:mm a");
+    if (isYesterday(d)) return t("msgYesterday") + " " + format(d, "h:mm a");
     return format(d, "MMM d, h:mm a");
   }
 
