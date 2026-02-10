@@ -371,8 +371,8 @@ export default function Auth() {
               </Button>
             </form>
             <p className="mt-6 pb-8 text-center text-sm text-muted-foreground">
-              Remember your password?{" "}
-              <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary">Log In</button>
+              {t("rememberPassword")}{" "}
+              <button type="button" onClick={() => setMode("login")} className="font-semibold text-primary">{t("login")}</button>
             </p>
           </div>
         </div>
