@@ -136,36 +136,16 @@ export default function ListingCard({ listing }: ListingCardProps) {
       navigate("/auth");
       return;
     }
-    setShowPayment(true);
-  };
-
-  const handlePaymentSuccess = async (method: string) => {
-    setBooking(true);
-    try {
-      const { data, error } = await supabase.from("bookings").insert({
-        user_id: user!.id,
-        listing_id: listing.id,
-        spots: 1,
-        total_price: listing.price_gel,
-        payment_status: "paid",
-        booking_status: "confirmed",
-        stripe_payment_id: `demo_${method}_${Date.now()}`,
-      }).select("id").single();
-      if (error) {
-        const msg = error.code === "23505"
-          ? "You've already booked this session."
-          : "Booking failed. Please try again.";
-        toast({ title: msg, variant: "destructive" });
-      } else {
-        setShowPayment(false);
-        setConfirmedBookingId(data.id);
-        setShowTicket(true);
-      }
-    } catch {
-      toast({ title: "Something went wrong", variant: "destructive" });
-    } finally {
-      setBooking(false);
-    }
+    const paymentState: PaymentLocationState = {
+      amount: listing.price_gel,
+      title: listing.title_en,
+      listingId: listing.id,
+      sport: listing.sport,
+      scheduledAt: listing.scheduled_at,
+      durationMinutes: listing.duration_minutes,
+      trainerName: listing.partner.display_name,
+    };
+    navigate("/payment", { state: paymentState });
   };
 
   const handleBookmark = async (e: React.MouseEvent) => {
