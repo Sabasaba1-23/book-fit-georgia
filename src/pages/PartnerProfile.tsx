@@ -363,6 +363,16 @@ export default function PartnerProfile() {
   };
 
 
+  const SPORT_FALLBACK_IMAGES: Record<string, string> = {
+    Yoga: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+    HIIT: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
+    Boxing: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&q=80",
+    Tennis: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&q=80",
+    Pilates: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80",
+    CrossFit: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&q=80",
+    Swimming: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80",
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -890,17 +900,17 @@ export default function PartnerProfile() {
                     className="flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-muted/30 active:scale-[0.99]"
                     onClick={() => setExpandedListingId(isExpanded ? null : listing.id)}
                   >
-                    {listing.background_image_url ? (
-                      <img
-                        src={listing.background_image_url}
-                        alt=""
-                        className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                        <Dumbbell className="h-5 w-5 text-primary" />
-                      </div>
-                    )}
+                    {(() => {
+                      const imgUrl = listing.background_image_url || SPORT_FALLBACK_IMAGES[listing.sport] || SPORT_FALLBACK_IMAGES.HIIT;
+                      return (
+                        <img
+                          src={imgUrl}
+                          alt=""
+                          className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                          loading="lazy"
+                        />
+                      );
+                    })()}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="text-[13px] font-bold text-foreground truncate max-w-[140px]">{lTitle}</p>
