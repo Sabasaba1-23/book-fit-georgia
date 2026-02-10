@@ -616,9 +616,9 @@ export default function Auth() {
                   <ShieldCheck className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">Premium Verification</p>
+                  <p className="text-sm font-bold text-foreground">{t("premiumVerification")}</p>
                   <p className="mt-0.5 text-[13px] leading-relaxed text-muted-foreground">
-                    All partners undergo a brief screening to ensure the highest quality of service for our community.
+                    {t("verificationDescription")}
                   </p>
                 </div>
               </div>
