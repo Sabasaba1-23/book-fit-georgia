@@ -531,7 +531,7 @@ export default function Auth() {
                   )}
                 >
                   <Building2 className="h-4 w-4" />
-                  Gym / Place
+                  {t("gymPlace")}
                 </button>
               </div>
             </div>
