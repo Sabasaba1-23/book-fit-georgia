@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Send, MessageCircle } from "lucide-react";
 import BackButton from "@/components/BackButton";
 import { format, isToday, isYesterday } from "date-fns";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Thread {
   id: string;
