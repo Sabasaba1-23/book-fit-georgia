@@ -311,6 +311,7 @@ export default function CreateListingSheet({
                 totalPriceGel={totalPriceGel} setTotalPriceGel={setTotalPriceGel}
                 additionalImages={additionalImages} setAdditionalImages={setAdditionalImages}
                 additionalPreviews={additionalPreviews} setAdditionalPreviews={setAdditionalPreviews}
+                venueFee={venueFee} setVenueFee={setVenueFee}
               />
             )}
             {step === 3 && (
