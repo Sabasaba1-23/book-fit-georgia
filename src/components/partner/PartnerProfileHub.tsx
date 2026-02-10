@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/i18n/LanguageContext";
 import {
   Camera, ExternalLink, UserPen, ImageIcon, Award, LayoutDashboard,
   Settings, CreditCard, HelpCircle, LogOut, ChevronRight, ShieldCheck, Users,
@@ -39,6 +40,7 @@ interface Props {
 
 export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut, onNavigate, onSwitchTab, onOpenVerification }: Props) {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -48,7 +50,7 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "File too large", description: "Max 5MB", variant: "destructive" });
+      toast({ title: t("fileTooLarge"), description: t("maxFileSize"), variant: "destructive" });
       return;
     }
     setUploading(true);
@@ -59,13 +61,13 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
     }
     const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file);
     if (uploadError) {
-      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      toast({ title: t("uploadFailed"), description: uploadError.message, variant: "destructive" });
       setUploading(false);
       return;
     }
     const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
     await supabase.from("partner_profiles").update({ logo_url: publicUrl }).eq("id", profile.id);
-    toast({ title: "Photo updated!" });
+    toast({ title: t("photoUpdated") });
     onRefetch();
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -81,70 +83,70 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
   }[] = [
     {
       icon: <UserPen className="h-5 w-5" />,
-      label: "Edit Public Profile",
-      subtitle: "Name, bio, sports, location",
+      label: t("editPublicProfile"),
+      subtitle: t("editProfileSubtitle"),
       action: () => onNavigate("edit"),
       showChevron: true,
     },
     {
       icon: <ImageIcon className="h-5 w-5" />,
-      label: "Photos & Media",
-      subtitle: "Manage your gallery",
+      label: t("photosMedia"),
+      subtitle: t("photosMediaSubtitle"),
       action: () => onNavigate("media"),
       showChevron: true,
     },
     {
       icon: <Award className="h-5 w-5" />,
-      label: "Badges & Achievements",
-      subtitle: "View earned and available badges",
+      label: t("badgesAchievements"),
+      subtitle: t("badgesAchievementsSubtitle"),
       action: () => onNavigate("badges"),
       showChevron: true,
     },
     {
       icon: <ShieldCheck className="h-5 w-5" />,
-      label: "Identity Verification",
-      subtitle: profile.verification_status === "verified" ? "Verified" : "Verify your identity",
+      label: t("identityVerification"),
+      subtitle: profile.verification_status === "verified" ? t("verifiedStatus") : t("verifyYourIdentity"),
       action: onOpenVerification,
       showChevron: true,
     },
     ...(profile.partner_type === "gym" ? [{
       icon: <Users className="h-5 w-5" />,
-      label: "Manage Trainers",
-      subtitle: "Add or remove trainers at your gym",
+      label: t("manageTrainers"),
+      subtitle: t("manageTrainersSubtitle"),
       action: () => onNavigate("trainers"),
       showChevron: true,
     }] : []),
     {
       icon: <LayoutDashboard className="h-5 w-5" />,
-      label: "Sessions & Listings",
-      subtitle: "Manage your active trainings",
+      label: t("sessionsListings"),
+      subtitle: t("sessionsListingsSubtitle"),
       action: () => onSwitchTab("dashboard"),
       showChevron: true,
     },
     {
       icon: <Settings className="h-5 w-5" />,
-      label: "Settings",
-      subtitle: "Notifications, privacy, language",
+      label: t("settingsLabel"),
+      subtitle: t("settingsSubtitle"),
       action: () => onNavigate("settings"),
       showChevron: true,
     },
     {
       icon: <CreditCard className="h-5 w-5" />,
-      label: "Payments",
-      subtitle: "Bank details and payouts",
+      label: t("paymentsLabel"),
+      subtitle: t("paymentsSubtitle"),
       action: () => onNavigate("payments"),
       showChevron: true,
     },
     {
       icon: <HelpCircle className="h-5 w-5" />,
-      label: "Support & Help",
-      subtitle: "FAQs, contact us",
+      label: t("supportHelp"),
+      subtitle: t("supportHelpSubtitle"),
       action: () => setShowHelp(true),
       showChevron: true,
     },
     {
       icon: <LogOut className="h-5 w-5" />,
-      label: "Log Out",
+      label: t("logOut"),
       subtitle: "",
       action: onSignOut,
       destructive: true,
@@ -174,19 +176,13 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
               <Camera className="h-4 w-4" />
             )}
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handlePhotoUpload}
-            className="hidden"
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
         </div>
 
         <div className="text-center space-y-1.5">
           <h2 className="text-[22px] font-semibold text-foreground leading-tight">{profile.display_name}</h2>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary capitalize">
-            {profile.partner_type === "gym" ? "Studio" : "Individual Trainer"}
+            {profile.partner_type === "gym" ? t("studioLabel") : t("individualTrainerLabel")}
           </p>
           <div className="flex items-center justify-center gap-2 pt-1">
             <span className={cn(
@@ -195,23 +191,22 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
                 ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
                 : "bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
             )}>
-              {profile.approved ? "Approved" : "Pending"}
+              {profile.approved ? t("approvedStatus") : t("pendingStatus")}
             </span>
             {profile.verification_status === "verified" && (
               <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-                Verified
+                {t("verifiedStatus")}
               </span>
             )}
           </div>
         </div>
 
-        {/* Preview Public Profile CTA */}
         <button
           onClick={() => navigate(`/partner/${profile.id}`)}
           className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary/20 bg-primary/5 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
         >
           <ExternalLink className="h-4 w-4" />
-          Preview Public Profile
+          {t("previewPublicProfile")}
         </button>
       </div>
 
@@ -223,9 +218,7 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
             onClick={item.action}
             className={cn(
               "flex w-full items-center gap-4 rounded-2xl p-4 transition-colors active:scale-[0.98]",
-              item.destructive
-                ? "bg-destructive/5 hover:bg-destructive/10 mt-4"
-                : "bg-card hover:bg-muted/50"
+              item.destructive ? "bg-destructive/5 hover:bg-destructive/10 mt-4" : "bg-card hover:bg-muted/50"
             )}
           >
             <div className={cn(
@@ -235,19 +228,12 @@ export default function PartnerProfileHub({ profile, user, onRefetch, onSignOut,
               {item.icon}
             </div>
             <div className="flex-1 text-left min-w-0">
-              <p className={cn(
-                "text-[15px] font-semibold",
-                item.destructive ? "text-destructive" : "text-foreground"
-              )}>
+              <p className={cn("text-[15px] font-semibold", item.destructive ? "text-destructive" : "text-foreground")}>
                 {item.label}
               </p>
-              {item.subtitle && (
-                <p className="text-xs text-muted-foreground mt-0.5">{item.subtitle}</p>
-              )}
+              {item.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{item.subtitle}</p>}
             </div>
-            {item.showChevron && (
-              <ChevronRight className="h-5 w-5 text-muted-foreground/40 shrink-0" />
-            )}
+            {item.showChevron && <ChevronRight className="h-5 w-5 text-muted-foreground/40 shrink-0" />}
           </button>
         ))}
       </div>
