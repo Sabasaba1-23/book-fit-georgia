@@ -428,7 +428,7 @@ export default function Auth() {
             <form onSubmit={handleRegisterUser} className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">{t("fullName")}</label>
-                <Input placeholder="Enter your full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
+                <Input placeholder={t("enterFullName")} value={fullName} onChange={(e) => setFullName(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-foreground">Phone Number <span className="text-destructive">*</span></label>
