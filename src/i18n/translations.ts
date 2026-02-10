@@ -698,6 +698,8 @@ export const translations = {
     resetDescription: "შეიყვანეთ ელფოსტა და გამოგიგზავნით აღდგენის ბმულს.",
     sendResetLink: "აღდგენის ბმულის გაგზავნა",
     rememberPassword: "გახსოვთ პაროლი?",
+    resetLinkSent: "ბმული გაგზავნილია",
+    resetLinkDescription: "შეამოწმეთ ელფოსტა პაროლის აღდგენის ბმულისთვის.",
     joinFitBook: "შემოგვიერთდი",
     howToUseFitBook: "როგორ გინდა გამოიყენო FitBook?",
     createYourAccount: "შექმენი შენი",
