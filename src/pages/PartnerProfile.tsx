@@ -363,6 +363,16 @@ export default function PartnerProfile() {
   };
 
 
+  const SPORT_FALLBACK_IMAGES: Record<string, string> = {
+    Yoga: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&q=80",
+    HIIT: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80",
+    Boxing: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=600&q=80",
+    Tennis: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&q=80",
+    Pilates: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&q=80",
+    CrossFit: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&q=80",
+    Swimming: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&q=80",
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
