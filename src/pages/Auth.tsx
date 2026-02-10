@@ -596,7 +596,7 @@ export default function Auth() {
                 </label>
                 <div className="relative">
                   <Input
-                    placeholder="Create a secure password"
+                    placeholder={t("createSecurePassword")}
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
