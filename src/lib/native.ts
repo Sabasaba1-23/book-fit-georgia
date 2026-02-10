@@ -1,4 +1,5 @@
 import { isNative, isIOS, isAndroid } from './platform';
+import { supabase } from '@/integrations/supabase/client';
 
 let backPressedOnce = false;
 
