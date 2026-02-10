@@ -276,10 +276,10 @@ export default function Auth() {
           <div className="flex flex-1 flex-col px-6 pt-6">
             <div className="mb-8 text-center">
               <h1 className="text-3xl font-extrabold leading-tight text-foreground">
-                Get Moving in<br />
-                <span className="text-primary">Georgia</span>
+                {t("getMovingIn")}<br />
+                <span className="text-primary">{t("georgia")}</span>
               </h1>
-              <p className="mt-2 text-sm text-muted-foreground">Access top trainers and facilities near you.</p>
+              <p className="mt-2 text-sm text-muted-foreground">{t("accessTopTrainers")}</p>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
