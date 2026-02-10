@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFeedRanking } from "@/hooks/useFeedRanking";
 import ListingCard from "@/components/ListingCard";
 import PackageCard from "@/components/PackageCard";
 import BottomNav from "@/components/BottomNav";
@@ -108,8 +109,10 @@ export default function Home() {
     refetchOnWindowFocus: true,
   });
 
-  const listings = data?.listings ?? [];
-  const packages = data?.packages ?? [];
+  const rawListings = data?.listings ?? [];
+  const rawPackages = data?.packages ?? [];
+
+  const { rankedListings: listings, rankedPackages: packages } = useFeedRanking(rawListings, rawPackages);
 
   const handleSportChange = useCallback((v: string) => setActiveSport(v), []);
   const handleFiltersApply = useCallback((f: FilterState) => setFilters(f), []);
