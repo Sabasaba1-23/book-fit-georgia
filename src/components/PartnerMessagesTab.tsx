@@ -98,7 +98,7 @@ export default function PartnerMessagesTab({ partnerUserId }: PartnerMessagesTab
       let otherUser: Thread["otherUser"];
       if (otherUserId) {
         const profile = profileMap.get(otherUserId);
-        if (profile) otherUser = { display_name: profile.full_name || "Client", avatar_url: profile.avatar_url };
+        if (profile) otherUser = { display_name: profile.full_name || t("msgClient"), avatar_url: profile.avatar_url };
       }
       const lastMsg = lastMsgMap.get(thread.id);
       return {
