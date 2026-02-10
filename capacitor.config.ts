@@ -4,6 +4,10 @@ const config: CapacitorConfig = {
   appId: 'com.bookfit.georgia',
   appName: 'FitBook Georgia',
   webDir: 'dist',
+  ios: {
+    // Exclude plugins that have compatibility issues with iOS/Swift Package Manager
+    includePlugins: []
+  },
   // For development hot-reload, uncomment the server block below:
   // server: {
   //   url: 'https://fitbook.my',
