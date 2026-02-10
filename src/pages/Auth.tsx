@@ -640,7 +640,7 @@ export default function Auth() {
               >
                 {loading ? t("loading") : (
                   <span className="flex items-center gap-2">
-                    Create Partner Account
+                    {t("createPartnerAccount")}
                     <ArrowRight className="h-5 w-5" />
                   </span>
                 )}
