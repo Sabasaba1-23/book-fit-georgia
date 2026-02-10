@@ -76,7 +76,6 @@ export default function PackageCard({ pkg }: PackageCardProps) {
   const { toast } = useToast();
   const [expanded, setExpanded] = useState(false);
   const [booking, setBooking] = useState(false);
-  const [showPayment, setShowPayment] = useState(false);
   const [bookmarking, setBookmarking] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
@@ -95,7 +94,19 @@ export default function PackageCard({ pkg }: PackageCardProps) {
       navigate("/auth");
       return;
     }
-    setShowPayment(true);
+    const paymentState: PaymentLocationState = {
+      amount: pkg.total_price_gel,
+      title: `${pkg.title_en} (${pkg.sessions_count} sessions)`,
+      listingId: pkg.id,
+      sport: pkg.sport,
+      scheduledAt: new Date().toISOString(),
+      durationMinutes: pkg.duration_minutes * pkg.sessions_count,
+      trainerName: pkg.partner_profiles.display_name,
+      spots: pkg.sessions_count,
+      isPackage: true,
+      sessionsCount: pkg.sessions_count,
+    };
+    navigate("/payment", { state: paymentState });
   };
 
   const handlePaymentSuccess = async (method: string) => {
