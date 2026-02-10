@@ -31,20 +31,20 @@ interface ScheduleListing {
   bookings: BookingAttendee[];
 }
 
-function getTimeLabel(scheduledAt: string, durationMinutes: number): { text: string; color: string } {
+function getTimeLabel(scheduledAt: string, durationMinutes: number, t: (key: TranslationKey) => string): { text: string; color: string } {
   const start = new Date(scheduledAt);
   const end = addMinutes(start, durationMinutes);
   const now = new Date();
 
-  if (isPast(end)) return { text: "Completed", color: "text-muted-foreground bg-muted" };
+  if (isPast(end)) return { text: t("schedCompleted"), color: "text-muted-foreground bg-muted" };
 
   const hoursUntil = differenceInHours(start, now);
-  if (isPast(start) && !isPast(end)) return { text: "In Progress", color: "text-primary bg-primary/10" };
+  if (isPast(start) && !isPast(end)) return { text: t("schedInProgress"), color: "text-primary bg-primary/10" };
   if (isToday(start)) {
-    if (hoursUntil <= 1) return { text: "Starting Soon", color: "text-destructive bg-destructive/10" };
-    return { text: `Today · ${format(start, "HH:mm")}`, color: "text-primary bg-primary/10" };
+    if (hoursUntil <= 1) return { text: t("schedStartingSoon"), color: "text-destructive bg-destructive/10" };
+    return { text: `${t("schedUpcoming")} · ${format(start, "HH:mm")}`, color: "text-primary bg-primary/10" };
   }
-  if (isTomorrow(start)) return { text: `Tomorrow · ${format(start, "HH:mm")}`, color: "text-amber-600 bg-amber-50" };
+  if (isTomorrow(start)) return { text: `${t("msgYesterday").replace(/.*/, format(start, "EEE"))} · ${format(start, "HH:mm")}`, color: "text-amber-600 bg-amber-50" };
   return { text: format(start, "EEE, MMM d · HH:mm"), color: "text-foreground/70 bg-muted" };
 }
 
