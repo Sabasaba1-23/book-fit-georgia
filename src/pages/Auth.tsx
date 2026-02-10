@@ -296,7 +296,7 @@ export default function Auth() {
                   </button>
                 </div>
                 <div className="mt-1.5 text-right">
-                  <button type="button" onClick={() => setMode("forgot-password")} className="text-sm font-medium text-primary">Forgot Password?</button>
+                  <button type="button" onClick={() => setMode("forgot-password")} className="text-sm font-medium text-primary">{t("forgotPassword")}</button>
                 </div>
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
