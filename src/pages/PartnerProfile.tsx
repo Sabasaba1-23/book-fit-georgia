@@ -7,6 +7,7 @@ import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carouse
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import MediaLightbox from "@/components/partner/MediaLightbox";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import BottomNav from "@/components/BottomNav";
 import {
   Share2,
