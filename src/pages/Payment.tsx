@@ -51,7 +51,7 @@ export default function Payment() {
   if (!state || !user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background p-6">
-        <p className="text-muted-foreground">{t("noPaymentData") || "No payment data found."}</p>
+        <p className="text-muted-foreground">No payment data found.</p>
         <Button variant="outline" onClick={() => navigate(-1)}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
         </Button>
