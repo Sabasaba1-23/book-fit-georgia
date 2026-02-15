@@ -3,12 +3,13 @@ import App from "./App.tsx";
 import "./index.css";
 import { IconProvider, DEFAULT_ICON_CONFIGS } from "@icon-park/react";
 import { initNativePlugins } from "./lib/native";
+import { initNativeStorage } from "./lib/nativeStorage";
 import { Capacitor } from "@capacitor/core";
 
 const IconConfig = { ...DEFAULT_ICON_CONFIGS, strokeWidth: 3, strokeLinecap: "round" as const, theme: "outline" as const };
 
-// Initialize native plugins (no-op on web)
-initNativePlugins();
+// Initialize native storage (loads persisted auth) then native plugins
+initNativeStorage().then(() => initNativePlugins());
 
 // Unregister PWA service workers inside native shell to avoid caching conflicts
 if (Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
