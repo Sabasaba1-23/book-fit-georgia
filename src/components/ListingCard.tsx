@@ -291,7 +291,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
           <button
             onClick={handleBookClick}
-            className="rounded-full bg-primary px-5 py-2.5 text-[14px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 active:scale-[0.97]"
+            className="rounded-full gradient-primary px-5 py-2.5 text-[14px] font-semibold text-primary-foreground transition-all duration-200 gradient-primary-hover active:scale-[0.97] premium-gradient-shadow"
           >
             {t("bookNowBtn")}
           </button>

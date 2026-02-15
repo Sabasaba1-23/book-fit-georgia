@@ -46,7 +46,7 @@ export default memo(function BottomNav() {
                 <Icon
                   size={22}
                   strokeWidth={active ? 3 : 2}
-                  fill={active ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.6)"}
+                  fill={active ? "hsl(170, 76%, 63%)" : "hsl(var(--muted-foreground) / 0.6)"}
                 />
                 <span
                   className={cn(

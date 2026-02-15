@@ -248,9 +248,9 @@ export default function Profile() {
   return (
     <div className="relative min-h-screen bg-background pb-24">
       {/* Hero gradient header */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/85 to-accent pb-24 pt-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(168_76%_50%/0.35),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,hsl(168_76%_36%/0.25),transparent_50%)]" />
+      <div className="relative overflow-hidden pb-24 pt-10" style={{ background: 'var(--gradient-primary)' }}>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(170_76%_70%/0.35),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,hsl(209_68%_52%/0.25),transparent_50%)]" />
         <div className="absolute -bottom-12 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
 
         {/* Back button */}
