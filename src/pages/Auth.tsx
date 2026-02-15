@@ -247,19 +247,19 @@ export default function Auth() {
       {/* Rich green gradient background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         {/* Top-right glow */}
-        <div className="absolute -top-28 -right-28 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-primary/25 via-primary/12 to-transparent blur-[80px]" />
+        <div className="absolute -top-28 -right-28 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-[hsl(170_76%_63%/0.25)] via-[hsl(194_70%_58%/0.12)] to-transparent blur-[80px]" />
         {/* Left-center accent */}
-        <div className="absolute top-[30%] -left-36 h-[350px] w-[350px] rounded-full bg-gradient-to-tr from-primary/18 via-accent/20 to-transparent blur-[70px]" />
+        <div className="absolute top-[30%] -left-36 h-[350px] w-[350px] rounded-full bg-gradient-to-tr from-[hsl(209_68%_52%/0.18)] via-[hsl(194_70%_58%/0.20)] to-transparent blur-[70px]" />
         {/* Center-right subtle */}
-        <div className="absolute top-[55%] right-[-10%] h-[250px] w-[250px] rounded-full bg-gradient-to-bl from-primary/12 via-accent/10 to-transparent blur-[60px]" />
+        <div className="absolute top-[55%] right-[-10%] h-[250px] w-[250px] rounded-full bg-gradient-to-bl from-[hsl(170_76%_63%/0.12)] via-[hsl(209_68%_52%/0.10)] to-transparent blur-[60px]" />
         {/* Bottom wide gradient band */}
-        <div className="absolute bottom-0 left-0 right-0 h-[320px] bg-gradient-to-t from-primary/14 via-primary/6 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-[320px] bg-gradient-to-t from-[hsl(209_68%_52%/0.14)] via-[hsl(194_70%_58%/0.06)] to-transparent" />
         {/* Bottom-left orb */}
-        <div className="absolute -bottom-16 -left-16 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-[70px]" />
+        <div className="absolute -bottom-16 -left-16 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-[hsl(170_76%_63%/0.20)] via-[hsl(194_70%_58%/0.15)] to-transparent blur-[70px]" />
         {/* Bottom-right orb */}
-        <div className="absolute -bottom-12 -right-12 h-[260px] w-[260px] rounded-full bg-gradient-to-tl from-primary/16 via-primary/8 to-transparent blur-[60px]" />
+        <div className="absolute -bottom-12 -right-12 h-[260px] w-[260px] rounded-full bg-gradient-to-tl from-[hsl(209_68%_52%/0.16)] via-[hsl(170_76%_63%/0.08)] to-transparent blur-[60px]" />
         {/* Bottom center highlight */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 h-[120px] w-[500px] rounded-full bg-gradient-to-t from-primary/10 via-accent/8 to-transparent blur-[50px]" />
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 h-[120px] w-[500px] rounded-full bg-gradient-to-t from-[hsl(194_70%_58%/0.10)] via-[hsl(170_76%_63%/0.08)] to-transparent blur-[50px]" />
       </div>
 
       {/* ─── LOGIN ─── */}
@@ -278,7 +278,7 @@ export default function Auth() {
             <div className="mb-8 text-center">
               <h1 className="text-3xl font-extrabold leading-tight text-foreground">
                 {t("getMovingIn")}<br />
-                <span className="text-primary">{t("georgia")}</span>
+                <span className="gradient-text">{t("georgia")}</span>
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">{t("accessTopTrainers")}</p>
             </div>
@@ -301,12 +301,12 @@ export default function Auth() {
                 </div>
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
+              <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl gradient-primary text-base font-semibold text-primary-foreground premium-gradient-shadow hover:opacity-90">
                 {loading ? t("loading") : t("login")}
               </Button>
             </form>
 
-            <Button variant="outline" onClick={() => setMode("register-partner")} className="mt-3 h-14 w-full rounded-2xl border-primary/30 bg-primary/5 text-base font-semibold text-primary hover:bg-primary/10">
+            <Button variant="outline" onClick={() => setMode("register-partner")} className="mt-3 h-14 w-full rounded-2xl gradient-border bg-card text-base font-semibold text-foreground hover:bg-accent/20">
               <Handshake className="mr-2 h-5 w-5" />
               {t("joinAsPartner")}
             </Button>
@@ -367,7 +367,7 @@ export default function Auth() {
                 <Input placeholder={t("enterEmail")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-13 rounded-2xl border-border bg-card px-4 text-sm shadow-none" />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground shadow-lg hover:bg-primary/90">
+              <Button type="submit" disabled={loading} className="h-14 w-full rounded-2xl gradient-primary text-base font-semibold text-primary-foreground premium-gradient-shadow hover:opacity-90">
                 {loading ? t("loading") : t("sendResetLink")}
               </Button>
             </form>

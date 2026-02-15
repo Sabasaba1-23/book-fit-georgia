@@ -18,9 +18,9 @@ export default memo(function FilterChips({ options, active, onChange }: FilterCh
           key={option}
           onClick={() => onChange(option)}
           className={cn(
-            "shrink-0 rounded-full px-3.5 py-1 text-[12px] font-medium transition-all duration-150 active:scale-95",
+            "shrink-0 rounded-full px-3.5 py-1 text-[12px] font-medium transition-all duration-200 active:scale-95",
             active === option
-              ? "bg-primary/90 text-primary-foreground"
+              ? "gradient-primary text-primary-foreground premium-gradient-shadow"
               : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
           )}
         >

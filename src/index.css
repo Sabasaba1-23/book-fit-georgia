@@ -6,83 +6,94 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98.5%;
-    --foreground: 210 25% 11%;
+    --background: 210 20% 98%;
+    --foreground: 215 28% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 25% 11%;
+    --card-foreground: 215 28% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 25% 11%;
+    --popover-foreground: 215 28% 10%;
 
-    --primary: 168 76% 36%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 170 76% 63%;
+    --primary-foreground: 215 28% 10%;
 
-    --secondary: 40 90% 56%;
-    --secondary-foreground: 210 25% 11%;
+    --secondary: 209 68% 52%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 180 10% 95%;
-    --muted-foreground: 210 10% 46%;
+    --muted: 200 14% 95%;
+    --muted-foreground: 210 12% 44%;
 
-    --accent: 168 50% 92%;
-    --accent-foreground: 168 76% 26%;
+    --accent: 194 70% 58%;
+    --accent-foreground: 215 28% 10%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 15% 91%;
-    --input: 200 15% 91%;
-    --ring: 168 76% 36%;
+    --border: 200 18% 90%;
+    --input: 200 18% 90%;
+    --ring: 194 70% 58%;
 
     --radius: 1.25rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 210 10% 26%;
-    --sidebar-primary: 168 76% 36%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 10% 95%;
-    --sidebar-accent-foreground: 210 25% 11%;
-    --sidebar-border: 200 15% 91%;
-    --sidebar-ring: 168 76% 36%;
+    /* Gradient tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(170 76% 63%), hsl(194 70% 58%), hsl(209 68% 52%));
+    --gradient-primary-hover: linear-gradient(135deg, hsl(170 76% 58%), hsl(194 70% 53%), hsl(209 68% 47%));
+    --gradient-soft: linear-gradient(135deg, hsl(170 76% 63% / 0.12), hsl(209 68% 52% / 0.08));
+    --gradient-glass: linear-gradient(135deg, hsl(170 76% 63% / 0.06), hsl(194 70% 58% / 0.04));
+
+    --sidebar-background: 210 20% 98%;
+    --sidebar-foreground: 210 12% 26%;
+    --sidebar-primary: 170 76% 63%;
+    --sidebar-primary-foreground: 215 28% 10%;
+    --sidebar-accent: 200 14% 95%;
+    --sidebar-accent-foreground: 215 28% 10%;
+    --sidebar-border: 200 18% 90%;
+    --sidebar-ring: 194 70% 58%;
   }
 
   .dark {
-    --background: 210 25% 6%;
-    --foreground: 180 10% 96%;
+    --background: 215 25% 7%;
+    --foreground: 200 14% 96%;
 
-    --card: 210 20% 10%;
-    --card-foreground: 180 10% 96%;
+    --card: 215 22% 11%;
+    --card-foreground: 200 14% 96%;
 
-    --popover: 210 20% 10%;
-    --popover-foreground: 180 10% 96%;
+    --popover: 215 22% 11%;
+    --popover-foreground: 200 14% 96%;
 
-    --primary: 168 70% 42%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 170 70% 55%;
+    --primary-foreground: 215 28% 8%;
 
-    --secondary: 40 70% 40%;
-    --secondary-foreground: 180 10% 96%;
+    --secondary: 209 60% 45%;
+    --secondary-foreground: 200 14% 96%;
 
-    --muted: 210 15% 16%;
-    --muted-foreground: 200 12% 60%;
+    --muted: 215 18% 16%;
+    --muted-foreground: 200 14% 58%;
 
-    --accent: 168 40% 18%;
-    --accent-foreground: 168 70% 70%;
+    --accent: 194 50% 22%;
+    --accent-foreground: 170 70% 70%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62% 32%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 210 15% 18%;
-    --input: 210 15% 18%;
-    --ring: 168 70% 42%;
+    --border: 215 18% 18%;
+    --input: 215 18% 18%;
+    --ring: 194 60% 50%;
 
-    --sidebar-background: 210 25% 8%;
-    --sidebar-foreground: 180 10% 96%;
-    --sidebar-primary: 168 70% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 15% 16%;
-    --sidebar-accent-foreground: 180 10% 96%;
-    --sidebar-border: 210 15% 18%;
-    --sidebar-ring: 168 70% 42%;
+    --gradient-primary: linear-gradient(135deg, hsl(170 70% 55%), hsl(194 60% 50%), hsl(209 60% 45%));
+    --gradient-primary-hover: linear-gradient(135deg, hsl(170 70% 50%), hsl(194 60% 45%), hsl(209 60% 40%));
+    --gradient-soft: linear-gradient(135deg, hsl(170 70% 55% / 0.15), hsl(209 60% 45% / 0.10));
+    --gradient-glass: linear-gradient(135deg, hsl(170 70% 55% / 0.08), hsl(194 60% 50% / 0.05));
+
+    --sidebar-background: 215 25% 9%;
+    --sidebar-foreground: 200 14% 96%;
+    --sidebar-primary: 170 70% 55%;
+    --sidebar-primary-foreground: 215 28% 8%;
+    --sidebar-accent: 215 18% 16%;
+    --sidebar-accent-foreground: 200 14% 96%;
+    --sidebar-border: 215 18% 18%;
+    --sidebar-ring: 194 60% 50%;
   }
 }
 
@@ -237,14 +248,62 @@
 
   .blob-warm-1 {
     filter: blur(70px);
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+    background: linear-gradient(135deg, hsl(170 76% 63%) 0%, hsl(194 70% 58%) 100%);
     opacity: 0.15;
   }
 
   .blob-warm-2 {
     filter: blur(60px);
-    background: linear-gradient(135deg, hsl(var(--secondary)) 0%, hsl(var(--primary)) 100%);
+    background: linear-gradient(135deg, hsl(209 68% 52%) 0%, hsl(170 76% 63%) 100%);
     opacity: 0.12;
+  }
+
+  /* ── Gradient utilities ── */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-primary-hover:hover {
+    background: var(--gradient-primary-hover);
+  }
+
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-border {
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: var(--gradient-primary);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .gradient-glow {
+    box-shadow:
+      0 0 20px hsl(170 76% 63% / 0.15),
+      0 0 40px hsl(194 70% 58% / 0.08),
+      0 8px 32px hsl(209 68% 52% / 0.10);
+  }
+
+  .premium-gradient-shadow {
+    box-shadow:
+      0 4px 16px hsl(170 76% 63% / 0.12),
+      0 8px 32px hsl(209 68% 52% / 0.08);
   }
 
   .hide-scrollbar::-webkit-scrollbar {

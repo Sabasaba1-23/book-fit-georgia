@@ -212,7 +212,7 @@ export default function Home() {
                 {t("greeting") || "Good morning"}, {firstName}
               </p>
             )}
-            <h1 className="text-page-title">
+            <h1 className="text-page-title gradient-text">
               {t("discovery")}
             </h1>
           </div>
