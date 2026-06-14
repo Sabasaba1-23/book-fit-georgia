@@ -264,8 +264,9 @@ export default function Home() {
       <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
       {/* Section header */}
-      <div className="px-5 md:px-6 pt-6 pb-4 flex items-center justify-between">
+      <div className="px-5 md:px-6 pt-8 pb-4 flex items-end justify-between">
         <h2 className="text-section-title">{t("recommended") || "Recommended"}</h2>
+        <span className="text-meta">{feedItems.length} results</span>
       </div>
 
       {/* Feed */}
