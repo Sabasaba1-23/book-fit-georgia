@@ -244,22 +244,12 @@ export default function Auth() {
 
   return (
     <div className="relative flex min-h-screen flex-col bg-background overflow-hidden">
-      {/* Rich green gradient background */}
+      {/* Editorial pastel backdrop */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Top-right glow */}
-        <div className="absolute -top-28 -right-28 h-[400px] w-[400px] rounded-full bg-gradient-to-br from-[hsl(170_76%_63%/0.25)] via-[hsl(194_70%_58%/0.12)] to-transparent blur-[80px]" />
-        {/* Left-center accent */}
-        <div className="absolute top-[30%] -left-36 h-[350px] w-[350px] rounded-full bg-gradient-to-tr from-[hsl(209_68%_52%/0.18)] via-[hsl(194_70%_58%/0.20)] to-transparent blur-[70px]" />
-        {/* Center-right subtle */}
-        <div className="absolute top-[55%] right-[-10%] h-[250px] w-[250px] rounded-full bg-gradient-to-bl from-[hsl(170_76%_63%/0.12)] via-[hsl(209_68%_52%/0.10)] to-transparent blur-[60px]" />
-        {/* Bottom wide gradient band */}
-        <div className="absolute bottom-0 left-0 right-0 h-[320px] bg-gradient-to-t from-[hsl(209_68%_52%/0.14)] via-[hsl(194_70%_58%/0.06)] to-transparent" />
-        {/* Bottom-left orb */}
-        <div className="absolute -bottom-16 -left-16 h-[300px] w-[300px] rounded-full bg-gradient-to-tr from-[hsl(170_76%_63%/0.20)] via-[hsl(194_70%_58%/0.15)] to-transparent blur-[70px]" />
-        {/* Bottom-right orb */}
-        <div className="absolute -bottom-12 -right-12 h-[260px] w-[260px] rounded-full bg-gradient-to-tl from-[hsl(209_68%_52%/0.16)] via-[hsl(170_76%_63%/0.08)] to-transparent blur-[60px]" />
-        {/* Bottom center highlight */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 h-[120px] w-[500px] rounded-full bg-gradient-to-t from-[hsl(194_70%_58%/0.10)] via-[hsl(170_76%_63%/0.08)] to-transparent blur-[50px]" />
+        <div className="absolute -top-32 -right-24 h-[440px] w-[440px] rounded-full bg-pastel-lilac blur-[90px] opacity-80" />
+        <div className="absolute top-[28%] -left-32 h-[360px] w-[360px] rounded-full bg-pastel-sage blur-[80px] opacity-70" />
+        <div className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 h-[320px] w-[600px] rounded-full bg-pastel-peach blur-[100px] opacity-60" />
+        <div className="absolute -bottom-20 -right-16 h-[280px] w-[280px] rounded-full bg-pastel-sky blur-[80px] opacity-75" />
       </div>
 
       {/* ─── LOGIN ─── */}

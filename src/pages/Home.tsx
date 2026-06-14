@@ -203,22 +203,22 @@ export default function Home() {
   const firstName = user?.user_metadata?.full_name?.split(" ")[0] || null;
 
   return (
-    <div className="relative min-h-screen bg-background overscroll-none mx-auto max-w-7xl pb-[calc(60px+var(--sab))]">
+    <div className="relative min-h-screen bg-background overscroll-none mx-auto max-w-7xl pb-[calc(96px+var(--sab))]">
 
       {/* Header */}
-      <header className="relative z-40 px-5 md:px-6 pt-8 pb-4">
-        <div className="flex items-center justify-between">
-          <div>
+      <header className="relative z-40 px-5 md:px-6 pt-10 pb-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 min-w-0">
             {firstName && (
-              <p className="text-meta mb-1">
-                {t("greeting") || "Good morning"}, {firstName}
+              <p className="text-meta mb-2">
+                {t("greeting") || "Welcome back"}, {firstName}
               </p>
             )}
-            <h1 className="text-page-title gradient-text">
-              {t("discovery")}
+            <h1 className="text-display">
+              {t("discovery")?.toString().toUpperCase() || "DISCOVER"}
             </h1>
           </div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 pt-1">
             {/* Desktop nav */}
             <nav className="hidden md:flex items-center gap-1 mr-2">
               <button onClick={() => navigate("/bookings")} className="px-4 py-2 rounded-full text-[14px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors">
@@ -230,7 +230,8 @@ export default function Home() {
             </nav>
             <button
               onClick={() => setShowNotifications(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 text-foreground transition-colors hover:bg-muted active:scale-95"
+              aria-label="Notifications"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-card border border-border/60 text-foreground transition-colors hover:bg-muted/60 active:scale-95"
             >
               <Alarm size={20} fill="currentColor" />
             </button>
@@ -239,26 +240,23 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Search bar (opens full-screen overlay) */}
-      <div className="relative z-30 px-5 md:px-6 pb-4">
+      {/* Search bar — pill with circular filter button */}
+      <div className="relative z-30 px-5 md:px-6 pb-5">
         <div className="flex items-center gap-2.5">
           <button
             type="button"
             onClick={() => setShowSearch(true)}
-            className="flex flex-1 items-center gap-2.5 rounded-full border border-border/30 bg-card px-4 py-2.5 premium-shadow text-left transition-colors hover:border-primary/30 active:scale-[0.99]"
+            className="flex flex-1 items-center gap-3 rounded-full border border-border/60 bg-card px-5 py-3.5 premium-shadow text-left transition-all hover:border-foreground/30 active:scale-[0.99]"
             aria-label={t("searchPlaceholder")}
           >
-            <SearchIcon size={16} fill="hsl(var(--primary))" />
-            <span className="flex-1 truncate text-[15px] font-normal text-muted-foreground/60">
+            <SearchIcon size={18} fill="hsl(var(--foreground))" />
+            <span className="flex-1 truncate text-[15px] font-medium text-muted-foreground">
               {searchQuery || t("searchPlaceholder")}
             </span>
-            {searchQuery && (
-              <span className="rounded-full gradient-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
-                Active
-              </span>
-            )}
           </button>
-          <FilterOverlay filters={filters} onApply={handleFiltersApply} />
+          <div className="shrink-0">
+            <FilterOverlay filters={filters} onApply={handleFiltersApply} />
+          </div>
         </div>
       </div>
 
@@ -266,8 +264,9 @@ export default function Home() {
       <FilterChips options={sports} active={activeSport} onChange={handleSportChange} />
 
       {/* Section header */}
-      <div className="px-5 md:px-6 pt-6 pb-4 flex items-center justify-between">
+      <div className="px-5 md:px-6 pt-8 pb-4 flex items-end justify-between">
         <h2 className="text-section-title">{t("recommended") || "Recommended"}</h2>
+        <span className="text-meta">{feedItems.length} results</span>
       </div>
 
       {/* Feed */}
