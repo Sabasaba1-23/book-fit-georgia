@@ -12,6 +12,7 @@ import FilterChips from "@/components/FilterChips";
 import FilterOverlay, { DEFAULT_FILTERS, type FilterState } from "@/components/FilterOverlay";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import UserMenuDropdown from "@/components/UserMenuDropdown";
+import SearchOverlay from "@/components/SearchOverlay";
 import { Search as SearchIcon, Alarm } from "@icon-park/react";
 import { SlidersHorizontal } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -101,6 +102,7 @@ export default function Home() {
   const [activeSport, setActiveSport] = useState("All");
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ["homeFeed"],
@@ -237,19 +239,25 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Search bar */}
+      {/* Search bar (opens full-screen overlay) */}
       <div className="relative z-30 px-5 md:px-6 pb-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex flex-1 items-center gap-2.5 rounded-full border border-border/30 bg-card px-4 py-2.5 premium-shadow">
-            <SearchIcon size={16} fill="hsl(var(--muted-foreground) / 0.5)" />
-            <input
-              type="text"
-              placeholder={t("searchPlaceholder")}
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className="w-full bg-transparent text-[15px] font-normal outline-none placeholder:text-muted-foreground/40"
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowSearch(true)}
+            className="flex flex-1 items-center gap-2.5 rounded-full border border-border/30 bg-card px-4 py-2.5 premium-shadow text-left transition-colors hover:border-primary/30 active:scale-[0.99]"
+            aria-label={t("searchPlaceholder")}
+          >
+            <SearchIcon size={16} fill="hsl(var(--primary))" />
+            <span className="flex-1 truncate text-[15px] font-normal text-muted-foreground/60">
+              {searchQuery || t("searchPlaceholder")}
+            </span>
+            {searchQuery && (
+              <span className="rounded-full gradient-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary-foreground">
+                Active
+              </span>
+            )}
+          </button>
           <FilterOverlay filters={filters} onApply={handleFiltersApply} />
         </div>
       </div>
@@ -328,6 +336,11 @@ export default function Home() {
 
       <BottomNav />
       <NotificationsPanel open={showNotifications} onOpenChange={setShowNotifications} />
+      <SearchOverlay
+        open={showSearch}
+        onClose={() => setShowSearch(false)}
+        initialQuery={searchQuery}
+      />
     </div>
   );
 }
