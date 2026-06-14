@@ -20,41 +20,51 @@ export default memo(function BottomNav() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleNav = useCallback((path: string, requiresAuth: boolean) => {
-    if (requiresAuth && !user) {
-      toast({ title: t("loginRequired"), variant: "destructive" });
-      navigate("/auth");
-      return;
-    }
-    navigate(path);
-  }, [user, toast, t, navigate]);
+  const handleNav = useCallback(
+    (path: string, requiresAuth: boolean) => {
+      if (requiresAuth && !user) {
+        toast({ title: t("loginRequired"), variant: "destructive" });
+        navigate("/auth");
+        return;
+      }
+      navigate(path);
+    },
+    [user, toast, t, navigate],
+  );
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur-2xl border-t border-border/30 pb-[var(--sab)]">
-      <div className="mx-auto max-w-lg">
-        <div className="flex h-[60px] items-center justify-around px-4">
-        {navItems.map(({ key, labelKey, Icon, path, requiresAuth }) => {
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden pointer-events-none"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)" }}
+      aria-label="Primary"
+    >
+      <div className="mx-auto w-full max-w-sm px-5 pointer-events-auto">
+        <div className="flex h-[64px] items-center justify-between rounded-full bg-foreground px-2.5 shadow-[0_18px_40px_-12px_hsl(0_0%_0%/0.35)]">
+          {navItems.map(({ key, labelKey, Icon, path, requiresAuth }) => {
             const active = location.pathname === path;
             return (
               <button
                 key={key}
                 onClick={() => handleNav(path, requiresAuth)}
+                aria-label={t(labelKey)}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-col items-center gap-1 px-4 py-1.5 transition-all duration-200 active:scale-95",
+                  "relative flex h-[52px] flex-1 items-center justify-center transition-transform duration-200 active:scale-95",
                 )}
               >
-                <Icon
-                  size={22}
-                  strokeWidth={active ? 3 : 2}
-                  fill={active ? "hsl(170, 76%, 63%)" : "hsl(var(--muted-foreground) / 0.6)"}
-                />
                 <span
                   className={cn(
-                    "text-[10px] font-medium tracking-[0.06em]",
-                    active ? "text-primary" : "text-muted-foreground/60"
+                    "flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300",
+                    active
+                      ? "bg-background text-foreground shadow-[0_6px_16px_-4px_hsl(0_0%_0%/0.4)]"
+                      : "bg-transparent text-background/55",
                   )}
                 >
-                  {t(labelKey)}
+                  <Icon
+                    size={22}
+                    strokeWidth={active ? 3 : 2.4}
+                    fill={active ? "hsl(var(--foreground))" : "hsl(var(--background) / 0.55)"}
+                  />
                 </span>
               </button>
             );
