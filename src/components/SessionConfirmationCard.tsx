@@ -114,11 +114,11 @@ export default function SessionConfirmationCard({
         await supabase.from("completion_requests").insert({
           booking_id: bookingId,
           [isPartner ? "partner_status" : "user_status"]: "disputed",
-        });
+        } as any);
       } else {
         await supabase
           .from("completion_requests")
-          .update({ [isPartner ? "partner_status" : "user_status"]: "disputed" })
+          .update({ [isPartner ? "partner_status" : "user_status"]: "disputed" } as any)
           .eq("id", completionRequest.id);
       }
 

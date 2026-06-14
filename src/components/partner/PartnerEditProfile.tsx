@@ -41,7 +41,7 @@ export default function PartnerEditProfile({ profile, onBack, onRefetch }: Props
     setSaving(true);
     const { error } = await supabase
       .from("partner_profiles")
-      .update({ [field]: editValue.trim() || null })
+      .update({ [field]: editValue.trim() || null } as any)
       .eq("id", profile.id);
 
     if (error) {

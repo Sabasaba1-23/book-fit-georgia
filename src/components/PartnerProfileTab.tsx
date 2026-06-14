@@ -85,7 +85,7 @@ export default function PartnerProfileTab({ profile, user, onRefetch, onSignOut 
     setSaving(true);
     const { error } = await supabase
       .from("partner_profiles")
-      .update({ [field]: editValue.trim() || null })
+      .update({ [field]: editValue.trim() || null } as any)
       .eq("id", profile.id);
 
     if (error) {
