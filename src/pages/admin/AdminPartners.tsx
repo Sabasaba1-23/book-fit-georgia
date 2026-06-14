@@ -182,7 +182,7 @@ export default function AdminPartners() {
 
     const { error } = await supabase
       .from("partner_documents")
-      .update(update)
+      .update(update as any)
       .eq("id", docId);
 
     if (error) {

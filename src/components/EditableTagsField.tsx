@@ -40,7 +40,7 @@ export default function EditableTagsField({
     setSaving(true);
     const { error } = await supabase
       .from("partner_profiles")
-      .update({ [field]: selected.length > 0 ? selected : null })
+      .update({ [field]: selected.length > 0 ? selected : null } as any)
       .eq("id", profileId);
 
     if (error) {
