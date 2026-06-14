@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Calendar, Clock, Users, CheckCircle2, MessageCircle, Star,
   MapPin, BarChart3, ChevronUp, Bookmark, ChevronDown, Dumbbell, Target, ShoppingBag, Landmark,
+  Heart, ArrowRight,
 } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
@@ -225,32 +226,40 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const equipment = getEquipmentForSport(listing.sport, equipmentKey);
 
   return (
-    <div className="overflow-hidden rounded-[22px] bg-card shadow-sm transition-shadow hover:shadow-md">
-      {/* Image — immersive, 65% of card */}
+    <div className="group relative overflow-hidden rounded-[28px] bg-card editorial-shadow transition-shadow hover:shadow-[0_24px_50px_-20px_hsl(0_0%_0%/0.18)] animate-fade-up">
+      {/* Hero image area — fully immersive */}
       <div
         className="relative w-full cursor-pointer overflow-hidden"
-        style={{ height: "clamp(220px, 55vw, 320px)" }}
+        style={{ height: "clamp(380px, 92vw, 480px)" }}
         onClick={() => setExpanded(!expanded)}
       >
         <img
           src={imageUrl}
           alt={title}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           loading="lazy"
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
+        {/* Gradient scrim */}
+        <div className="absolute inset-0 card-gradient-overlay" />
 
         {/* Category pill — top left */}
-        <span className="absolute left-3.5 top-3.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm">
+        <span className="absolute left-4 top-4 rounded-full bg-background/95 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-foreground backdrop-blur-md">
           {listing.sport}
         </span>
 
-        {/* Text on image — bottom */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
+        {/* Bookmark / heart — top right, white circle */}
+        <button
+          onClick={handleBookmark}
+          aria-label="Bookmark"
+          className="absolute right-4 top-4 circle-icon-btn"
+        >
+          <Heart className={cn("h-[18px] w-[18px]", bookmarking && "fill-foreground")} />
+        </button>
+
+        {/* Title + partner on image — bottom */}
+        <div className="absolute bottom-[88px] left-0 right-0 px-5">
           <p
-            className="text-[13px] font-medium text-white/80 mb-1 cursor-pointer hover:text-white transition-colors"
-            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.3)" }}
+            className="mb-1.5 text-[13px] font-medium text-white/85 cursor-pointer hover:text-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               const pid = listing.partner_id || listing.partner?.id;
@@ -259,44 +268,54 @@ export default function ListingCard({ listing }: ListingCardProps) {
           >
             {listing.partner.display_name}
           </p>
-          <h3
-            className="text-[22px] font-semibold leading-tight text-white line-clamp-2"
-            style={{ textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}
-          >
+          <h3 className="text-[26px] font-extrabold leading-[1.05] tracking-[-0.025em] text-white line-clamp-2">
             {title}
           </h3>
-        </div>
-      </div>
-
-      {/* Slim content strip below image */}
-      <div className="px-5 py-4 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-        {/* One meta line */}
-        <div className="flex items-center gap-1.5 text-[13px] text-muted-foreground opacity-80 mb-3">
-          <Calendar className="h-3.5 w-3.5" />
-          <span>{format(date, "MMM d, h:mm a")}</span>
+          {hasRating && (
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur-md">
+              <Star className="h-3 w-3 fill-white text-white" />
+              {Number(listing.partner.avg_rating).toFixed(1)}
+              <span className="font-normal opacity-70">· {listing.partner.review_count} reviews</span>
+            </div>
+          )}
         </div>
 
-        {/* Price + Book row */}
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-[19px] font-semibold text-foreground">
-              {listing.price_gel}₾
-              <span className="text-[12px] font-normal text-muted-foreground ml-1">/ session</span>
-            </p>
-            {hasVenueFee && (
-              <p className="text-[11px] font-medium text-primary mt-0.5">
-                + {listing.venue_fee_gel}₾ venue fee at location
-              </p>
-            )}
-          </div>
+        {/* Floating signature CTA — bottom of image */}
+        <div className="absolute bottom-4 left-4 right-4">
           <button
             onClick={handleBookClick}
-            className="rounded-full gradient-primary px-5 py-2.5 text-[14px] font-semibold text-primary-foreground transition-all duration-200 gradient-primary-hover active:scale-[0.97] premium-gradient-shadow"
+            className="pill-with-arrow w-full justify-between"
+            aria-label={t("bookNowBtn")}
           >
-            {t("bookNowBtn")}
+            <span className="flex flex-col items-start leading-tight">
+              <span className="text-[11px] font-medium uppercase tracking-[0.12em] opacity-65">
+                {format(date, "MMM d · h:mm a")}
+              </span>
+              <span className="text-[15px] font-bold">
+                {listing.price_gel}₾ <span className="text-[12px] font-normal opacity-65">/ session</span>
+              </span>
+            </span>
+            <span className="arrow-chip">
+              <ArrowRight className="h-4 w-4" />
+            </span>
           </button>
+          {hasVenueFee && (
+            <p className="mt-2 text-center text-[11px] font-medium text-white/85">
+              + {listing.venue_fee_gel}₾ venue fee at location
+            </p>
+          )}
         </div>
       </div>
+
+      {/* Slim expand toggle */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex w-full items-center justify-center gap-1.5 py-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {expanded ? "Less details" : "More details"}
+        {expanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+      </button>
+
 
       {/* ─── EXPANDED DETAIL PANEL ─── */}
       {expanded && (
